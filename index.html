@@ -59,7 +59,7 @@
       margin-top: 2px;
     }
 
-    /* Login Overlay */
+    /* Login Overlay - Only for Admin */
     .login-overlay {
       position: fixed;
       top: 0;
@@ -67,12 +67,13 @@
       width: 100%;
       height: 100%;
       background: rgba(0,0,0,0.6);
-      display: flex;
+      display: none;
       justify-content: center;
       align-items: center;
       z-index: 10000;
       backdrop-filter: blur(8px);
     }
+    .login-overlay.open { display: flex; }
     .login-overlay.hidden { display: none; }
     .login-box {
       background: white;
@@ -428,6 +429,11 @@
       color: white;
     }
     .admin-actions .btn-danger:hover { background: #c62828; }
+    .admin-actions .btn-warning {
+      background: #b8860b;
+      color: white;
+    }
+    .admin-actions .btn-warning:hover { background: #d4a017; }
 
     .admin-table-wrap {
       overflow-x: auto;
@@ -687,7 +693,7 @@
 </head>
 <body>
 
-<!-- Login Overlay -->
+<!-- Login Overlay - Only for Admin -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-box">
     <h2><i class="fas fa-lock"></i> Admin Login</h2>
@@ -717,10 +723,10 @@
   <!-- Tabs -->
   <div class="tabs">
     <button class="tab-btn active" data-tab="register"><i class="fas fa-user-plus"></i> Register</button>
-    <button class="tab-btn" data-tab="admin"><i class="fas fa-user-shield"></i> Admin Panel</button>
+    <button class="tab-btn" data-tab="admin" id="adminTabBtn"><i class="fas fa-user-shield"></i> Admin Panel</button>
   </div>
 
-  <!-- Tab: Registration -->
+  <!-- Tab: Registration (Public - No Login Required) -->
   <div class="tab-content active" id="tab-register">
     <form id="registrationForm" class="form-card">
       <div class="form-row">
@@ -825,13 +831,30 @@
     </div>
   </div>
 
-  <!-- Tab: Admin Panel -->
+  <!-- Tab: Admin Panel (Login Required) -->
   <div class="tab-content" id="tab-admin">
+    <div style="text-align:center; padding:2rem; background:#f8faff; border-radius:20px; margin-bottom:1.5rem;">
+      <i class="fas fa-shield-alt" style="font-size:2.5rem; color:#0b3b7a;"></i>
+      <h3 style="color:#0b2b5c; margin-top:0.5rem;">Admin Panel</h3>
+      <p style="color:#6b8aaa;">Manage members, generate certificates, and view all registrations</p>
+    </div>
+    
     <div class="admin-actions">
       <button class="btn-primary" id="refreshAdminBtn"><i class="fas fa-sync"></i> Refresh List</button>
-      <button class="btn-success" id="generateAllCertsBtn"><i class="fas fa-certificate"></i> Generate Certificates for All Eligible</button>
+      <button class="btn-success" id="generateAllCertsBtn"><i class="fas fa-certificate"></i> Generate All Eligible</button>
+      <button class="btn-warning" id="viewStatsBtn"><i class="fas fa-chart-bar"></i> View Stats</button>
       <button class="btn-danger" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
+    
+    <div id="adminStats" style="display:none; background:#f3f9fc; padding:1rem; border-radius:16px; margin-bottom:1rem;">
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap:1rem; text-align:center;">
+        <div><strong id="statTotal">0</strong><br><span style="font-size:0.8rem; color:#6b8aaa;">Total Members</span></div>
+        <div><strong id="statPaid">0</strong><br><span style="font-size:0.8rem; color:#6b8aaa;">Paid Members</span></div>
+        <div><strong id="statCert">0</strong><br><span style="font-size:0.8rem; color:#6b8aaa;">Certificates Issued</span></div>
+        <div><strong id="statEligible">0</strong><br><span style="font-size:0.8rem; color:#6b8aaa;">Eligible for Certificate</span></div>
+      </div>
+    </div>
+    
     <div class="admin-table-wrap">
       <table>
         <thead>
@@ -882,12 +905,27 @@
       const session = sessionStorage.getItem('wub_eee_admin_session');
       if (session === 'true') {
         isLoggedIn = true;
+        document.getElementById('loginOverlay').classList.remove('open');
         document.getElementById('loginOverlay').classList.add('hidden');
-        document.getElementById('mainContainer').style.display = 'block';
         return true;
       }
       return false;
     }
+
+    // Show login when admin tab is clicked
+    document.getElementById('adminTabBtn').addEventListener('click', function(e) {
+      if (!isLoggedIn) {
+        e.preventDefault();
+        document.getElementById('loginOverlay').classList.remove('hidden');
+        document.getElementById('loginOverlay').classList.add('open');
+        document.getElementById('loginError').classList.remove('show');
+        // Switch back to register tab
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('[data-tab="register"]').classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-register').classList.add('active');
+      }
+    });
 
     document.getElementById('loginBtn').addEventListener('click', function() {
       const email = document.getElementById('loginEmail').value.trim();
@@ -897,9 +935,16 @@
       if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
         sessionStorage.setItem('wub_eee_admin_session', 'true');
         isLoggedIn = true;
+        document.getElementById('loginOverlay').classList.remove('open');
         document.getElementById('loginOverlay').classList.add('hidden');
-        document.getElementById('mainContainer').style.display = 'block';
         errorEl.classList.remove('show');
+        
+        // Switch to admin tab
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('adminTabBtn').classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-admin').classList.add('active');
+        
         renderAdminTable();
         showToast('✅ Welcome Admin!');
       } else {
@@ -920,7 +965,14 @@
       sessionStorage.removeItem('wub_eee_admin_session');
       isLoggedIn = false;
       document.getElementById('loginOverlay').classList.remove('hidden');
-      document.getElementById('mainContainer').style.display = 'none';
+      document.getElementById('loginOverlay').classList.add('open');
+      
+      // Switch to register tab
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('[data-tab="register"]').classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-register').classList.add('active');
+      
       showToast('👋 Logged out successfully');
     });
 
@@ -1194,7 +1246,6 @@
       const join = new Date(joinDate);
       const now = new Date();
       const yearsDiff = now.getFullYear() - join.getFullYear();
-      // Check if at least 2 years have passed and the month/day has been reached
       if (yearsDiff > 2) return true;
       if (yearsDiff === 2) {
         const monthDiff = now.getMonth() - join.getMonth();
@@ -1209,7 +1260,6 @@
       if (certs[clubId]) {
         return certs[clubId].certNumber;
       }
-      // Generate new certificate number
       const existingCerts = Object.values(certs);
       const maxNum = existingCerts.reduce((max, c) => {
         const num = parseInt(c.certNumber.split('-')[1]);
@@ -1290,6 +1340,8 @@
 
     // ---- ADMIN TABLE ----
     function renderAdminTable() {
+      if (!isLoggedIn) return;
+      
       const records = getRegistrations();
       const tbody = document.getElementById('adminTableBody');
       if (!tbody) return;
@@ -1317,8 +1369,9 @@
           certStatus = `<span class="badge-no-cert"><i class="fas fa-clock"></i> Eligible</span>`;
           certAction = `<button class="cert-btn generate" onclick="generateCertForMember('${r.clubId}')"><i class="fas fa-certificate"></i> Generate</button>`;
         } else {
-          certStatus = `<span class="badge-no-cert"><i class="fas fa-hourglass-half"></i> ${2 - Math.floor((new Date() - new Date(r.joinDate)) / (1000*60*60*24*365))} year(s)</span>`;
-          certAction = `<span style="font-size:0.7rem; color:#6b8aaa;">Not eligible yet</span>`;
+          const yearsLeft = 2 - Math.floor((new Date() - new Date(r.joinDate)) / (1000*60*60*24*365));
+          certStatus = `<span class="badge-no-cert"><i class="fas fa-hourglass-half"></i> ${yearsLeft} year(s)</span>`;
+          certAction = `<span style="font-size:0.7rem; color:#6b8aaa;">Not eligible</span>`;
         }
         
         return `<tr>
@@ -1332,6 +1385,23 @@
           <td>${certAction}</td>
         </tr>`;
       }).join('');
+      
+      // Update stats
+      updateStats();
+    }
+
+    function updateStats() {
+      const records = getRegistrations();
+      const certs = getCertificates();
+      const total = records.length;
+      const paid = records.filter(r => r.paymentStatus && r.paymentStatus.includes('Paid')).length;
+      const certCount = Object.keys(certs).length;
+      const eligible = records.filter(r => isEligibleForCertificate(r.joinDate) && !certs[r.clubId]).length;
+      
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statPaid').textContent = paid;
+      document.getElementById('statCert').textContent = certCount;
+      document.getElementById('statEligible').textContent = eligible;
     }
 
     // ---- CERTIFICATE GLOBAL FUNCTIONS ----
@@ -1398,8 +1468,25 @@
     });
 
     document.getElementById('refreshAdminBtn').addEventListener('click', function() {
+      if (!isLoggedIn) {
+        showToast('⚠️ Please login first', true);
+        return;
+      }
       renderAdminTable();
       showToast('🔄 Admin list refreshed');
+    });
+
+    // View Stats
+    document.getElementById('viewStatsBtn').addEventListener('click', function() {
+      const statsEl = document.getElementById('adminStats');
+      if (statsEl.style.display === 'none') {
+        statsEl.style.display = 'block';
+        updateStats();
+        this.innerHTML = '<i class="fas fa-chart-bar"></i> Hide Stats';
+      } else {
+        statsEl.style.display = 'none';
+        this.innerHTML = '<i class="fas fa-chart-bar"></i> View Stats';
+      }
     });
 
     document.getElementById('certModalClose').addEventListener('click', function() {
@@ -1477,6 +1564,14 @@
     // ---- TABS ----
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', function() {
+        // If trying to access admin without login, show login
+        if (this.dataset.tab === 'admin' && !isLoggedIn) {
+          document.getElementById('loginOverlay').classList.remove('hidden');
+          document.getElementById('loginOverlay').classList.add('open');
+          document.getElementById('loginError').classList.remove('show');
+          return;
+        }
+        
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         this.classList.add('active');
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -1490,12 +1585,9 @@
 
     // ---- INIT ----
     document.getElementById('department').value = 'EEE';
-    document.getElementById('mainContainer').style.display = 'none';
     
     // Check if already logged in
-    if (checkLogin()) {
-      renderAdminTable();
-    }
+    checkLogin();
 
     console.log('🏫 WUB EEE Club Registration System loaded successfully!');
     console.log('📧 Admin: eee-club@eee.wub.edu.bd');
@@ -1503,6 +1595,8 @@
     console.log('📧 Confirmation emails from: eee-club@eee.wub.edu.bd');
     console.log('💳 bKash: 01754526593 (200 TK)');
     console.log('📜 Certificate generation after 2 years of membership');
+    console.log('👤 Users can register without login');
+    console.log('🔐 Only admins need to login to access the admin panel');
   })();
 </script>
 </body>
