@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WUB EEE Club · Registration System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #f0f5fe;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      margin: 0;
+      color: #1e293b;
+    }
+    .container {
+      width: 100%;
+      max-width: 860px;
+      background: white;
+      border-radius: 2rem;
+      box-shadow: 0 25px 50px -8px rgba(0, 20, 60, 0.15);
+      padding: 2rem 2.2rem;
+      transition: 0.2s;
+    }
+    .club-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      border-bottom: 2px solid #e6edf8;
+      padding-bottom: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .club-header i {
+      font-size: 2.6rem;
+      color: #0a3b7a;
+      background: #e2ebf9;
+      padding: 0.6rem;
+      border-radius: 18px;
+    }
+    .club-header h1 {
+      font-weight: 700;
+      font-size: 1.9rem;
+      letter-spacing: -0.3px;
+      color: #0b2b5c;
+    }
+    .club-header span {
+      font-weight: 500;
+      color: #3c6e9c;
+      font-size: 0.95rem;
+      display: block;
+      margin-top: 2px;
+    }
+    .form-card { display: flex; flex-direction: column; gap: 1.5rem; }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem 1.8rem;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .form-group.full-width { grid-column: 1 / -1; }
+    label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: -0.2px;
+      color: #1f3a66;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    label i { color: #3c7bcb; font-size: 0.9rem; width: 1.2rem; }
+    input, select, textarea {
+      font-family: 'Inter', sans-serif;
+      padding: 0.7rem 1rem;
+      border: 1.5px solid #dde6f2;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      background: #fafcff;
+      transition: 0.2s;
+      color: #0f2b4f;
+      width: 100%;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #2b6bb0;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(43, 107, 176, 0.08);
+    }
+    input:disabled {
+      background: #eef3fa;
+      color: #1f3f66;
+      font-weight: 500;
+      border-color: #cbd8ea;
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    .skills-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem 1.6rem;
+      background: #f8faff;
+      padding: 0.8rem 1.2rem;
+      border-radius: 20px;
+      border: 1px solid #e2ecfc;
+      margin-top: 4px;
+    }
+    .skills-group label {
+      font-weight: 500;
+      font-size: 0.9rem;
+      gap: 6px;
+      color: #1f3a66;
+    }
+    .skills-group input[type="checkbox"] {
+      width: 1rem;
+      height: 1rem;
+      accent-color: #1d5b9e;
+      margin-right: 2px;
+    }
+    .btn-submit {
+      background: #0b3b7a;
+      color: white;
+      border: none;
+      padding: 0.9rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 0.4rem;
+      letter-spacing: -0.2px;
+      box-shadow: 0 6px 14px rgba(11, 59, 122, 0.25);
+      width: 100%;
+    }
+    .btn-submit:hover { background: #0d4a90; transform: scale(1.01); }
+    .btn-submit:active { transform: scale(0.97); }
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background: #6b8aaa;
+      box-shadow: none;
+    }
+    .btn-submit:disabled:hover { background: #6b8aaa; transform: none; }
+
+    .payment-section {
+      background: #f3f9fc;
+      border-radius: 28px;
+      padding: 1.2rem 1.8rem;
+      margin-top: 0.2rem;
+      border: 1px solid #d4e4f5;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .payment-label {
+      font-weight: 600;
+      color: #0b2b5c;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .payment-label i { font-size: 1.3rem; color: #1b754b; }
+    .bkash-info {
+      font-size: 0.9rem;
+      background: #e8f0fe;
+      padding: 0.4rem 1rem;
+      border-radius: 30px;
+      color: #0b2b5c;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bkash-info i { color: #d63b6b; }
+    .payment-actions {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .payment-actions button {
+      background: white;
+      border: 1.5px solid #2b6bb0;
+      color: #0b3b7a;
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .payment-actions button:hover {
+      background: #0b3b7a;
+      color: white;
+    }
+    .payment-actions button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .payment-actions button.paid {
+      background: #1b754b;
+      border-color: #1b754b;
+      color: white;
+      cursor: default;
+      opacity: 0.8;
+    }
+    .payment-actions button.paid:hover { background: #1b754b; }
+    .payment-status {
+      font-weight: 500;
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
+      background: #e5edf9;
+      color: #1f3a66;
+    }
+    .payment-status.done {
+      background: #daf0e4;
+      color: #0f422b;
+    }
+    .trxid-input {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .trxid-input input {
+      width: 180px;
+      padding: 0.5rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.9rem;
+    }
+    .trxid-input input:focus { border-color: #1b754b; }
+
+    .success-box {
+      background: #e5f2e9;
+      border-radius: 28px;
+      padding: 1.2rem 2rem;
+      margin-top: 1.5rem;
+      border-left: 8px solid #1b754b;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .success-box.show { display: flex; }
+    .success-box .id-badge {
+      background: #0b3b7a;
+      color: white;
+      font-weight: 700;
+      padding: 0.4rem 1.4rem;
+      border-radius: 60px;
+      font-size: 1.1rem;
+      letter-spacing: 0.3px;
+    }
+    .success-box .message { font-weight: 500; color: #0f422b; }
+    .slip-actions {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .slip-actions button {
+      background: white;
+      border: 1px solid #1b754b;
+      color: #1b754b;
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .slip-actions button:hover { background: #1b754b; color: white; }
+
+    .admin-section {
+      margin-top: 2.5rem;
+      border-top: 2px dashed #d4e0f0;
+      padding-top: 1.5rem;
+    }
+    .admin-toggle {
+      background: none;
+      border: none;
+      font-weight: 600;
+      color: #1f4b7a;
+      cursor: pointer;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.3rem 0.6rem;
+      border-radius: 30px;
+      transition: 0.2s;
+    }
+    .admin-toggle:hover { background: #e8f0fe; }
+    .admin-table-wrap {
+      overflow-x: auto;
+      margin-top: 1rem;
+      display: none;
+    }
+    .admin-table-wrap.open { display: block; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      background: #fafdff;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    th {
+      background: #e2ebf9;
+      padding: 0.8rem 0.5rem;
+      text-align: left;
+      font-weight: 600;
+      color: #0b2a55;
+    }
+    td {
+      padding: 0.7rem 0.5rem;
+      border-bottom: 1px solid #e6edf8;
+    }
+    .empty-row td { text-align: center; color: #62748c; padding: 1.5rem; }
+    .badge-paid {
+      background: #1b754b;
+      color: white;
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-pending {
+      background: #b8860b;
+      color: white;
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .email-sent {
+      color: #1b754b;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .email-sent i { margin-right: 2px; }
+
+    .notification-toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #1b754b;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      z-index: 9999;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideUp 0.5s ease;
+      max-width: 400px;
+    }
+    .notification-toast.hidden {
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @media (max-width: 640px) {
+      .container { padding: 1.5rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .club-header h1 { font-size: 1.5rem; }
+      .club-header { flex-direction: column; align-items: flex-start; }
+      .skills-group { gap: 0.4rem 1rem; }
+      .success-box { flex-direction: column; align-items: flex-start; }
+      .slip-actions { width: 100%; justify-content: flex-start; }
+      .payment-section { flex-direction: column; align-items: stretch; }
+      .trxid-input input { width: 100%; }
+      .payment-actions { justify-content: flex-start; }
+      table { font-size: 0.75rem; }
+      th, td { padding: 0.4rem 0.3rem; }
+    }
+    .text-muted { color: #506e92; font-size: 0.85rem; }
+    .mt-1 { margin-top: 0.3rem; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="club-header">
+    <i class="fas fa-bolt"></i>
+    <div>
+      <h1>WUB EEE Club</h1>
+      <span><i class="fas fa-university"></i> World University of Bangladesh · Electrical &amp; Electronic Engineering</span>
+    </div>
+  </div>
+
+  <form id="registrationForm" class="form-card">
+    <div class="form-row">
+      <div class="form-group">
+        <label><i class="fas fa-user"></i> Full Name <span style="color:#b22234;">*</span></label>
+        <input type="text" id="fullName" placeholder="e.g. Md. Rahim Khan" required />
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-id-card"></i> Student ID <span style="color:#b22234;">*</span></label>
+        <input type="text" id="studentId" placeholder="WUB-2024-123" required />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label><i class="fas fa-building"></i> Department</label>
+        <input type="text" id="department" value="EEE" disabled />
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-calendar-alt"></i> Semester</label>
+        <select id="semester">
+          <option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd" selected>3rd</option>
+          <option value="4th">4th</option><option value="5th">5th</option><option value="6th">6th</option>
+          <option value="7th">7th</option><option value="8th">8th</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label><i class="fas fa-envelope"></i> Email <span style="color:#b22234;">*</span></label>
+        <input type="email" id="email" placeholder="student@wub.edu.bd" required />
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-phone-alt"></i> Phone</label>
+        <input type="tel" id="phone" placeholder="+880 17XX-XXXXXX" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label><i class="fas fa-venus-mars"></i> Gender</label>
+        <select id="gender"><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-tag"></i> Interest Area</label>
+        <select id="interest">
+          <option value="Technical Workshop">Technical Workshop</option>
+          <option value="Competition Team">Competition Team</option>
+          <option value="Research Team">Research Team</option>
+          <option value="Event Management">Event Management</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group full-width">
+      <label><i class="fas fa-check-circle"></i> Skills</label>
+      <div class="skills-group" id="skillsGroup">
+        <label><input type="checkbox" value="Programming" /> Programming</label>
+        <label><input type="checkbox" value="Circuit Design" /> Circuit Design</label>
+        <label><input type="checkbox" value="Robotics" /> Robotics</label>
+        <label><input type="checkbox" value="Research" /> Research</label>
+        <label><input type="checkbox" value="Event Management" /> Event Management</label>
+      </div>
+    </div>
+    <div class="form-group full-width">
+      <label><i class="fas fa-comment"></i> Why do you want to join?</label>
+      <textarea id="reason" placeholder="Share your motivation..."></textarea>
+    </div>
+
+    <!-- PAYMENT SECTION with bKash TrxID -->
+    <div class="payment-section">
+      <div class="payment-label">
+        <i class="fas fa-credit-card"></i>
+        <span>Membership Fee: <strong style="color:#0b2b5c;">200 TK</strong></span>
+        <span class="bkash-info"><i class="fas fa-mobile-alt"></i> bKash: 01754526593</span>
+      </div>
+      <div class="payment-actions" style="flex:1; justify-content:flex-end;">
+        <div class="trxid-input">
+          <input type="text" id="trxidInput" placeholder="Enter bKash TrxID" />
+          <button type="button" id="verifyTrxidBtn" style="padding:0.5rem 1.2rem; border-radius:40px; background:#1b754b; color:white; border:none; font-weight:600; cursor:pointer;">
+            <i class="fas fa-check"></i> Verify
+          </button>
+        </div>
+        <span class="payment-status" id="paymentStatus"><i class="fas fa-clock"></i> Pending</span>
+        <button type="button" id="resetPaymentBtn" style="border-color:#b0b0b0; color:#4a5a72; padding:0.4rem 1rem;"><i class="fas fa-undo"></i></button>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-submit" id="submitBtn" disabled>
+      <i class="fas fa-paper-plane"></i> Register & Complete
+    </button>
+  </form>
+
+  <!-- success -->
+  <div id="successBox" class="success-box">
+    <div>
+      <div class="message"><i class="fas fa-check-circle" style="color:#1b754b;"></i> Registration Successful!</div>
+      <div style="margin-top:6px; font-weight:500;">Your Club ID: <span id="displayClubId" class="id-badge">WUB-EEE-2026-0001</span></div>
+      <div style="margin-top:4px; font-size:0.85rem; color:#0f422b;">
+        <i class="fas fa-envelope"></i> Confirmation email sent to your inbox
+      </div>
+    </div>
+    <div class="slip-actions">
+      <button id="downloadSlipBtn"><i class="fas fa-download"></i> Download Slip</button>
+      <button id="resetFormBtn"><i class="fas fa-undo-alt"></i> New Registration</button>
+    </div>
+  </div>
+
+  <!-- admin -->
+  <div class="admin-section">
+    <button class="admin-toggle" id="adminToggle"><i class="fas fa-users-cog"></i> Show Registered Members</button>
+    <div class="admin-table-wrap" id="adminTableWrap">
+      <table>
+        <thead><tr><th>#</th><th>Name</th><th>Student ID</th><th>Club ID</th><th>Payment</th><th>TrxID</th><th>Email</th></tr></thead>
+        <tbody id="adminTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const STORAGE_KEY = 'wub_eee_registrations';
+    const ID_KEY = 'wub_eee_last_id';
+    const year = new Date().getFullYear();
+
+    // ---- helpers ----
+    function getLastSerial() {
+      const stored = localStorage.getItem(ID_KEY);
+      return stored ? parseInt(stored, 10) : 0;
+    }
+    function setLastSerial(serial) {
+      localStorage.setItem(ID_KEY, String(serial));
+    }
+    function generateClubId(serial) {
+      return `WUB-EEE-${year}-${String(serial).padStart(4, '0')}`;
+    }
+    function getRegistrations() {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    }
+    function saveRegistrations(records) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    }
+    function escapeHtml(text) {
+      if (!text) return '';
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return String(text).replace(/[&<>"']/g, m => map[m]);
+    }
+
+    // ---- Email simulation ----
+    function sendConfirmationEmail(record) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const emailContent = `
+            Subject: WUB EEE Club Registration Confirmation
+
+            Dear ${record.fullName},
+
+            Congratulations! Your registration for the WUB EEE Club has been confirmed.
+
+            Club ID: ${record.clubId}
+            Student ID: ${record.studentId}
+            Department: EEE
+            Semester: ${record.semester}
+            Email: ${record.email}
+            Payment: ${record.paymentStatus} (TrxID: ${record.trxid || 'N/A'})
+
+            Thank you for joining the WUB EEE Club!
+
+            Best regards,
+            WUB EEE Club Team
+            EEE Club Office, World University of Bangladesh
+            Email: eee-club@eee.wub.edu.bd
+          `;
+          
+          console.log('📧 Confirmation email sent to:', record.email);
+          console.log('📧 From: eee-club@eee.wub.edu.bd');
+          console.log('📧 Content:', emailContent);
+          
+          showToast(`✅ Confirmation email sent to ${record.email}`);
+          resolve(true);
+        }, 1000);
+      });
+    }
+
+    // ---- Toast notification ----
+    function showToast(message) {
+      const existing = document.querySelector('.notification-toast');
+      if (existing) existing.remove();
+      
+      const toast = document.createElement('div');
+      toast.className = 'notification-toast';
+      toast.innerHTML = `<i class="fas fa-envelope"></i> ${message}`;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.classList.add('hidden');
+        setTimeout(() => toast.remove(), 500);
+      }, 4000);
+    }
+
+    // ---- payment state ----
+    let paymentCompleted = false;
+    let verifiedTrxID = '';
+
+    function updatePaymentUI() {
+      const statusEl = document.getElementById('paymentStatus');
+      const trxInput = document.getElementById('trxidInput');
+      const verifyBtn = document.getElementById('verifyTrxidBtn');
+      const submitBtn = document.getElementById('submitBtn');
+      
+      if (paymentCompleted && verifiedTrxID) {
+        statusEl.innerHTML = `<i class="fas fa-check-circle" style="color:#1b754b;"></i> Paid (TrxID: ${verifiedTrxID})`;
+        statusEl.className = 'payment-status done';
+        trxInput.disabled = true;
+        verifyBtn.disabled = true;
+        verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verified';
+        verifyBtn.style.background = '#1b754b';
+        submitBtn.disabled = false;
+      } else {
+        statusEl.innerHTML = '<i class="fas fa-clock"></i> Pending';
+        statusEl.className = 'payment-status';
+        trxInput.disabled = false;
+        verifyBtn.disabled = false;
+        verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify';
+        verifyBtn.style.background = '#1b754b';
+        submitBtn.disabled = true;
+      }
+    }
+
+    // Verify TrxID
+    document.getElementById('verifyTrxidBtn').addEventListener('click', function() {
+      const trxInput = document.getElementById('trxidInput');
+      const trxid = trxInput.value.trim();
+      if (!trxid) {
+        alert('Please enter a bKash Transaction ID (TrxID).');
+        return;
+      }
+      if (trxid.length < 4) {
+        alert('Please enter a valid TrxID (at least 4 characters).');
+        return;
+      }
+      this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+      this.disabled = true;
+      setTimeout(() => {
+        verifiedTrxID = trxid;
+        paymentCompleted = true;
+        updatePaymentUI();
+        alert(`✅ bKash payment verified!\nTrxID: ${verifiedTrxID}\nAmount: 200 TK`);
+        this.innerHTML = '<i class="fas fa-check"></i> Verified';
+        this.style.background = '#1b754b';
+      }, 800);
+    });
+
+    // Reset payment
+    document.getElementById('resetPaymentBtn').addEventListener('click', function() {
+      paymentCompleted = false;
+      verifiedTrxID = '';
+      document.getElementById('trxidInput').value = '';
+      document.getElementById('trxidInput').disabled = false;
+      const verifyBtn = document.getElementById('verifyTrxidBtn');
+      verifyBtn.disabled = false;
+      verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify';
+      verifyBtn.style.background = '#1b754b';
+      document.getElementById('submitBtn').disabled = true;
+      updatePaymentUI();
+    });
+
+    // ---- form submit ----
+    document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      if (!paymentCompleted || !verifiedTrxID) {
+        alert('⚠️ Please enter and verify your bKash TrxID first.');
+        return;
+      }
+
+      const fullName = document.getElementById('fullName').value.trim();
+      const studentId = document.getElementById('studentId').value.trim();
+      const email = document.getElementById('email').value.trim();
+      if (!fullName || !studentId || !email) {
+        alert('Please fill in all required fields: Full Name, Student ID, and Email.');
+        return;
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        alert('Please enter a valid email address.');
+        return;
+      }
+
+      const skillCheckboxes = document.querySelectorAll('#skillsGroup input[type="checkbox"]');
+      const skills = [];
+      skillCheckboxes.forEach(cb => { if (cb.checked) skills.push(cb.value); });
+
+      const semester = document.getElementById('semester').value;
+      const phone = document.getElementById('phone').value.trim();
+      const gender = document.getElementById('gender').value;
+      const interest = document.getElementById('interest').value;
+      const reason = document.getElementById('reason').value.trim();
+
+      let lastSerial = getLastSerial();
+      const newSerial = lastSerial + 1;
+      const clubId = generateClubId(newSerial);
+      setLastSerial(newSerial);
+
+      const record = {
+        fullName, studentId, department: 'EEE', semester, email, phone, gender,
+        skills, interest, reason, clubId,
+        paymentStatus: 'Paid (bKash)',
+        paymentMethod: 'bKash',
+        paymentAmount: '200 TK',
+        trxid: verifiedTrxID,
+        timestamp: new Date().toISOString()
+      };
+
+      const records = getRegistrations();
+      const exists = records.some(r => r.studentId === studentId);
+      if (exists) {
+        alert('This Student ID is already registered. Please use a different ID.');
+        setLastSerial(lastSerial);
+        return;
+      }
+      records.push(record);
+      saveRegistrations(records);
+
+      // Send confirmation email
+      await sendConfirmationEmail(record);
+      
+      // show success
+      const box = document.getElementById('successBox');
+      const span = document.getElementById('displayClubId');
+      if (span) span.textContent = clubId;
+      if (box) box.classList.add('show');
+
+      window._lastClubId = clubId;
+      window._lastFormData = record;
+
+      renderAdminTable();
+      document.getElementById('successBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.getElementById('submitBtn').disabled = true;
+    });
+
+    // reset form
+    document.getElementById('resetFormBtn').addEventListener('click', function() {
+      const form = document.getElementById('registrationForm');
+      if (form) form.reset();
+      document.querySelectorAll('#skillsGroup input[type="checkbox"]').forEach(cb => cb.checked = false);
+      document.getElementById('department').value = 'EEE';
+      document.getElementById('successBox').classList.remove('show');
+      paymentCompleted = false;
+      verifiedTrxID = '';
+      document.getElementById('trxidInput').value = '';
+      document.getElementById('trxidInput').disabled = false;
+      const verifyBtn = document.getElementById('verifyTrxidBtn');
+      verifyBtn.disabled = false;
+      verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify';
+      verifyBtn.style.background = '#1b754b';
+      document.getElementById('submitBtn').disabled = true;
+      updatePaymentUI();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // download slip
+    document.getElementById('downloadSlipBtn').addEventListener('click', function() {
+      const clubId = window._lastClubId;
+      const data = window._lastFormData;
+      if (!clubId || !data) {
+        alert('No registration data to download. Please submit the form first.');
+        return;
+      }
+      const lines = [
+        '═══════════════════════════════════════════',
+        '         WUB EEE CLUB REGISTRATION         ',
+        '═══════════════════════════════════════════',
+        '',
+        `Club ID      : ${clubId}`,
+        `Name         : ${data.fullName}`,
+        `Student ID   : ${data.studentId}`,
+        `Department   : EEE`,
+        `Semester     : ${data.semester}`,
+        `Email        : ${data.email}`,
+        `Phone        : ${data.phone || '—'}`,
+        `Gender       : ${data.gender}`,
+        `Interest     : ${data.interest}`,
+        `Skills       : ${data.skills.join(', ') || '—'}`,
+        `Reason       : ${data.reason || '—'}`,
+        `Payment      : ${data.paymentStatus || 'Paid'}`,
+        `Method       : bKash (01754526593)`,
+        `Amount       : 200 TK`,
+        `TrxID        : ${data.trxid || '—'}`,
+        `Registered   : ${new Date().toLocaleString()}`,
+        '',
+        '───────────────────────────────────────────',
+        'Thank you for joining WUB EEE Club!',
+        'Confirmation email sent to: ' + data.email,
+        'From: eee-club@eee.wub.edu.bd',
+        '═══════════════════════════════════════════'
+      ].join('\n');
+      const blob = new Blob([lines], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `WUB_EEE_Club_Slip_${clubId}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    });
+
+    // admin table
+    function renderAdminTable() {
+      const records = getRegistrations();
+      const tbody = document.getElementById('adminTableBody');
+      if (!tbody) return;
+      if (records.length === 0) {
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="7">No registered members yet. Be the first!</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = records.map((r, idx) => {
+        const paid = r.paymentStatus && r.paymentStatus.includes('Paid');
+        return `<tr>
+          <td>${idx+1}</td>
+          <td><strong>${escapeHtml(r.fullName || '')}</strong></td>
+          <td>${escapeHtml(r.studentId || '')}</td>
+          <td><code style="background:#e8f0fe; padding:2px 8px; border-radius:12px; font-weight:600;">${escapeHtml(r.clubId || '')}</code></td>
+          <td><span class="${paid ? 'badge-paid' : 'badge-pending'}">${paid ? '✅ Paid' : '⏳ Pending'}</span></td>
+          <td><code style="font-size:0.7rem; background:#f0f0f0; padding:2px 6px; border-radius:4px;">${escapeHtml(r.trxid || '—')}</code></td>
+          <td style="font-size:0.8rem;">${escapeHtml(r.email || '—')} <span class="email-sent"><i class="fas fa-check-circle"></i></span></td>
+        </tr>`;
+      }).join('');
+    }
+
+    // admin toggle
+    let adminOpen = false;
+    document.getElementById('adminToggle').addEventListener('click', function() {
+      const wrap = document.getElementById('adminTableWrap');
+      adminOpen = !adminOpen;
+      wrap.classList.toggle('open', adminOpen);
+      this.innerHTML = adminOpen ? 
+        '<i class="fas fa-users-cog"></i> Hide Registered Members' : 
+        '<i class="fas fa-users-cog"></i> Show Registered Members';
+      if (adminOpen) renderAdminTable();
+    });
+
+    // ---- init ----
+    document.getElementById('department').value = 'EEE';
+    renderAdminTable();
+    updatePaymentUI();
+    
+    // Set initial state
+    paymentCompleted = false;
+    verifiedTrxID = '';
+    updatePaymentUI();
+
+    console.log('🏫 WUB EEE Club Registration System loaded successfully!');
+    console.log('📧 Confirmation emails will be sent from: eee-club@eee.wub.edu.bd');
+    console.log('💳 bKash: 01754526593 (200 TK)');
+  })();
+</script>
+</body>
+</html>
