@@ -1148,10 +1148,11 @@
 <script>
   (function() {
     // ============================================
-    // GOOGLE SHEETS CONFIGURATION
+    // JSONBin.io CONFIGURATION
     // ============================================
-    // !!! REPLACE THIS WITH YOUR ACTUAL WEB APP URL !!!
-    const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+    const JSONBIN_BIN_ID = '6a3a40f6f5f4af5e2921c0d2';
+    const JSONBIN_API_KEY = '$2a$10$uxxlv8nJapUJj6YbaVCY4u1EBDwX6.jOssFoyi0I7e8CyDKeTIc5W';
+    const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
     
     // ============================================
     // CONSTANTS
@@ -1186,44 +1187,63 @@
       }
     }
 
-    async function syncDataToCloud(records) {
+    async function syncDataToCloud(records, lastId) {
       try {
-        if (!GOOGLE_SHEETS_URL || GOOGLE_SHEETS_URL.includes('YOUR_SCRIPT_ID')) {
-          updateSyncStatus('offline', '⚠️ Google Sheets not configured');
+        updateSyncStatus('syncing', '⏳ Saving to cloud...');
+        
+        const data = {
+          records: records,
+          lastId: lastId || getLastSerial()
+        };
+        
+        const response = await fetch(JSONBIN_URL, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Master-Key': JSONBIN_API_KEY
+          },
+          body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+          updateSyncStatus('online', '✅ Data saved to cloud');
+          return true;
+        } else {
+          const error = await response.json();
+          console.error('Cloud save error:', error);
+          updateSyncStatus('offline', '⚠️ Cloud save failed');
           return false;
         }
-        
-        const response = await fetch(GOOGLE_SHEETS_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            action: 'sync', 
-            data: records, 
-            lastId: getLastSerial() 
-          })
-        });
-        updateSyncStatus('online', '✅ Data synced to cloud');
-        return true;
       } catch (error) {
-        console.warn('Cloud sync failed:', error);
-        updateSyncStatus('offline', '⚠️ Cloud sync failed - Using local data');
+        console.error('Cloud sync error:', error);
+        updateSyncStatus('offline', '⚠️ Cloud error - Using local data');
         return false;
       }
     }
 
     async function fetchDataFromCloud() {
       try {
-        if (!GOOGLE_SHEETS_URL || GOOGLE_SHEETS_URL.includes('YOUR_SCRIPT_ID')) {
-          updateSyncStatus('offline', '⚠️ Google Sheets not configured');
+        updateSyncStatus('syncing', '⏳ Fetching from cloud...');
+        
+        const response = await fetch(JSONBIN_URL, {
+          method: 'GET',
+          headers: {
+            'X-Master-Key': JSONBIN_API_KEY
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          updateSyncStatus('online', '✅ Data fetched from cloud');
+          return data.record || data;
+        } else {
+          console.error('Cloud fetch failed:', response.status);
+          updateSyncStatus('offline', '⚠️ Cloud fetch failed');
           return null;
         }
-        
-        const response = await fetch(GOOGLE_SHEETS_URL + '?action=fetch');
-        const data = await response.json();
-        return data;
       } catch (error) {
-        console.warn('Cloud fetch failed:', error);
+        console.error('Cloud fetch error:', error);
+        updateSyncStatus('offline', '⚠️ Cloud error - Using local data');
         return null;
       }
     }
@@ -1231,21 +1251,20 @@
     async function syncFromCloud() {
       if (isSyncing) return;
       isSyncing = true;
-      updateSyncStatus('syncing', '⏳ Fetching data from cloud...');
       
       try {
         const cloudData = await fetchDataFromCloud();
         if (cloudData && cloudData.records) {
           // Merge cloud data with local
           const localRecords = getRegistrations();
-          const mergedRecords = mergeRecords(localRecords, cloudData.records);
+          const cloudRecords = cloudData.records || [];
+          const mergedRecords = mergeRecords(localRecords, cloudRecords);
           saveRegistrations(mergedRecords);
           
           if (cloudData.lastId && cloudData.lastId > getLastSerial()) {
             setLastSerial(cloudData.lastId);
           }
           
-          updateSyncStatus('online', '✅ Data synced from cloud');
           renderAdminTable();
           showToast('✅ Data synced from cloud successfully!');
         } else if (cloudData && cloudData.records && cloudData.records.length === 0) {
@@ -1292,7 +1311,8 @@
     function saveRegistrations(records) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
       // Sync to cloud in background
-      setTimeout(() => syncDataToCloud(records), 100);
+      const lastId = getLastSerial();
+      setTimeout(() => syncDataToCloud(records, lastId), 100);
     }
     
     function getCertificates() {
@@ -2131,7 +2151,6 @@
         
         if (this.dataset.tab === 'admin' && isLoggedIn) {
           renderAdminTable();
-          // Refresh from cloud when admin tab is opened
           setTimeout(syncFromCloud, 300);
         }
       });
@@ -2151,15 +2170,9 @@
     console.log('🔑 Password: Eee123@580Eee');
     console.log('📜 Certificate: A4 size (210mm × 297mm)');
     console.log('📜 Title: 🏆 CERTIFICATE OF MEMBERSHIP');
-    console.log('📜 Period: 2 years before generation date to current date');
     console.log('📱 QR Code generated after registration');
-    
-    if (GOOGLE_SHEETS_URL && !GOOGLE_SHEETS_URL.includes('YOUR_SCRIPT_ID')) {
-      console.log('☁️ Cloud sync enabled with Google Sheets');
-    } else {
-      console.log('⚠️ Google Sheets not configured - data stays on each device');
-      console.log('📝 To enable cloud sync, set up Google Sheets and update GOOGLE_SHEETS_URL');
-    }
+    console.log('☁️ Cloud sync enabled with JSONBin.io');
+    console.log('📦 Bin ID:', JSONBIN_BIN_ID);
   })();
 </script>
 </body>
