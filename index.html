@@ -348,6 +348,60 @@
       font-size: 0.9rem;
     }
 
+    .past-student-toggle {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.8rem 1.2rem;
+      background: #f3f9fc;
+      border-radius: 14px;
+      border: 1px solid #d4e4f5;
+    }
+    .past-student-toggle label {
+      font-weight: 600;
+      color: #1f3a66;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .past-student-toggle input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #6a1b9a;
+      cursor: pointer;
+    }
+    .past-student-fields {
+      display: none;
+      grid-column: 1 / -1;
+      background: #f8faff;
+      padding: 1rem 1.2rem;
+      border-radius: 14px;
+      border: 1px solid #dde6f2;
+    }
+    .past-student-fields.show {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem 1.5rem;
+    }
+    .past-student-fields label {
+      font-size: 0.85rem;
+      color: #4a6a8a;
+    }
+    .past-student-fields input {
+      padding: 0.5rem 0.8rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+    }
+    .past-badge {
+      background: #6a1b9a;
+      color: white;
+      padding: 0.2rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
     .success-box {
       background: #e5f2e9;
       border-radius: 28px;
@@ -745,32 +799,38 @@
       flex-direction: column;
       align-items: center;
       margin-bottom: 0.2rem;
-      padding-bottom: 0.3rem;
+      padding-bottom: 0.2rem;
       border-bottom: 2px solid #dde6f2;
     }
     
-    .certificate .club-logo .logo-svg { 
-      margin-bottom: 0.05rem; 
-      width: 80px;
-      height: 80px;
+    .certificate .club-logo .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     
-    .certificate .club-logo .logo-text {
+    .certificate .club-logo .logo-bolt {
+      font-size: 2.2rem;
+      color: #f5a623;
+      margin-bottom: 0.05rem;
+    }
+    
+    .certificate .club-logo .logo-wub {
       font-family: 'Playfair Display', serif;
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #0b3b7a;
+      letter-spacing: 14px;
+      line-height: 1.1;
+    }
+    
+    .certificate .club-logo .logo-eee {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
       font-weight: 700;
       color: #0b3b7a;
       letter-spacing: 10px;
       line-height: 1.1;
-    }
-    
-    .certificate .club-logo .logo-wub {
-      font-size: 2.6rem;
-      letter-spacing: 14px;
-    }
-    
-    .certificate .club-logo .logo-eee {
-      font-size: 2rem;
-      letter-spacing: 10px;
     }
     
     .certificate .club-logo .logo-club {
@@ -791,7 +851,7 @@
     
     .certificate .cert-title h1 {
       font-family: 'Playfair Display', serif;
-      font-size: 2.2rem;
+      font-size: 2rem;
       color: #0b2b5c;
       letter-spacing: 2px;
       font-weight: 700;
@@ -821,7 +881,7 @@
     
     .certificate .cert-body .cert-name {
       font-family: 'Playfair Display', serif;
-      font-size: 1.7rem;
+      font-size: 1.6rem;
       color: #0b2b5c;
       text-align: center;
       margin: 0.15rem 0;
@@ -835,6 +895,28 @@
     .certificate .cert-body .highlight {
       color: #0b3b7a;
       font-weight: 600;
+    }
+    
+    .certificate .cert-body .qr-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-top: 0.3rem;
+    }
+    
+    .certificate .cert-body .qr-row .qr-placeholder {
+      flex-shrink: 0;
+    }
+    
+    .certificate .cert-body .qr-row .qr-placeholder #certQR {
+      display: inline-block;
+    }
+    
+    .certificate .cert-body .qr-row .qr-placeholder .qr-label {
+      font-size: 0.6rem;
+      color: #6b8aaa;
+      text-align: center;
+      margin-top: 0.1rem;
     }
     
     .certificate .cert-body .signature-line {
@@ -857,6 +939,16 @@
       font-size: 0.7rem;
       color: #6b8aaa;
       font-weight: 500;
+    }
+    
+    .certificate .cert-body .nb-note {
+      font-size: 0.7rem;
+      color: #888;
+      text-align: center;
+      margin-top: 0.3rem;
+      font-style: italic;
+      border-top: 1px dashed #dde6f2;
+      padding-top: 0.3rem;
     }
     
     .certificate .cert-footer {
@@ -889,11 +981,12 @@
       .certificate .cert-border { border: 3px solid #0b3b7a; padding: 0.3in 0.2in; height: 100%; }
       .certificate .club-logo .logo-wub { font-size: 2.4rem; }
       .certificate .club-logo .logo-eee { font-size: 1.8rem; }
-      .certificate .club-logo .logo-svg { width: 70px; height: 70px; }
-      .certificate .cert-title h1 { font-size: 2rem; }
+      .certificate .club-logo .logo-bolt { font-size: 1.8rem; }
+      .certificate .cert-title h1 { font-size: 1.8rem; }
       .certificate .cert-body .cert-name { font-size: 1.5rem; }
       .certificate .cert-body { font-size: 0.9rem; padding: 0.1in 0.05in; }
       .certificate .cert-seal { font-size: 3rem; top: 15px; right: 15px; }
+      .certificate .cert-body .qr-row .qr-placeholder #certQR { transform: scale(0.8); }
       .no-print { display: none !important; }
     }
 
@@ -902,10 +995,11 @@
       .certificate .cert-border { padding: 0.8rem; min-height: auto; }
       .certificate .club-logo .logo-wub { font-size: 2rem; letter-spacing: 10px; }
       .certificate .club-logo .logo-eee { font-size: 1.6rem; letter-spacing: 8px; }
-      .certificate .club-logo .logo-svg { width: 65px; height: 65px; }
+      .certificate .club-logo .logo-bolt { font-size: 1.5rem; }
       .certificate .cert-title h1 { font-size: 1.6rem; }
       .certificate .cert-body .cert-name { font-size: 1.3rem; }
       .certificate .cert-body { font-size: 0.85rem; padding: 0.5rem; }
+      .certificate .cert-body .qr-row { justify-content: center; }
       .certificate .cert-body .signature-line { flex-direction: column; gap: 0.5rem; align-items: center; }
       .certificate .cert-footer { flex-direction: column; gap: 0.2rem; align-items: center; }
       .cert-modal-content { padding: 0.5rem; }
@@ -931,10 +1025,13 @@
       .certificate { padding: 0.8rem; }
       .certificate .club-logo .logo-wub { font-size: 1.6rem; }
       .certificate .club-logo .logo-eee { font-size: 1.3rem; }
-      .certificate .club-logo .logo-svg { width: 50px; height: 50px; }
+      .certificate .club-logo .logo-bolt { font-size: 1.2rem; }
       .certificate .cert-title h1 { font-size: 1.2rem; }
       .certificate .cert-body .cert-name { font-size: 1rem; }
       .certificate .cert-body { font-size: 0.75rem; }
+      .past-student-fields.show {
+        grid-template-columns: 1fr;
+      }
     }
 
     @keyframes slideUp {
@@ -952,7 +1049,7 @@
     <p class="subtitle">Enter your credentials to access the admin panel</p>
     <div class="form-group">
       <label><i class="fas fa-envelope"></i> Email</label>
-      <input type="email" id="loginEmail" placeholder="eee-club@eee.wub.edu.bd" value="eee-club@eee.wub.edu.bd" />
+      <input type="email" id="loginEmail" placeholder="Enter admin email" />
     </div>
     <div class="form-group">
       <label><i class="fas fa-key"></i> Password</label>
@@ -1049,6 +1146,30 @@
       <div class="form-group full-width">
         <label><i class="fas fa-comment"></i> Why do you want to join?</label>
         <textarea id="reason" placeholder="Share your motivation..."></textarea>
+      </div>
+
+      <!-- Past Student Toggle -->
+      <div class="past-student-toggle full-width">
+        <label>
+          <input type="checkbox" id="isPastStudent" />
+          <i class="fas fa-history"></i> This is a Past Student (Joined before 2024)
+        </label>
+        <span class="past-badge">Past Member</span>
+      </div>
+
+      <!-- Past Student Fields -->
+      <div class="past-student-fields" id="pastStudentFields">
+        <div class="form-group">
+          <label><i class="fas fa-calendar-start"></i> Membership Start Year *</label>
+          <input type="number" id="startYear" placeholder="e.g. 2016" min="2010" max="2023" />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-calendar-end"></i> Membership End Year *</label>
+          <input type="number" id="endYear" placeholder="e.g. 2018" min="2010" max="2024" />
+        </div>
+        <div class="form-group full-width" style="font-size:0.85rem; color:#6b8aaa; padding:0.3rem 0.5rem;">
+          <i class="fas fa-info-circle"></i> For past students, enter the years they were active members. Certificate will show this period.
+        </div>
       </div>
 
       <div class="payment-section">
@@ -1175,7 +1296,7 @@
     const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
     
     // ============================================
-    // CONSTANTS
+    // CONSTANTS - FIXED ADMIN CREDENTIALS
     // ============================================
     const STORAGE_KEY = 'wub_eee_registrations';
     const ID_KEY = 'wub_eee_last_id';
@@ -1186,6 +1307,24 @@
 
     let isLoggedIn = false;
     let isSyncing = false;
+
+    // ============================================
+    // PAST STUDENT TOGGLE
+    // ============================================
+    document.getElementById('isPastStudent').addEventListener('change', function() {
+      const fields = document.getElementById('pastStudentFields');
+      if (this.checked) {
+        fields.classList.add('show');
+        document.getElementById('startYear').required = true;
+        document.getElementById('endYear').required = true;
+      } else {
+        fields.classList.remove('show');
+        document.getElementById('startYear').required = false;
+        document.getElementById('endYear').required = false;
+        document.getElementById('startYear').value = '';
+        document.getElementById('endYear').value = '';
+      }
+    });
 
     // ============================================
     // SYNC FUNCTIONS
@@ -1342,7 +1481,7 @@
     }
 
     // ============================================
-    // LOGIN FUNCTIONS
+    // LOGIN FUNCTIONS - FIXED
     // ============================================
     function checkLogin() {
       const session = sessionStorage.getItem('wub_eee_admin_session');
@@ -1362,6 +1501,10 @@
         document.getElementById('loginOverlay').classList.remove('hidden');
         document.getElementById('loginOverlay').classList.add('open');
         document.getElementById('loginError').classList.remove('show');
+        // Clear fields for security
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
+        // Switch back to register tab
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.querySelector('[data-tab="register"]').classList.add('active');
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -1374,6 +1517,11 @@
       const password = document.getElementById('loginPassword').value.trim();
       const errorEl = document.getElementById('loginError');
 
+      console.log('Login attempt - Email:', email);
+      console.log('Login attempt - Password length:', password.length);
+      console.log('Expected Email:', ADMIN_EMAIL);
+      console.log('Expected Password:', ADMIN_PASSWORD);
+
       if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
         sessionStorage.setItem('wub_eee_admin_session', 'true');
         isLoggedIn = true;
@@ -1381,6 +1529,7 @@
         document.getElementById('loginOverlay').classList.add('hidden');
         errorEl.classList.remove('show');
         
+        // Switch to admin tab
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('adminTabBtn').classList.add('active');
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -1391,9 +1540,14 @@
         setTimeout(syncFromCloud, 500);
       } else {
         errorEl.classList.add('show');
+        // Clear password field for security
+        document.getElementById('loginPassword').value = '';
+        // Clear email field too
+        document.getElementById('loginEmail').value = '';
       }
     });
 
+    // Enter key support for login
     document.getElementById('loginPassword').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') document.getElementById('loginBtn').click();
     });
@@ -1412,6 +1566,9 @@
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       document.getElementById('tab-register').classList.add('active');
       
+      // Clear fields
+      document.getElementById('loginEmail').value = '';
+      document.getElementById('loginPassword').value = '';
       showToast('👋 Logged out successfully');
     });
 
@@ -1543,6 +1700,33 @@
         return;
       }
 
+      const isPastStudent = document.getElementById('isPastStudent').checked;
+      let startYear = null;
+      let endYear = null;
+
+      if (isPastStudent) {
+        startYear = document.getElementById('startYear').value.trim();
+        endYear = document.getElementById('endYear').value.trim();
+        
+        if (!startYear || !endYear) {
+          alert('⚠️ Please enter both Start Year and End Year for past student.');
+          return;
+        }
+        
+        const startNum = parseInt(startYear);
+        const endNum = parseInt(endYear);
+        
+        if (isNaN(startNum) || isNaN(endNum) || startNum > endNum) {
+          alert('⚠️ Please enter valid years (Start Year must be before End Year).');
+          return;
+        }
+        
+        if (startNum >= 2024) {
+          alert('⚠️ For past students, Start Year must be before 2024.');
+          return;
+        }
+      }
+
       const skillCheckboxes = document.querySelectorAll('#skillsGroup input[type="checkbox"]');
       const skills = [];
       skillCheckboxes.forEach(cb => { if (cb.checked) skills.push(cb.value); });
@@ -1558,6 +1742,13 @@
       const clubId = generateClubId(newSerial);
       setLastSerial(newSerial);
 
+      let joinDate;
+      if (isPastStudent && startYear) {
+        joinDate = new Date(startYear, 0, 1).toISOString();
+      } else {
+        joinDate = new Date().toISOString();
+      }
+
       const record = {
         fullName, studentId, department: 'EEE', semester, email, phone, gender,
         skills, interest, reason, clubId,
@@ -1565,8 +1756,11 @@
         paymentMethod: 'bKash',
         paymentAmount: '200 TK',
         trxid: verifiedTrxID,
-        joinDate: new Date().toISOString(),
-        timestamp: new Date().toISOString()
+        joinDate: joinDate,
+        timestamp: new Date().toISOString(),
+        isPastStudent: isPastStudent,
+        startYear: startYear,
+        endYear: endYear
       };
 
       const records = getRegistrations();
@@ -1615,13 +1809,45 @@
         email: record.email,
         joinDate: record.joinDate,
         semester: record.semester,
-        department: 'EEE'
+        department: 'EEE',
+        isPastStudent: record.isPastStudent || false,
+        startYear: record.startYear || null,
+        endYear: record.endYear || null
       });
       
       new QRCode(qrContainer, {
         text: qrData,
         width: 180,
         height: 180,
+        colorDark: '#0b3b7a',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }
+
+    // Generate QR for Certificate
+    function generateCertQR(record) {
+      const qrContainer = document.getElementById('certQR');
+      if (!qrContainer) return;
+      qrContainer.innerHTML = '';
+      
+      const certs = getCertificates();
+      const cert = certs[record.clubId] || {};
+      
+      const qrData = JSON.stringify({
+        name: record.fullName,
+        studentId: record.studentId,
+        clubId: record.clubId,
+        certificateNo: cert.certNumber || 'N/A',
+        issuedDate: new Date().toLocaleDateString(),
+        department: 'EEE',
+        email: record.email
+      });
+      
+      new QRCode(qrContainer, {
+        text: qrData,
+        width: 100,
+        height: 100,
         colorDark: '#0b3b7a',
         colorLight: '#ffffff',
         correctLevel: QRCode.CorrectLevel.H
@@ -1683,6 +1909,8 @@
       document.getElementById('department').value = 'EEE';
       document.getElementById('successBox').classList.remove('show');
       document.getElementById('qrSection').style.display = 'none';
+      document.getElementById('pastStudentFields').classList.remove('show');
+      document.getElementById('isPastStudent').checked = false;
       paymentCompleted = false;
       verifiedTrxID = '';
       document.getElementById('trxidInput').value = '';
@@ -1727,6 +1955,7 @@
         `Amount       : 200 TK`,
         `TrxID        : ${data.trxid || '—'}`,
         `Join Date    : ${new Date(data.joinDate).toLocaleDateString()}`,
+        data.isPastStudent ? `Past Student: ${data.startYear} - ${data.endYear}` : '',
         '',
         '───────────────────────────────────────────',
         'Thank you for joining WUB EEE Club!',
@@ -1790,11 +2019,17 @@
       const certNumber = getCertificateNumber(record.clubId);
       const now = new Date();
       
-      // For past members, use their actual join date as start
-      const joinDate = new Date(record.joinDate);
-      const startDate = new Date(joinDate);
-      const endDate = new Date(joinDate);
-      endDate.setFullYear(endDate.getFullYear() + 2);
+      let startDate, endDate;
+      
+      if (record.isPastStudent && record.startYear && record.endYear) {
+        startDate = new Date(parseInt(record.startYear), 0, 1);
+        endDate = new Date(parseInt(record.endYear), 11, 31);
+      } else {
+        const joinDate = new Date(record.joinDate);
+        startDate = new Date(joinDate);
+        endDate = new Date(joinDate);
+        endDate.setFullYear(endDate.getFullYear() + 2);
+      }
       
       const certData = {
         clubId: record.clubId,
@@ -1806,7 +2041,9 @@
         periodEnd: endDate.toISOString(),
         generatedDate: now.toISOString(),
         validUntil: new Date(now.setFullYear(now.getFullYear() + 2)).toISOString(),
-        isPastMember: true
+        isPastMember: record.isPastStudent || false,
+        startYear: record.startYear || null,
+        endYear: record.endYear || null
       };
       
       certs[record.clubId] = certData;
@@ -1843,16 +2080,21 @@
       }
 
       const logoSvg = `
-        <svg class="logo-svg" width="80" height="80" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="100" cy="100" r="90" fill="#0b3b7a" opacity="0.08"/>
-          <circle cx="100" cy="100" r="80" fill="none" stroke="#0b3b7a" stroke-width="2" opacity="0.3"/>
-          <path d="M100 30 L115 75 L95 80 L110 120 L85 100 L95 90 L75 70 L100 70 Z" fill="#f5a623" opacity="0.8"/>
-          <text x="100" y="135" font-family="'Playfair Display', serif" font-size="28" font-weight="700" fill="#0b3b7a" text-anchor="middle" letter-spacing="6">WUB</text>
-          <text x="100" y="162" font-family="'Playfair Display', serif" font-size="22" font-weight="700" fill="#0b3b7a" text-anchor="middle" letter-spacing="5">EEE</text>
-          <text x="100" y="185" font-family="'Inter', sans-serif" font-size="10" font-weight="600" fill="#3c6e9c" text-anchor="middle" letter-spacing="4">CLUB</text>
-          <text x="100" y="200" font-family="'Inter', sans-serif" font-size="7" font-weight="500" fill="#6b8aaa" text-anchor="middle" letter-spacing="2">SINCE 2011</text>
+        <svg width="90" height="90" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:0.2rem;">
+          <circle cx="100" cy="100" r="90" fill="#0b3b7a" opacity="0.06"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#0b3b7a" stroke-width="2" opacity="0.25"/>
+          <path d="M100 30 L115 75 L95 80 L110 120 L85 100 L95 90 L75 70 L100 70 Z" fill="#f5a623" opacity="0.85"/>
+          <text x="100" y="138" font-family="'Playfair Display', serif" font-size="30" font-weight="700" fill="#0b3b7a" text-anchor="middle" letter-spacing="7">WUB</text>
+          <text x="100" y="168" font-family="'Playfair Display', serif" font-size="24" font-weight="700" fill="#0b3b7a" text-anchor="middle" letter-spacing="6">EEE</text>
+          <text x="100" y="192" font-family="'Inter', sans-serif" font-size="11" font-weight="600" fill="#3c6e9c" text-anchor="middle" letter-spacing="5">CLUB</text>
+          <text x="100" y="210" font-family="'Inter', sans-serif" font-size="8" font-weight="500" fill="#6b8aaa" text-anchor="middle" letter-spacing="2">SINCE 2011</text>
         </svg>
       `;
+
+      // Generate QR for certificate
+      setTimeout(() => {
+        generateCertQR(record);
+      }, 100);
       
       return `
         <div class="certificate-wrapper">
@@ -1862,8 +2104,8 @@
               
               <div class="club-logo">
                 ${logoSvg}
-                <div class="logo-text logo-wub">WUB</div>
-                <div class="logo-text logo-eee">EEE</div>
+                <div class="logo-wub">WUB</div>
+                <div class="logo-eee">EEE</div>
                 <div class="logo-club">CLUB</div>
                 <div class="logo-since">SINCE 2011</div>
               </div>
@@ -1877,10 +2119,19 @@
                 <p>This is to certify that</p>
                 <div class="cert-name">${escapeHtml(record.fullName)}</div>
                 <p style="text-align:center; margin-top:0;">Student ID: <span class="highlight">${escapeHtml(record.studentId)}</span></p>
-                <p style="margin-top:0.6rem;">Has been an active member/participant of the <span class="highlight">EEE Club of World University of Bangladesh.</p>
+                <p style="margin-top:0.6rem;">has been an active member/participant of the <span class="highlight">EEE Club of World University of Bangladesh</span>.</p>
                 <p>During the period <span class="highlight">${startDateStr}</span> to <span class="highlight">${endDateStr}</span>, he/she has actively participated in various academic, technical, and extracurricular activities organized by the club, including workshops, seminars, and competitions.</p>
-                <p style="margin-top:0.6rem;">We appreciate his/her dedication, enthusiasm, and contribution to the development of technical knowledge and teamwork within the club.</p>
-                 <p style="margin-top:0.6rem;">We wish him every success in life.</p>
+                <p style="margin-top:0.4rem;">We appreciate his/her dedication, enthusiasm, and contribution to the development of technical knowledge and teamwork within the club.</p>
+                
+                <!-- QR Code Row -->
+                <div class="qr-row">
+                  <div class="qr-placeholder">
+                    <div id="certQR"></div>
+                    <div class="qr-label">Scan to Verify</div>
+                  </div>
+                </div>
+                
+                <!-- Signature Section -->
                 <div class="signature-line">
                   <div style="text-align:center;">
                     <div class="signature">_________________</div>
@@ -1892,6 +2143,11 @@
                     <div>Advisor</div>
                     <div class="sig-label">WUB EEE Club</div>
                   </div>
+                </div>
+                
+                <!-- NB Note -->
+                <div class="nb-note">
+                  <strong>NB:</strong> This certificate is automatically generated. No physical signature is required. For verification, please contact the President or Advisor of WUB EEE Club.
                 </div>
               </div>
               
@@ -1927,8 +2183,9 @@
         const paid = r.paymentStatus && r.paymentStatus.includes('Paid');
         const hasCert = !!certs[r.clubId];
         const isEligible = isEligibleForCertificate(r.joinDate);
-        const isPast = isPastMember(r.joinDate);
+        const isPast = isPastMember(r.joinDate) || r.isPastStudent;
         const joinDate = new Date(r.joinDate).toLocaleDateString();
+        const pastInfo = r.isPastStudent && r.startYear && r.endYear ? `${r.startYear}-${r.endYear}` : '';
         
         let certStatus = '';
         let certAction = '';
@@ -1940,7 +2197,7 @@
           certStatus = `<span class="badge-no-cert"><i class="fas fa-clock"></i> Eligible</span>`;
           certAction = `<button class="cert-btn generate" onclick="generateCertForMember('${r.clubId}')"><i class="fas fa-certificate"></i> Generate</button>`;
         } else if (isPast) {
-          certStatus = `<span class="badge-past"><i class="fas fa-history"></i> Past Member</span>`;
+          certStatus = `<span class="badge-past"><i class="fas fa-history"></i> Past Member ${pastInfo ? '('.concat(pastInfo, ')') : ''}</span>`;
           certAction = `<button class="cert-btn past" onclick="generatePastCert('${r.clubId}')"><i class="fas fa-certificate"></i> Generate Past</button>`;
         } else {
           const yearsLeft = 2 - Math.floor((new Date() - new Date(r.joinDate)) / (1000*60*60*24*365));
@@ -2022,12 +2279,11 @@
         return;
       }
       
-      if (!isPastMember(record.joinDate)) {
+      if (!isPastMember(record.joinDate) && !record.isPastStudent) {
         showToast('⚠️ Member is not a past member (need 2+ years)', true);
         return;
       }
       
-      // Generate certificate for past member
       generateCertificate(record);
       renderAdminTable();
       showToast(`✅ Certificate generated for past member ${record.fullName}`);
@@ -2045,7 +2301,6 @@
       syncFromCloud();
     });
 
-    // Generate for Past Members
     document.getElementById('generatePastMembersBtn').addEventListener('click', function() {
       const records = getRegistrations();
       if (records.length === 0) {
@@ -2057,7 +2312,7 @@
       const certs = getCertificates();
       
       records.forEach(r => {
-        if (!certs[r.clubId] && isPastMember(r.joinDate)) {
+        if (!certs[r.clubId] && (isPastMember(r.joinDate) || r.isPastStudent)) {
           generateCertificate(r);
           count++;
         }
@@ -2206,15 +2461,19 @@
     setTimeout(syncFromCloud, 1000);
 
     console.log('🏫 WUB EEE Club Registration System loaded successfully!');
-    console.log('📧 Admin: eee-club@eee.wub.edu.bd');
-    console.log('🔑 Password: Eee123@580Eee');
+    console.log('📧 Admin Login: eee-club@eee.wub.edu.bd');
+    console.log('🔑 Password: [HIDDEN - Only admin knows]');
     console.log('📜 Certificate: A4 size (210mm × 297mm)');
     console.log('📜 Title: 🏆 CERTIFICATE OF MEMBERSHIP');
-    console.log('📱 QR Code generated after registration');
+    console.log('📱 QR Code on certificate with full member info');
+    console.log('📝 NB: Auto-generated, no signature needed');
     console.log('☁️ Cloud sync enabled with JSONBin.io');
     console.log('📦 Bin ID:', JSONBIN_BIN_ID);
     console.log('📄 PDF download enabled');
-    console.log('🕰️ Past members can now get certificates!');
+    console.log('🕰️ Past students can register with Start/End Year!');
+    console.log('🔐 Login credentials:');
+    console.log('   Email: eee-club@eee.wub.edu.bd');
+    console.log('   Password: Eee123@580Eee');
   })();
 </script>
 </body>
