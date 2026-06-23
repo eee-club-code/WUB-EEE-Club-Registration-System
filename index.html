@@ -646,6 +646,27 @@
     }
     .cert-btn.past:hover { background: #7b1fa2; }
 
+    .action-btn {
+      padding: 0.2rem 0.6rem;
+      border: none;
+      border-radius: 15px;
+      font-weight: 600;
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: 0.2s;
+      margin: 0.1rem 0.15rem;
+    }
+    .action-btn.edit {
+      background: #f5a623;
+      color: white;
+    }
+    .action-btn.edit:hover { background: #d48a1a; }
+    .action-btn.delete {
+      background: #b22234;
+      color: white;
+    }
+    .action-btn.delete:hover { background: #8b1a2b; }
+
     .notification-toast {
       position: fixed;
       bottom: 20px;
@@ -742,8 +763,78 @@
       50% { opacity: 0.3; }
     }
 
+    /* Edit Modal */
+    .edit-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      backdrop-filter: blur(4px);
+    }
+    .edit-modal.open { display: flex; }
+    .edit-modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 2rem;
+      max-width: 500px;
+      width: 95%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    .edit-modal-close {
+      position: sticky;
+      top: 0;
+      float: right;
+      background: #b22234;
+      color: white;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: 0.2s;
+      z-index: 10;
+    }
+    .edit-modal-close:hover { background: #c62828; }
+    .edit-modal .form-group { margin-bottom: 1rem; }
+    .edit-modal label { font-weight: 600; font-size: 0.85rem; color: #1f3a66; }
+    .edit-modal input, .edit-modal select {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border: 1.5px solid #dde6f2;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      margin-top: 0.2rem;
+    }
+    .edit-modal input:focus, .edit-modal select:focus {
+      outline: none;
+      border-color: #2b6bb0;
+      box-shadow: 0 0 0 4px rgba(43,107,176,0.08);
+    }
+    .edit-modal .btn-save {
+      width: 100%;
+      padding: 0.8rem;
+      background: #1b754b;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .edit-modal .btn-save:hover { background: #1f8a5a; }
+
     /* ============================================
-       A4 CERTIFICATE WITH QR CODE
+       A4 CERTIFICATE - FIXED QR POSITION
        ============================================ */
     @page {
       size: A4 portrait;
@@ -764,7 +855,7 @@
       max-height: 297mm;
       background: linear-gradient(135deg, #f8faff 0%, #e8f0fe 100%);
       border: 8px double #0b3b7a;
-      padding: 0.5in 0.4in;
+      padding: 0.4in 0.3in;
       text-align: center;
       position: relative;
       border-radius: 4px;
@@ -777,7 +868,7 @@
     
     .certificate .cert-border {
       border: 3px solid #0b3b7a;
-      padding: 0.4in 0.3in;
+      padding: 0.3in 0.25in;
       border-radius: 4px;
       position: relative;
       flex: 1;
@@ -791,35 +882,30 @@
       position: absolute;
       top: 20px;
       right: 20px;
-      font-size: 3.5rem;
+      font-size: 3rem;
       color: #0b3b7a;
-      opacity: 0.12;
+      opacity: 0.1;
     }
     
+    /* LOGO */
     .certificate .club-logo {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-bottom: 0.2rem;
-      padding-bottom: 0.2rem;
+      margin-bottom: 0.15rem;
+      padding-bottom: 0.15rem;
       border-bottom: 2px solid #dde6f2;
     }
     
-    .certificate .club-logo .logo-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    
     .certificate .club-logo .logo-bolt {
-      font-size: 2.2rem;
+      font-size: 2rem;
       color: #f5a623;
       margin-bottom: 0.05rem;
     }
     
     .certificate .club-logo .logo-wub {
       font-family: 'Playfair Display', serif;
-      font-size: 2.8rem;
+      font-size: 2.6rem;
       font-weight: 700;
       color: #0b3b7a;
       letter-spacing: 14px;
@@ -828,7 +914,7 @@
     
     .certificate .club-logo .logo-eee {
       font-family: 'Playfair Display', serif;
-      font-size: 2.2rem;
+      font-size: 2rem;
       font-weight: 700;
       color: #0b3b7a;
       letter-spacing: 10px;
@@ -836,7 +922,7 @@
     }
     
     .certificate .club-logo .logo-club {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #3c6e9c;
       letter-spacing: 8px;
       font-weight: 600;
@@ -844,54 +930,57 @@
     }
     
     .certificate .club-logo .logo-since {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       color: #6b8aaa;
       letter-spacing: 3px;
       font-weight: 500;
       margin-top: 0.05rem;
     }
     
+    /* TITLE */
     .certificate .cert-title h1 {
       font-family: 'Playfair Display', serif;
-      font-size: 2rem;
+      font-size: 1.9rem;
       color: #0b2b5c;
       letter-spacing: 2px;
       font-weight: 700;
-      margin: 0.1rem 0;
+      margin: 0.08rem 0;
     }
     
     .certificate .cert-title .cert-subtitle {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #3c6e9c;
       letter-spacing: 4px;
       border-bottom: 1px solid #dde6f2;
-      padding-bottom: 0.3rem;
+      padding-bottom: 0.25rem;
       margin-top: 0.05rem;
     }
     
+    /* BODY */
     .certificate .cert-body {
       text-align: left;
-      padding: 0.15in 0.1in;
-      font-size: 0.95rem;
+      padding: 0.1in 0.08in;
+      font-size: 0.92rem;
       color: #1f3a66;
-      line-height: 1.9;
+      line-height: 1.8;
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
       position: relative;
+      min-height: 180px;
     }
     
     .certificate .cert-body .cert-name {
       font-family: 'Playfair Display', serif;
-      font-size: 1.6rem;
+      font-size: 1.5rem;
       color: #0b2b5c;
       text-align: center;
-      margin: 0.15rem 0;
+      margin: 0.1rem 0;
     }
     
     .certificate .cert-body p {
-      margin-bottom: 0.2rem;
+      margin-bottom: 0.15rem;
       text-align: justify;
     }
     
@@ -900,12 +989,19 @@
       font-weight: 600;
     }
     
-    /* QR CODE POSITION - Bottom Right */
+    /* QR CODE - BOTTOM RIGHT WITH CLEAR SPACE */
+    .certificate .cert-body .qr-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-end;
+      margin-top: 0.2rem;
+      padding-top: 0.15rem;
+      border-top: 1px dashed #dde6f2;
+    }
+    
     .certificate .cert-body .qr-container-cert {
-      position: absolute;
-      bottom: 0.15in;
-      right: 0.1in;
       text-align: center;
+      padding: 0.05rem 0.1rem;
     }
     
     .certificate .cert-body .qr-container-cert #certQR {
@@ -913,51 +1009,54 @@
     }
     
     .certificate .cert-body .qr-container-cert .qr-label {
-      font-size: 0.55rem;
+      font-size: 0.5rem;
       color: #6b8aaa;
       text-align: center;
       margin-top: 0.05rem;
       letter-spacing: 1px;
     }
     
+    /* SIGNATURE */
     .certificate .cert-body .signature-line {
-      margin-top: 0.3in;
+      margin-top: 0.2in;
       display: flex;
       justify-content: space-between;
       border-top: 1px solid #dde6f2;
-      padding-top: 0.4rem;
-      font-size: 0.85rem;
+      padding-top: 0.3rem;
+      font-size: 0.8rem;
       color: #506e92;
     }
     
     .certificate .cert-body .signature-line .signature {
       font-family: 'Playfair Display', cursive;
-      font-size: 1.1rem;
+      font-size: 1rem;
       color: #0b2b5c;
     }
     
     .certificate .cert-body .signature-line .sig-label {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       color: #6b8aaa;
       font-weight: 500;
     }
     
+    /* NB NOTE */
     .certificate .cert-body .nb-note {
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       color: #888;
       text-align: center;
-      margin-top: 0.2rem;
+      margin-top: 0.15rem;
       font-style: italic;
       border-top: 1px dashed #dde6f2;
-      padding-top: 0.2rem;
+      padding-top: 0.15rem;
     }
     
+    /* FOOTER */
     .certificate .cert-footer {
       display: flex;
       justify-content: space-between;
       border-top: 1px solid #dde6f2;
-      padding-top: 0.3rem;
-      font-size: 0.75rem;
+      padding-top: 0.2rem;
+      font-size: 0.7rem;
       color: #506e92;
     }
     
@@ -978,30 +1077,30 @@
       #downloadCertBtn { display: none; }
       #printCertBtn { display: none; }
       .certificate-wrapper { padding: 0; margin: 0; background: white; }
-      .certificate { width: 100%; min-height: 100vh; max-height: 100vh; border: 8px double #0b3b7a; padding: 0.4in 0.3in; box-shadow: none; border-radius: 0; margin: 0; }
-      .certificate .cert-border { border: 3px solid #0b3b7a; padding: 0.3in 0.2in; height: 100%; }
-      .certificate .club-logo .logo-wub { font-size: 2.4rem; }
-      .certificate .club-logo .logo-eee { font-size: 1.8rem; }
-      .certificate .club-logo .logo-bolt { font-size: 1.8rem; }
-      .certificate .cert-title h1 { font-size: 1.8rem; }
-      .certificate .cert-body .cert-name { font-size: 1.5rem; }
-      .certificate .cert-body { font-size: 0.9rem; padding: 0.1in 0.05in; }
-      .certificate .cert-seal { font-size: 3rem; top: 15px; right: 15px; }
-      .certificate .cert-body .qr-container-cert #certQR { transform: scale(0.8); }
+      .certificate { width: 100%; min-height: 100vh; max-height: 100vh; border: 8px double #0b3b7a; padding: 0.3in 0.2in; box-shadow: none; border-radius: 0; margin: 0; }
+      .certificate .cert-border { border: 3px solid #0b3b7a; padding: 0.2in 0.15in; height: 100%; }
+      .certificate .club-logo .logo-wub { font-size: 2.2rem; }
+      .certificate .club-logo .logo-eee { font-size: 1.6rem; }
+      .certificate .club-logo .logo-bolt { font-size: 1.6rem; }
+      .certificate .cert-title h1 { font-size: 1.6rem; }
+      .certificate .cert-body .cert-name { font-size: 1.3rem; }
+      .certificate .cert-body { font-size: 0.85rem; padding: 0.05in 0.05in; }
+      .certificate .cert-seal { font-size: 2.5rem; top: 12px; right: 12px; }
+      .certificate .cert-body .qr-container-cert #certQR { transform: scale(0.7); }
       .no-print { display: none !important; }
     }
 
     @media screen and (max-width: 800px) {
-      .certificate { width: 100%; min-height: auto; max-height: none; padding: 1rem; margin: 10px; }
-      .certificate .cert-border { padding: 0.8rem; min-height: auto; }
-      .certificate .club-logo .logo-wub { font-size: 2rem; letter-spacing: 10px; }
-      .certificate .club-logo .logo-eee { font-size: 1.6rem; letter-spacing: 8px; }
-      .certificate .club-logo .logo-bolt { font-size: 1.5rem; }
-      .certificate .cert-title h1 { font-size: 1.6rem; }
-      .certificate .cert-body .cert-name { font-size: 1.3rem; }
-      .certificate .cert-body { font-size: 0.85rem; padding: 0.5rem; }
-      .certificate .cert-body .qr-container-cert { position: relative; bottom: auto; right: auto; margin-top: 0.5rem; }
-      .certificate .cert-body .signature-line { flex-direction: column; gap: 0.5rem; align-items: center; }
+      .certificate { width: 100%; min-height: auto; max-height: none; padding: 0.8rem; margin: 10px; }
+      .certificate .cert-border { padding: 0.5rem; min-height: auto; }
+      .certificate .club-logo .logo-wub { font-size: 1.8rem; letter-spacing: 10px; }
+      .certificate .club-logo .logo-eee { font-size: 1.4rem; letter-spacing: 8px; }
+      .certificate .club-logo .logo-bolt { font-size: 1.3rem; }
+      .certificate .cert-title h1 { font-size: 1.4rem; }
+      .certificate .cert-body .cert-name { font-size: 1.2rem; }
+      .certificate .cert-body { font-size: 0.8rem; padding: 0.3rem; }
+      .certificate .cert-body .qr-footer { flex-direction: column; align-items: center; }
+      .certificate .cert-body .signature-line { flex-direction: column; gap: 0.3rem; align-items: center; }
       .certificate .cert-footer { flex-direction: column; gap: 0.2rem; align-items: center; }
       .cert-modal-content { padding: 0.5rem; }
     }
@@ -1017,19 +1116,20 @@
       .payment-section { flex-direction: column; align-items: stretch; }
       .trxid-input input { width: 100%; }
       .payment-actions { justify-content: flex-start; }
-      table { font-size: 0.65rem; }
-      th, td { padding: 0.2rem 0.15rem; }
-      .tabs .tab-btn { font-size: 0.75rem; padding: 0.3rem 0.6rem; }
-      .admin-actions button { font-size: 0.7rem; padding: 0.3rem 0.6rem; }
+      table { font-size: 0.6rem; }
+      th, td { padding: 0.15rem 0.1rem; }
+      .tabs .tab-btn { font-size: 0.7rem; padding: 0.2rem 0.5rem; }
+      .admin-actions button { font-size: 0.65rem; padding: 0.2rem 0.5rem; }
       .qr-container { flex-direction: column; align-items: center; }
       .qr-instructions { width: 100%; }
-      .certificate { padding: 0.8rem; }
-      .certificate .club-logo .logo-wub { font-size: 1.6rem; }
-      .certificate .club-logo .logo-eee { font-size: 1.3rem; }
-      .certificate .club-logo .logo-bolt { font-size: 1.2rem; }
-      .certificate .cert-title h1 { font-size: 1.2rem; }
+      .certificate { padding: 0.5rem; }
+      .certificate .club-logo .logo-wub { font-size: 1.4rem; letter-spacing: 6px; }
+      .certificate .club-logo .logo-eee { font-size: 1.1rem; letter-spacing: 5px; }
+      .certificate .club-logo .logo-bolt { font-size: 1rem; }
+      .certificate .cert-title h1 { font-size: 1.1rem; }
       .certificate .cert-body .cert-name { font-size: 1rem; }
-      .certificate .cert-body { font-size: 0.75rem; }
+      .certificate .cert-body { font-size: 0.7rem; }
+      .certificate .cert-body .qr-footer { flex-direction: column; align-items: center; }
       .past-student-fields.show {
         grid-template-columns: 1fr;
       }
@@ -1070,19 +1170,17 @@
     </div>
   </div>
 
-  <!-- Sync Status -->
   <div class="sync-status" id="syncStatus">
     <span class="sync-dot syncing" id="syncDot"></span>
     <span id="syncText">Connecting to cloud...</span>
   </div>
 
-  <!-- Tabs -->
   <div class="tabs">
     <button class="tab-btn active" data-tab="register"><i class="fas fa-user-plus"></i> Register</button>
     <button class="tab-btn" data-tab="admin" id="adminTabBtn"><i class="fas fa-user-shield"></i> Admin Panel</button>
   </div>
 
-  <!-- Tab: Registration -->
+  <!-- Registration Tab -->
   <div class="tab-content active" id="tab-register">
     <form id="registrationForm" class="form-card">
       <div class="form-row">
@@ -1149,7 +1247,6 @@
         <textarea id="reason" placeholder="Share your motivation..."></textarea>
       </div>
 
-      <!-- Past Student Toggle -->
       <div class="past-student-toggle full-width">
         <label>
           <input type="checkbox" id="isPastStudent" />
@@ -1158,7 +1255,6 @@
         <span class="past-badge">Past Member</span>
       </div>
 
-      <!-- Past Student Fields -->
       <div class="past-student-fields" id="pastStudentFields">
         <div class="form-group">
           <label><i class="fas fa-calendar-start"></i> Membership Start Year *</label>
@@ -1169,7 +1265,7 @@
           <input type="number" id="endYear" placeholder="e.g. 2018" min="2010" max="2024" />
         </div>
         <div class="form-group full-width" style="font-size:0.85rem; color:#6b8aaa; padding:0.3rem 0.5rem;">
-          <i class="fas fa-info-circle"></i> For past students, enter the years they were active members. Certificate will show this period.
+          <i class="fas fa-info-circle"></i> For past students, enter the years they were active members.
         </div>
       </div>
 
@@ -1235,7 +1331,7 @@
     </div>
   </div>
 
-  <!-- Tab: Admin Panel -->
+  <!-- Admin Panel -->
   <div class="tab-content" id="tab-admin">
     <div style="text-align:center; padding:2rem; background:#f8faff; border-radius:20px; margin-bottom:1.5rem;">
       <i class="fas fa-shield-alt" style="font-size:2.5rem; color:#0b3b7a;"></i>
@@ -1262,12 +1358,63 @@
             <th>Payment</th>
             <th>Join Date</th>
             <th>Certificate</th>
-            <th>Action</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody id="adminTableBody"></tbody>
       </table>
     </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="edit-modal" id="editModal">
+  <div class="edit-modal-content">
+    <button class="edit-modal-close" id="editModalClose">&times;</button>
+    <h3 style="color:#0b2b5c; margin-bottom:1rem;"><i class="fas fa-edit"></i> Edit Member</h3>
+    <form id="editForm">
+      <input type="hidden" id="editClubId" />
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="editFullName" required />
+      </div>
+      <div class="form-group">
+        <label>Student ID</label>
+        <input type="text" id="editStudentId" required />
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="editEmail" required />
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="text" id="editPhone" />
+      </div>
+      <div class="form-group">
+        <label>Semester</label>
+        <select id="editSemester">
+          <option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd">3rd</option>
+          <option value="4th">4th</option><option value="5th">5th</option><option value="6th">6th</option>
+          <option value="7th">7th</option><option value="8th">8th</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Gender</label>
+        <select id="editGender">
+          <option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Interest Area</label>
+        <select id="editInterest">
+          <option value="Technical Workshop">Technical Workshop</option>
+          <option value="Competition Team">Competition Team</option>
+          <option value="Research Team">Research Team</option>
+          <option value="Event Management">Event Management</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Changes</button>
+    </form>
   </div>
 </div>
 
@@ -1809,7 +1956,7 @@
       });
     }
 
-    // Generate QR for Certificate - Contains FULL Member Information
+    // Generate QR for Certificate - Full Member Info
     function generateCertQR(record) {
       const qrContainer = document.getElementById('certQR');
       if (!qrContainer) return;
@@ -1818,7 +1965,6 @@
       const certs = getCertificates();
       const cert = certs[record.clubId] || {};
       
-      // Full member information in QR code
       const qrData = JSON.stringify({
         name: record.fullName,
         studentId: record.studentId,
@@ -1839,8 +1985,8 @@
       
       new QRCode(qrContainer, {
         text: qrData,
-        width: 110,
-        height: 110,
+        width: 90,
+        height: 90,
         colorDark: '#0b3b7a',
         colorLight: '#ffffff',
         correctLevel: QRCode.CorrectLevel.H
@@ -2073,18 +2219,17 @@
       }
 
       const logoSvg = `
-        <svg width="90" height="90" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:0.2rem;">
+        <svg width="80" height="80" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:0.15rem;">
           <circle cx="100" cy="100" r="90" fill="#0b3b7a" opacity="0.06"/>
           <circle cx="100" cy="100" r="80" fill="none" stroke="#0b3b7a" stroke-width="2" opacity="0.25"/>
           <path d="M100 30 L115 75 L95 80 L110 120 L85 100 L95 90 L75 70 L100 70 Z" fill="#f5a623" opacity="0.85"/>
-          <text x="100" y="138" font-family="'Playfair Display', serif" font-size="30" font-weight="700" fill="#0b3b7a" text-anchor="middle" letter-spacing="7">WUB</text>
-          <text x="100" y="168" font-family="'Playfair Display', serif" font-size="24" font-weight="700" fill="#0b3b7a" text-anchor="middle" letter-spacing="6">EEE</text>
-          <text x="100" y="192" font-family="'Inter', sans-serif" font-size="11" font-weight="600" fill="#3c6e9c" text-anchor="middle" letter-spacing="5">CLUB</text>
-          <text x="100" y="210" font-family="'Inter', sans-serif" font-size="8" font-weight="500" fill="#6b8aaa" text-anchor="middle" letter-spacing="2">SINCE 2011</text>
+          <text x="100" y="138" font-family="'Playfair Display', serif" font-size="28" font-weight="700" fill="#0b3b7a" text-anchor="middle" letter-spacing="7">WUB</text>
+          <text x="100" y="168" font-family="'Playfair Display', serif" font-size="22" font-weight="700" fill="#0b3b7a" text-anchor="middle" letter-spacing="6">EEE</text>
+          <text x="100" y="192" font-family="'Inter', sans-serif" font-size="10" font-weight="600" fill="#3c6e9c" text-anchor="middle" letter-spacing="5">CLUB</text>
+          <text x="100" y="210" font-family="'Inter', sans-serif" font-size="7" font-weight="500" fill="#6b8aaa" text-anchor="middle" letter-spacing="2">SINCE 2011</text>
         </svg>
       `;
 
-      // Generate QR for certificate with full info
       setTimeout(() => {
         generateCertQR(record);
       }, 100);
@@ -2105,21 +2250,25 @@
               
               <div class="cert-title">
                 <h1>🏆 CERTIFICATE OF MEMBERSHIP</h1>
-                <div class="cert-subtitle">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+                <div class="cert-subtitle">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
               </div>
               
               <div class="cert-body">
                 <p>This is to certify that</p>
                 <div class="cert-name">${escapeHtml(record.fullName)}</div>
                 <p style="text-align:center; margin-top:0;">Student ID: <span class="highlight">${escapeHtml(record.studentId)}</span></p>
-                <p style="margin-top:0.6rem;">Has been an active member/participant of the <span class="highlight">EEE Club of World University of Bangladesh.
+                <p style="margin-top:0.4rem;">has been an active member/participant of the <span class="highlight">EEE Club of World University of Bangladesh.
                 <p>During the period <span class="highlight">${startDateStr}</span> to <span class="highlight">${endDateStr}</span>, he/she has actively participated in various academic, technical, and extracurricular activities organized by the club, including workshops, seminars, and competitions.</p>
-                <p style="margin-top:0.6rem;">We appreciate his/her dedication, enthusiasm, and contribution to the development of technical knowledge and teamwork within the club.</p>
-                <p style="margin-top:0.6rem;">We wish him every success in life.</p>
-                <!-- QR CODE - Bottom Right with Full Information -->
-                <div class="qr-container-cert">
-                  <div id="certQR"></div>
-                  <div class="qr-label">Scan to Verify Membership</div>
+                <p style="margin-top:0.2rem;">We appreciate his/her dedication, enthusiasm, and contribution to the development of technical knowledge and teamwork within the club.</p>
+                <p>We wish him/her every success in life.</p>
+                
+                <!-- QR CODE - Bottom Right Section -->
+                <div class="qr-footer">
+                  <div style="flex:1;"></div>
+                  <div class="qr-container-cert">
+                    <div id="certQR"></div>
+                    <div class="qr-label">Scan to Verify Membership</div>
+                  </div>
                 </div>
                 
                 <!-- Signature Section -->
@@ -2138,7 +2287,7 @@
                 
                 <!-- NB Note -->
                 <div class="nb-note">
-                  <strong>NB:</strong> This certificate is automatically generated. No physical signature is required. For verification, please contact the President or Advisor of WUB EEE Club.
+                  <strong>NB:</strong> This certificate is automatically generated. No physical signature is required. For verification, please contact the EEE Club.
                 </div>
               </div>
               
@@ -2154,7 +2303,7 @@
     }
 
     // ============================================
-    // ADMIN TABLE
+    // ADMIN TABLE WITH EDIT & DELETE
     // ============================================
     function renderAdminTable() {
       if (!isLoggedIn) return;
@@ -2180,6 +2329,13 @@
         
         let certStatus = '';
         let certAction = '';
+        let actions = '';
+        
+        // Actions: Edit & Delete buttons
+        actions = `
+          <button class="action-btn edit" onclick="editMember('${r.clubId}')"><i class="fas fa-edit"></i></button>
+          <button class="action-btn delete" onclick="deleteMember('${r.clubId}')"><i class="fas fa-trash"></i></button>
+        `;
         
         if (hasCert) {
           certStatus = `<span class="badge-cert"><i class="fas fa-check-circle"></i> Issued</span>`;
@@ -2203,11 +2359,111 @@
           <td><code style="background:#e8f0fe; padding:2px 8px; border-radius:12px; font-weight:600;">${escapeHtml(r.clubId || '')}</code></td>
           <td><span class="${paid ? 'badge-paid' : 'badge-pending'}">${paid ? '✅ Paid' : '⏳ Pending'}</span></td>
           <td style="font-size:0.8rem;">${joinDate}</td>
-          <td>${certStatus}</td>
-          <td>${certAction}</td>
+          <td>${certStatus} ${certAction ? '<br>' + certAction : ''}</td>
+          <td>${actions}</td>
         </tr>`;
       }).join('');
     }
+
+    // ============================================
+    // EDIT MEMBER FUNCTION
+    // ============================================
+    window.editMember = function(clubId) {
+      const records = getRegistrations();
+      const record = records.find(r => r.clubId === clubId);
+      if (!record) {
+        showToast('❌ Member not found', true);
+        return;
+      }
+      
+      document.getElementById('editClubId').value = clubId;
+      document.getElementById('editFullName').value = record.fullName || '';
+      document.getElementById('editStudentId').value = record.studentId || '';
+      document.getElementById('editEmail').value = record.email || '';
+      document.getElementById('editPhone').value = record.phone || '';
+      document.getElementById('editSemester').value = record.semester || '3rd';
+      document.getElementById('editGender').value = record.gender || 'Male';
+      document.getElementById('editInterest').value = record.interest || 'Technical Workshop';
+      
+      document.getElementById('editModal').classList.add('open');
+    };
+
+    document.getElementById('editModalClose').addEventListener('click', function() {
+      document.getElementById('editModal').classList.remove('open');
+    });
+
+    document.getElementById('editModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.classList.remove('open');
+      }
+    });
+
+    document.getElementById('editForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const clubId = document.getElementById('editClubId').value;
+      const fullName = document.getElementById('editFullName').value.trim();
+      const studentId = document.getElementById('editStudentId').value.trim();
+      const email = document.getElementById('editEmail').value.trim();
+      const phone = document.getElementById('editPhone').value.trim();
+      const semester = document.getElementById('editSemester').value;
+      const gender = document.getElementById('editGender').value;
+      const interest = document.getElementById('editInterest').value;
+      
+      if (!fullName || !studentId || !email) {
+        showToast('⚠️ Please fill in all required fields.', true);
+        return;
+      }
+      
+      const records = getRegistrations();
+      const index = records.findIndex(r => r.clubId === clubId);
+      if (index === -1) {
+        showToast('❌ Member not found', true);
+        return;
+      }
+      
+      records[index].fullName = fullName;
+      records[index].studentId = studentId;
+      records[index].email = email;
+      records[index].phone = phone;
+      records[index].semester = semester;
+      records[index].gender = gender;
+      records[index].interest = interest;
+      
+      saveRegistrations(records);
+      renderAdminTable();
+      
+      document.getElementById('editModal').classList.remove('open');
+      showToast('✅ Member updated successfully!');
+    });
+
+    // ============================================
+    // DELETE MEMBER FUNCTION
+    // ============================================
+    window.deleteMember = function(clubId) {
+      if (!confirm('Are you sure you want to delete this member? This action cannot be undone.')) {
+        return;
+      }
+      
+      const records = getRegistrations();
+      const index = records.findIndex(r => r.clubId === clubId);
+      if (index === -1) {
+        showToast('❌ Member not found', true);
+        return;
+      }
+      
+      // Remove certificate if exists
+      const certs = getCertificates();
+      if (certs[clubId]) {
+        delete certs[clubId];
+        saveCertificates(certs);
+      }
+      
+      records.splice(index, 1);
+      saveRegistrations(records);
+      renderAdminTable();
+      showToast('🗑️ Member deleted successfully!');
+    };
 
     // ============================================
     // CERTIFICATE GLOBAL FUNCTIONS
@@ -2455,14 +2711,11 @@
     console.log('📧 Admin: eee-club@eee.wub.edu.bd');
     console.log('🔑 Password: Eee123@580Eee');
     console.log('📜 Certificate: A4 size (210mm × 297mm)');
-    console.log('📜 Title: 🏆 CERTIFICATE OF MEMBERSHIP');
     console.log('📱 QR Code on certificate with FULL member information');
-    console.log('📝 QR contains: Name, Student ID, Club ID, Certificate No, Email, Phone, Semester, Join Date, Period, etc.');
     console.log('📝 NB: Auto-generated, no signature needed');
     console.log('☁️ Cloud sync enabled with JSONBin.io');
     console.log('📦 Bin ID:', JSONBIN_BIN_ID);
-    console.log('📄 PDF download enabled');
-    console.log('🕰️ Past students can register with Start/End Year!');
+    console.log('✏️ Edit & Delete options available in Admin Panel');
   })();
 </script>
 </body>
