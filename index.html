@@ -636,11 +636,40 @@
     }
     .cert-modal-close:hover { background: #c62828; }
 
-    /* ============================================
-       A4 CERTIFICATE DESIGN - 210mm x 297mm
-       ============================================ */
-    
-    /* A4 Page Settings */
+    .sync-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      background: #e8f0fe;
+      color: #0b3b7a;
+    }
+    .sync-status .sync-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .sync-status .sync-dot.online {
+      background: #1b754b;
+    }
+    .sync-status .sync-dot.offline {
+      background: #b8860b;
+    }
+    .sync-status .sync-dot.syncing {
+      background: #f5a623;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* A4 CERTIFICATE */
     @page {
       size: A4 portrait;
       margin: 0;
@@ -741,16 +770,13 @@
       margin-top: 0.05rem;
     }
     
-    .certificate .cert-title {
-      margin: 0.1rem 0 0.05rem;
-    }
-    
     .certificate .cert-title h1 {
       font-family: 'Playfair Display', serif;
       font-size: 2.2rem;
       color: #0b2b5c;
       letter-spacing: 2px;
       font-weight: 700;
+      margin: 0.1rem 0;
     }
     
     .certificate .cert-title .cert-subtitle {
@@ -831,63 +857,17 @@
       color: #0b3b7a;
     }
 
-    /* ============================================
-       PRINT STYLES - A4
-       ============================================ */
     @media print {
-      body { 
-        background: white; 
-        padding: 0; 
-        margin: 0;
-        display: block;
-      }
-      
+      body { background: white; padding: 0; margin: 0; }
       .container { display: none; }
-      .cert-modal { 
-        position: static; 
-        background: white;
-        display: block !important;
-        backdrop-filter: none;
-      }
-      .cert-modal-content { 
-        max-width: 100%; 
-        padding: 0; 
-        border-radius: 0; 
-        box-shadow: none;
-        background: white;
-        width: 100%;
-        height: 100vh;
-        overflow: visible;
-      }
-      .cert-modal-close { display: none !important; }
-      #downloadCertBtn { display: none !important; }
-      #printCertBtn { display: none !important; }
-      
-      .certificate-wrapper { 
-        padding: 0; 
-        margin: 0;
-        background: white;
-      }
-      
-      .certificate {
-        width: 100%;
-        min-height: 100vh;
-        max-height: 100vh;
-        border: 8px double #0b3b7a;
-        padding: 0.4in 0.3in;
-        box-shadow: none;
-        border-radius: 0;
-        margin: 0;
-        background: linear-gradient(135deg, #f8faff 0%, #e8f0fe 100%);
-      }
-      
-      .certificate .cert-border {
-        border: 3px solid #0b3b7a;
-        padding: 0.3in 0.2in;
-        height: 100%;
-        min-height: auto;
-      }
-      
+      .cert-modal { position: static; background: white; }
+      .cert-modal-content { max-width: 100%; padding: 0; border-radius: 0; box-shadow: none; background: white; }
+      .cert-modal-close { display: none; }
+      #downloadCertBtn { display: none; }
+      #printCertBtn { display: none; }
+      .certificate-wrapper { padding: 0; margin: 0; background: white; }
+      .certificate { width: 100%; min-height: 100vh; max-height: 100vh; border: 8px double #0b3b7a; padding: 0.4in 0.3in; box-shadow: none; border-radius: 0; margin: 0; }
+      .certificate .cert-border { border: 3px solid #0b3b7a; padding: 0.3in 0.2in; height: 100%; }
       .certificate .club-logo .logo-wub { font-size: 2.4rem; }
       .certificate .club-logo .logo-eee { font-size: 1.8rem; }
       .certificate .club-logo .logo-svg { width: 70px; height: 70px; }
@@ -898,21 +878,9 @@
       .no-print { display: none !important; }
     }
 
-    /* ============================================
-       SCREEN RESPONSIVE
-       ============================================ */
-    @media screen and (max-width: 900px) {
-      .certificate {
-        width: 100%;
-        min-height: auto;
-        max-height: none;
-        padding: 1.2rem;
-        margin: 10px;
-      }
-      .certificate .cert-border { 
-        padding: 0.8rem; 
-        min-height: auto;
-      }
+    @media screen and (max-width: 800px) {
+      .certificate { width: 100%; min-height: auto; max-height: none; padding: 1rem; margin: 10px; }
+      .certificate .cert-border { padding: 0.8rem; min-height: auto; }
       .certificate .club-logo .logo-wub { font-size: 2rem; letter-spacing: 10px; }
       .certificate .club-logo .logo-eee { font-size: 1.6rem; letter-spacing: 8px; }
       .certificate .club-logo .logo-svg { width: 65px; height: 65px; }
@@ -954,40 +922,6 @@
       from { transform: translateY(100px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
-
-    /* Sync Status */
-    .sync-status {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      border-radius: 30px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      margin-bottom: 1rem;
-      background: #e8f0fe;
-      color: #0b3b7a;
-    }
-    .sync-status .sync-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      display: inline-block;
-    }
-    .sync-status .sync-dot.online {
-      background: #1b754b;
-    }
-    .sync-status .sync-dot.offline {
-      background: #b22234;
-    }
-    .sync-status .sync-dot.syncing {
-      background: #f5a623;
-      animation: pulse 1s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
   </style>
 </head>
 <body>
@@ -1021,8 +955,8 @@
 
   <!-- Sync Status -->
   <div class="sync-status" id="syncStatus">
-    <span class="sync-dot online" id="syncDot"></span>
-    <span id="syncText">Data synced across all devices</span>
+    <span class="sync-dot syncing" id="syncDot"></span>
+    <span id="syncText">Connecting to cloud...</span>
   </div>
 
   <!-- Tabs -->
@@ -1169,7 +1103,7 @@
     </div>
     
     <div class="admin-actions">
-      <button class="btn-primary" id="refreshAdminBtn"><i class="fas fa-sync"></i> Refresh</button>
+      <button class="btn-primary" id="refreshAdminBtn"><i class="fas fa-sync"></i> Refresh from Cloud</button>
       <button class="btn-success" id="generateAllCertsBtn"><i class="fas fa-certificate"></i> Generate Eligible</button>
       <button class="btn-warning" id="forceGenerateBtn"><i class="fas fa-bolt"></i> Force Generate (Test)</button>
       <button class="btn-danger" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -1214,7 +1148,13 @@
 <script>
   (function() {
     // ============================================
-    // CONFIGURATION
+    // GOOGLE SHEETS CONFIGURATION
+    // ============================================
+    // !!! REPLACE THIS WITH YOUR ACTUAL WEB APP URL !!!
+    const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+    
+    // ============================================
+    // CONSTANTS
     // ============================================
     const STORAGE_KEY = 'wub_eee_registrations';
     const ID_KEY = 'wub_eee_last_id';
@@ -1227,11 +1167,8 @@
     let isSyncing = false;
 
     // ============================================
-    // SYNC FUNCTIONS (Google Sheets)
+    // SYNC FUNCTIONS
     // ============================================
-    // Replace with your Google Apps Script Web App URL
-    const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
-
     function updateSyncStatus(status, message) {
       const dot = document.getElementById('syncDot');
       const text = document.getElementById('syncText');
@@ -1239,33 +1176,49 @@
       dot.className = 'sync-dot';
       if (status === 'online') {
         dot.classList.add('online');
-        text.textContent = message || 'Data synced across all devices';
+        text.textContent = message || '✅ Cloud connected - Data synced across all devices';
       } else if (status === 'offline') {
         dot.classList.add('offline');
-        text.textContent = message || 'Offline - Local data only';
+        text.textContent = message || '⚠️ Cloud unavailable - Using local data only';
       } else if (status === 'syncing') {
         dot.classList.add('syncing');
-        text.textContent = message || 'Syncing...';
+        text.textContent = message || '⏳ Syncing with cloud...';
       }
     }
 
     async function syncDataToCloud(records) {
       try {
+        if (!GOOGLE_SHEETS_URL || GOOGLE_SHEETS_URL.includes('YOUR_SCRIPT_ID')) {
+          updateSyncStatus('offline', '⚠️ Google Sheets not configured');
+          return false;
+        }
+        
         const response = await fetch(GOOGLE_SHEETS_URL, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'sync', data: records, lastId: getLastSerial() })
+          body: JSON.stringify({ 
+            action: 'sync', 
+            data: records, 
+            lastId: getLastSerial() 
+          })
         });
+        updateSyncStatus('online', '✅ Data synced to cloud');
         return true;
       } catch (error) {
         console.warn('Cloud sync failed:', error);
+        updateSyncStatus('offline', '⚠️ Cloud sync failed - Using local data');
         return false;
       }
     }
 
     async function fetchDataFromCloud() {
       try {
+        if (!GOOGLE_SHEETS_URL || GOOGLE_SHEETS_URL.includes('YOUR_SCRIPT_ID')) {
+          updateSyncStatus('offline', '⚠️ Google Sheets not configured');
+          return null;
+        }
+        
         const response = await fetch(GOOGLE_SHEETS_URL + '?action=fetch');
         const data = await response.json();
         return data;
@@ -1278,11 +1231,12 @@
     async function syncFromCloud() {
       if (isSyncing) return;
       isSyncing = true;
-      updateSyncStatus('syncing', 'Syncing data from cloud...');
+      updateSyncStatus('syncing', '⏳ Fetching data from cloud...');
       
       try {
         const cloudData = await fetchDataFromCloud();
         if (cloudData && cloudData.records) {
+          // Merge cloud data with local
           const localRecords = getRegistrations();
           const mergedRecords = mergeRecords(localRecords, cloudData.records);
           saveRegistrations(mergedRecords);
@@ -1291,15 +1245,17 @@
             setLastSerial(cloudData.lastId);
           }
           
-          updateSyncStatus('online', `Synced successfully at ${new Date().toLocaleTimeString()}`);
+          updateSyncStatus('online', '✅ Data synced from cloud');
           renderAdminTable();
           showToast('✅ Data synced from cloud successfully!');
+        } else if (cloudData && cloudData.records && cloudData.records.length === 0) {
+          updateSyncStatus('online', '✅ Cloud connected - No data yet');
         } else {
-          updateSyncStatus('offline', 'Cloud unavailable - using local data');
+          updateSyncStatus('offline', '⚠️ Cloud unavailable - Using local data');
         }
       } catch (error) {
         console.error('Sync error:', error);
-        updateSyncStatus('offline', 'Sync failed - using local data');
+        updateSyncStatus('offline', '⚠️ Cloud error - Using local data');
       }
       
       isSyncing = false;
@@ -1307,7 +1263,7 @@
 
     function mergeRecords(local, cloud) {
       const recordMap = {};
-      local.forEach(r => recordMap[r.studentId] = r);
+      local.forEach(r => { if (r.studentId) recordMap[r.studentId] = r; });
       cloud.forEach(r => { if (r.studentId) recordMap[r.studentId] = r; });
       return Object.values(recordMap);
     }
@@ -1335,7 +1291,8 @@
     
     function saveRegistrations(records) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
-      syncDataToCloud(records);
+      // Sync to cloud in background
+      setTimeout(() => syncDataToCloud(records), 100);
     }
     
     function getCertificates() {
@@ -1604,7 +1561,7 @@
       document.getElementById('successBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
       document.getElementById('submitBtn').disabled = true;
       
-      showToast('🎉 Registration complete! Data synced to cloud.');
+      showToast('🎉 Registration complete! Data saved to cloud.');
     });
 
     // ============================================
@@ -2105,211 +2062,32 @@
           <style>
             * { margin:0; padding:0; box-sizing:border-box; }
             @page { size: A4 portrait; margin: 0; }
-            body { 
-              background: white; 
-              display: flex; 
-              justify-content: center; 
-              align-items: center; 
-              min-height: 100vh;
-              font-family: 'Inter', sans-serif;
-              padding: 0;
-              margin: 0;
-            }
-            .certificate-wrapper {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              width: 100%;
-              background: white;
-            }
-            .certificate {
-              width: 210mm;
-              min-height: 297mm;
-              max-height: 297mm;
-              background: linear-gradient(135deg, #f8faff 0%, #e8f0fe 100%);
-              border: 8px double #0b3b7a;
-              padding: 0.5in 0.4in;
-              text-align: center;
-              position: relative;
-              border-radius: 4px;
-              box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-              margin: 0 auto;
-              display: flex;
-              flex-direction: column;
-              overflow: hidden;
-            }
-            .certificate .cert-border {
-              border: 3px solid #0b3b7a;
-              padding: 0.4in 0.3in;
-              border-radius: 4px;
-              position: relative;
-              flex: 1;
-              display: flex;
-              flex-direction: column;
-              justify-content: space-between;
-              height: 100%;
-            }
-            .certificate .cert-seal {
-              position: absolute;
-              top: 20px;
-              right: 20px;
-              font-size: 3.5rem;
-              color: #0b3b7a;
-              opacity: 0.12;
-            }
-            .certificate .club-logo {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              margin-bottom: 0.2rem;
-              padding-bottom: 0.3rem;
-              border-bottom: 2px solid #dde6f2;
-            }
-            .certificate .club-logo .logo-svg { 
-              margin-bottom: 0.05rem; 
-              width: 80px;
-              height: 80px;
-            }
-            .certificate .club-logo .logo-text {
-              font-family: 'Playfair Display', serif;
-              font-weight: 700;
-              color: #0b3b7a;
-              letter-spacing: 10px;
-              line-height: 1.1;
-            }
-            .certificate .club-logo .logo-wub {
-              font-size: 2.6rem;
-              letter-spacing: 14px;
-            }
-            .certificate .club-logo .logo-eee {
-              font-size: 2rem;
-              letter-spacing: 10px;
-            }
-            .certificate .club-logo .logo-club {
-              font-size: 0.9rem;
-              color: #3c6e9c;
-              letter-spacing: 8px;
-              font-weight: 600;
-              margin-top: 0.05rem;
-            }
-            .certificate .club-logo .logo-since {
-              font-size: 0.7rem;
-              color: #6b8aaa;
-              letter-spacing: 3px;
-              font-weight: 500;
-              margin-top: 0.05rem;
-            }
-            .certificate .cert-title h1 {
-              font-family: 'Playfair Display', serif;
-              font-size: 2.2rem;
-              color: #0b2b5c;
-              letter-spacing: 2px;
-              font-weight: 700;
-              margin: 0.1rem 0;
-            }
-            .certificate .cert-title .cert-subtitle {
-              font-size: 0.9rem;
-              color: #3c6e9c;
-              letter-spacing: 4px;
-              border-bottom: 1px solid #dde6f2;
-              padding-bottom: 0.3rem;
-              margin-top: 0.05rem;
-            }
-            .certificate .cert-body {
-              text-align: left;
-              padding: 0.15in 0.1in;
-              font-size: 0.95rem;
-              color: #1f3a66;
-              line-height: 1.9;
-              flex: 1;
-              display: flex;
-              flex-direction: column;
-              justify-content: center;
-            }
-            .certificate .cert-body .cert-name {
-              font-family: 'Playfair Display', serif;
-              font-size: 1.7rem;
-              color: #0b2b5c;
-              text-align: center;
-              margin: 0.15rem 0;
-            }
-            .certificate .cert-body p {
-              margin-bottom: 0.2rem;
-              text-align: justify;
-            }
-            .certificate .cert-body .highlight {
-              color: #0b3b7a;
-              font-weight: 600;
-            }
-            .certificate .cert-body .signature-line {
-              margin-top: 0.3in;
-              display: flex;
-              justify-content: space-between;
-              border-top: 1px solid #dde6f2;
-              padding-top: 0.4rem;
-              font-size: 0.85rem;
-              color: #506e92;
-            }
-            .certificate .cert-body .signature-line .signature {
-              font-family: 'Playfair Display', cursive;
-              font-size: 1.1rem;
-              color: #0b2b5c;
-            }
-            .certificate .cert-body .signature-line .sig-label {
-              font-size: 0.7rem;
-              color: #6b8aaa;
-              font-weight: 500;
-            }
-            .certificate .cert-footer {
-              display: flex;
-              justify-content: space-between;
-              border-top: 1px solid #dde6f2;
-              padding-top: 0.3rem;
-              font-size: 0.75rem;
-              color: #506e92;
-            }
-            .certificate .cert-footer .cert-id {
-              font-weight: 500;
-            }
-            .certificate .cert-footer .cert-id strong {
-              color: #0b3b7a;
-            }
-            @media print {
-              body { padding: 0; margin: 0; background: white; }
-              .certificate { 
-                box-shadow: none; 
-                border-radius: 0;
-                width: 100%;
-                min-height: 100vh;
-                max-height: 100vh;
-                padding: 0.4in 0.3in;
-                margin: 0;
-              }
-              .certificate .cert-border {
-                padding: 0.3in 0.2in;
-                height: 100%;
-              }
-              .certificate .club-logo .logo-wub { font-size: 2.4rem; }
-              .certificate .club-logo .logo-eee { font-size: 1.8rem; }
-              .certificate .club-logo .logo-svg { width: 70px; height: 70px; }
-              .certificate .cert-title h1 { font-size: 2rem; }
-              .certificate .cert-body .cert-name { font-size: 1.5rem; }
-              .certificate .cert-body { font-size: 0.9rem; padding: 0.1in 0.05in; }
-              .certificate .cert-seal { font-size: 3rem; top: 15px; right: 15px; }
-              .no-print { display: none !important; }
-            }
-            @media screen and (max-width: 800px) {
-              .certificate { width: 100%; min-height: auto; max-height: none; padding: 1rem; margin: 10px; }
-              .certificate .cert-border { padding: 0.8rem; min-height: auto; }
-              .certificate .club-logo .logo-wub { font-size: 2rem; letter-spacing: 10px; }
-              .certificate .club-logo .logo-eee { font-size: 1.6rem; letter-spacing: 8px; }
-              .certificate .club-logo .logo-svg { width: 65px; height: 65px; }
-              .certificate .cert-title h1 { font-size: 1.6rem; }
-              .certificate .cert-body .cert-name { font-size: 1.3rem; }
-              .certificate .cert-body { font-size: 0.85rem; padding: 0.5rem; }
-              .certificate .cert-body .signature-line { flex-direction: column; gap: 0.5rem; align-items: center; }
-              .certificate .cert-footer { flex-direction: column; gap: 0.2rem; align-items: center; }
-            }
+            body { background: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Inter', sans-serif; padding: 0; margin: 0; }
+            .certificate-wrapper { display: flex; justify-content: center; align-items: center; width: 100%; background: white; }
+            .certificate { width: 210mm; min-height: 297mm; max-height: 297mm; background: linear-gradient(135deg, #f8faff 0%, #e8f0fe 100%); border: 8px double #0b3b7a; padding: 0.5in 0.4in; text-align: center; position: relative; border-radius: 4px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); margin: 0 auto; display: flex; flex-direction: column; overflow: hidden; }
+            .certificate .cert-border { border: 3px solid #0b3b7a; padding: 0.4in 0.3in; border-radius: 4px; position: relative; flex: 1; display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
+            .certificate .cert-seal { position: absolute; top: 20px; right: 20px; font-size: 3.5rem; color: #0b3b7a; opacity: 0.12; }
+            .certificate .club-logo { display: flex; flex-direction: column; align-items: center; margin-bottom: 0.2rem; padding-bottom: 0.3rem; border-bottom: 2px solid #dde6f2; }
+            .certificate .club-logo .logo-svg { margin-bottom: 0.05rem; width: 80px; height: 80px; }
+            .certificate .club-logo .logo-text { font-family: 'Playfair Display', serif; font-weight: 700; color: #0b3b7a; letter-spacing: 10px; line-height: 1.1; }
+            .certificate .club-logo .logo-wub { font-size: 2.6rem; letter-spacing: 14px; }
+            .certificate .club-logo .logo-eee { font-size: 2rem; letter-spacing: 10px; }
+            .certificate .club-logo .logo-club { font-size: 0.9rem; color: #3c6e9c; letter-spacing: 8px; font-weight: 600; margin-top: 0.05rem; }
+            .certificate .club-logo .logo-since { font-size: 0.7rem; color: #6b8aaa; letter-spacing: 3px; font-weight: 500; margin-top: 0.05rem; }
+            .certificate .cert-title h1 { font-family: 'Playfair Display', serif; font-size: 2.2rem; color: #0b2b5c; letter-spacing: 2px; font-weight: 700; margin: 0.1rem 0; }
+            .certificate .cert-title .cert-subtitle { font-size: 0.9rem; color: #3c6e9c; letter-spacing: 4px; border-bottom: 1px solid #dde6f2; padding-bottom: 0.3rem; margin-top: 0.05rem; }
+            .certificate .cert-body { text-align: left; padding: 0.15in 0.1in; font-size: 0.95rem; color: #1f3a66; line-height: 1.9; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+            .certificate .cert-body .cert-name { font-family: 'Playfair Display', serif; font-size: 1.7rem; color: #0b2b5c; text-align: center; margin: 0.15rem 0; }
+            .certificate .cert-body p { margin-bottom: 0.2rem; text-align: justify; }
+            .certificate .cert-body .highlight { color: #0b3b7a; font-weight: 600; }
+            .certificate .cert-body .signature-line { margin-top: 0.3in; display: flex; justify-content: space-between; border-top: 1px solid #dde6f2; padding-top: 0.4rem; font-size: 0.85rem; color: #506e92; }
+            .certificate .cert-body .signature-line .signature { font-family: 'Playfair Display', cursive; font-size: 1.1rem; color: #0b2b5c; }
+            .certificate .cert-body .signature-line .sig-label { font-size: 0.7rem; color: #6b8aaa; font-weight: 500; }
+            .certificate .cert-footer { display: flex; justify-content: space-between; border-top: 1px solid #dde6f2; padding-top: 0.3rem; font-size: 0.75rem; color: #506e92; }
+            .certificate .cert-footer .cert-id { font-weight: 500; }
+            .certificate .cert-footer .cert-id strong { color: #0b3b7a; }
+            @media print { body { padding: 0; margin: 0; background: white; } .certificate { box-shadow: none; border-radius: 0; width: 100%; min-height: 100vh; max-height: 100vh; padding: 0.4in 0.3in; margin: 0; } .certificate .cert-border { padding: 0.3in 0.2in; height: 100%; } .certificate .club-logo .logo-wub { font-size: 2.4rem; } .certificate .club-logo .logo-eee { font-size: 1.8rem; } .certificate .club-logo .logo-svg { width: 70px; height: 70px; } .certificate .cert-title h1 { font-size: 2rem; } .certificate .cert-body .cert-name { font-size: 1.5rem; } .certificate .cert-body { font-size: 0.9rem; padding: 0.1in 0.05in; } .certificate .cert-seal { font-size: 3rem; top: 15px; right: 15px; } .no-print { display: none !important; } }
+            @media screen and (max-width: 800px) { .certificate { width: 100%; min-height: auto; max-height: none; padding: 1rem; margin: 10px; } .certificate .cert-border { padding: 0.8rem; min-height: auto; } .certificate .club-logo .logo-wub { font-size: 2rem; letter-spacing: 10px; } .certificate .club-logo .logo-eee { font-size: 1.6rem; letter-spacing: 8px; } .certificate .club-logo .logo-svg { width: 65px; height: 65px; } .certificate .cert-title h1 { font-size: 1.6rem; } .certificate .cert-body .cert-name { font-size: 1.3rem; } .certificate .cert-body { font-size: 0.85rem; padding: 0.5rem; } .certificate .cert-body .signature-line { flex-direction: column; gap: 0.5rem; align-items: center; } .certificate .cert-footer { flex-direction: column; gap: 0.2rem; align-items: center; } }
           </style>
         </head>
         <body>
@@ -2353,6 +2131,8 @@
         
         if (this.dataset.tab === 'admin' && isLoggedIn) {
           renderAdminTable();
+          // Refresh from cloud when admin tab is opened
+          setTimeout(syncFromCloud, 300);
         }
       });
     });
@@ -2363,16 +2143,23 @@
     document.getElementById('department').value = 'EEE';
     checkLogin();
 
+    // Try to sync on load
+    setTimeout(syncFromCloud, 1000);
+
     console.log('🏫 WUB EEE Club Registration System loaded successfully!');
     console.log('📧 Admin: eee-club@eee.wub.edu.bd');
     console.log('🔑 Password: Eee123@580Eee');
     console.log('📜 Certificate: A4 size (210mm × 297mm)');
     console.log('📜 Title: 🏆 CERTIFICATE OF MEMBERSHIP');
     console.log('📜 Period: 2 years before generation date to current date');
-    console.log('📜 Certificate Format: WUB-EEE-CERT-XXXX');
-    console.log('📜 Eligibility: 2 years of continuous membership');
     console.log('📱 QR Code generated after registration');
-    console.log('☁️ Data sync across all devices enabled');
+    
+    if (GOOGLE_SHEETS_URL && !GOOGLE_SHEETS_URL.includes('YOUR_SCRIPT_ID')) {
+      console.log('☁️ Cloud sync enabled with Google Sheets');
+    } else {
+      console.log('⚠️ Google Sheets not configured - data stays on each device');
+      console.log('📝 To enable cloud sync, set up Google Sheets and update GOOGLE_SHEETS_URL');
+    }
   })();
 </script>
 </body>
