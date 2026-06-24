@@ -833,7 +833,7 @@
     .edit-modal .btn-save:hover { background: #1f8a5a; }
 
     /* ============================================
-       FIXED A4 CERTIFICATE - PERFECT FIT
+       CERTIFICATE - EXACT FORMAT FROM PDF
        A4 = 210mm x 297mm
        ============================================ */
     @page {
@@ -858,7 +858,7 @@
       height: 297mm;
       background: linear-gradient(135deg, #f8faff 0%, #e8f0fe 100%);
       border: 6px double #0b3b7a;
-      padding: 8mm 6mm;
+      padding: 8mm 7mm;
       text-align: center;
       position: relative;
       border-radius: 0;
@@ -882,89 +882,89 @@
     
     .certificate .cert-seal {
       position: absolute;
-      top: 8px;
-      right: 12px;
-      font-size: 2rem;
+      top: 10px;
+      right: 15px;
+      font-size: 2.5rem;
       color: #0b3b7a;
       opacity: 0.1;
     }
     
-    /* ===== LOGO - Smaller ===== */
+    /* ===== LOGO - Exactly as in PDF ===== */
     .certificate .club-logo {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-bottom: 0.08rem;
-      padding-bottom: 0.08rem;
-      border-bottom: 1.5px solid #dde6f2;
+      margin-bottom: 0.2rem;
+      padding-bottom: 0.2rem;
+      border-bottom: 2px solid #dde6f2;
     }
     
     .certificate .club-logo .logo-bolt {
-      font-size: 1.4rem;
+      font-size: 1.8rem;
       color: #f5a623;
-      margin-bottom: 0.02rem;
+      margin-bottom: 0.05rem;
     }
     
     .certificate .club-logo .logo-wub {
       font-family: 'Playfair Display', serif;
-      font-size: 1.8rem;
+      font-size: 2.2rem;
       font-weight: 700;
       color: #0b3b7a;
       letter-spacing: 10px;
-      line-height: 1.1;
+      line-height: 1.05;
     }
     
     .certificate .club-logo .logo-eee {
       font-family: 'Playfair Display', serif;
-      font-size: 1.4rem;
+      font-size: 1.8rem;
       font-weight: 700;
       color: #0b3b7a;
-      letter-spacing: 7px;
-      line-height: 1.1;
+      letter-spacing: 8px;
+      line-height: 1.05;
     }
     
     .certificate .club-logo .logo-club {
-      font-size: 0.65rem;
+      font-size: 0.8rem;
       color: #3c6e9c;
-      letter-spacing: 5px;
+      letter-spacing: 6px;
       font-weight: 600;
-      margin-top: 0.02rem;
+      margin-top: 0.05rem;
     }
     
     .certificate .club-logo .logo-since {
-      font-size: 0.5rem;
+      font-size: 0.6rem;
       color: #6b8aaa;
-      letter-spacing: 2px;
+      letter-spacing: 3px;
       font-weight: 500;
-      margin-top: 0.02rem;
+      margin-top: 0.05rem;
     }
     
     /* ===== TITLE ===== */
     .certificate .cert-title h1 {
       font-family: 'Playfair Display', serif;
-      font-size: 1.3rem;
+      font-size: 1.6rem;
       color: #0b2b5c;
-      letter-spacing: 1px;
+      letter-spacing: 2px;
       font-weight: 700;
-      margin: 0.04rem 0;
+      margin: 0.15rem 0 0.1rem;
     }
     
     .certificate .cert-title .cert-subtitle {
-      font-size: 0.6rem;
+      font-size: 0.7rem;
       color: #3c6e9c;
-      letter-spacing: 2px;
+      letter-spacing: 3px;
       border-bottom: 1px solid #dde6f2;
-      padding-bottom: 0.1rem;
-      margin-top: 0.02rem;
+      padding-bottom: 0.2rem;
+      margin-top: 0.05rem;
     }
     
-    /* ===== BODY ===== */
+    /* ===== BODY - Matches PDF Format ===== */
     .certificate .cert-body {
       text-align: left;
-      padding: 0.06in 0.04in;
-      font-size: 0.72rem;
+      padding: 0.1in 0.05in;
+      font-size: 0.85rem;
       color: #1f3a66;
-      line-height: 1.6;
+      line-height: 1.7;
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -974,14 +974,26 @@
     
     .certificate .cert-body .cert-name {
       font-family: 'Playfair Display', serif;
-      font-size: 1.1rem;
+      font-size: 1.4rem;
       color: #0b2b5c;
       text-align: center;
-      margin: 0.04rem 0;
+      margin: 0.05rem 0;
+    }
+    
+    .certificate .cert-body .cert-student-id {
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+    }
+    
+    .certificate .cert-body .cert-student-id .highlight {
+      color: #0b3b7a;
+      font-weight: 600;
     }
     
     .certificate .cert-body p {
-      margin-bottom: 0.08rem;
+      margin-bottom: 0.1rem;
       text-align: justify;
     }
     
@@ -1019,23 +1031,23 @@
     
     /* ===== SIGNATURE ===== */
     .certificate .cert-body .signature-line {
-      margin-top: 0.1in;
+      margin-top: 0.15in;
       display: flex;
       justify-content: space-between;
       border-top: 1px solid #dde6f2;
       padding-top: 0.15rem;
-      font-size: 0.65rem;
+      font-size: 0.75rem;
       color: #506e92;
     }
     
     .certificate .cert-body .signature-line .signature {
       font-family: 'Playfair Display', cursive;
-      font-size: 0.8rem;
+      font-size: 0.9rem;
       color: #0b2b5c;
     }
     
     .certificate .cert-body .signature-line .sig-label {
-      font-size: 0.5rem;
+      font-size: 0.55rem;
       color: #6b8aaa;
       font-weight: 500;
     }
@@ -1057,7 +1069,7 @@
       justify-content: space-between;
       border-top: 1px solid #dde6f2;
       padding-top: 0.1rem;
-      font-size: 0.5rem;
+      font-size: 0.55rem;
       color: #506e92;
     }
     
@@ -1123,24 +1135,21 @@
       
       .certificate .cert-border {
         border: 2px solid #0b3b7a;
-        padding: 5mm 4mm;
+        padding: 4mm 4mm;
         height: 100%;
       }
       
-      .certificate .club-logo .logo-wub { font-size: 1.6rem; }
-      .certificate .club-logo .logo-eee { font-size: 1.2rem; }
-      .certificate .club-logo .logo-bolt { font-size: 1.2rem; }
-      .certificate .cert-title h1 { font-size: 1.1rem; }
-      .certificate .cert-body .cert-name { font-size: 1rem; }
-      .certificate .cert-body { font-size: 0.68rem; padding: 0.04in 0.03in; }
-      .certificate .cert-seal { font-size: 1.6rem; top: 5px; right: 8px; }
+      .certificate .club-logo .logo-wub { font-size: 1.8rem; }
+      .certificate .club-logo .logo-eee { font-size: 1.4rem; }
+      .certificate .club-logo .logo-bolt { font-size: 1.4rem; }
+      .certificate .cert-title h1 { font-size: 1.3rem; }
+      .certificate .cert-body .cert-name { font-size: 1.1rem; }
+      .certificate .cert-body { font-size: 0.75rem; padding: 0.05in 0.03in; }
+      .certificate .cert-seal { font-size: 2rem; top: 8px; right: 10px; }
       .certificate .cert-body .qr-container-cert #certQR { transform: scale(0.6); }
       .no-print { display: none !important; }
     }
 
-    /* ============================================
-       SCREEN RESPONSIVE
-       ============================================ */
     @media screen and (max-width: 800px) {
       .certificate-wrapper { 
         width: 100%; 
@@ -1161,7 +1170,7 @@
       .certificate .club-logo .logo-bolt { font-size: 1rem; }
       .certificate .cert-title h1 { font-size: 1rem; }
       .certificate .cert-body .cert-name { font-size: 0.9rem; }
-      .certificate .cert-body { font-size: 0.65rem; padding: 0.3rem; }
+      .certificate .cert-body { font-size: 0.65rem; padding: 0.2rem; }
       .certificate .cert-body .qr-footer { flex-direction: column; align-items: center; }
       .certificate .cert-body .signature-line { flex-direction: column; gap: 0.3rem; align-items: center; }
       .certificate .cert-footer { flex-direction: column; gap: 0.2rem; align-items: center; }
@@ -1170,13 +1179,13 @@
 
     @media (max-width: 640px) {
       .certificate { padding: 0.3rem; }
-      .certificate .club-logo .logo-wub { font-size: 1.2rem; letter-spacing: 4px; }
-      .certificate .club-logo .logo-eee { font-size: 0.8rem; letter-spacing: 3px; }
-      .certificate .club-logo .logo-bolt { font-size: 0.8rem; }
-      .certificate .cert-title h1 { font-size: 0.8rem; }
-      .certificate .cert-body .cert-name { font-size: 0.75rem; }
-      .certificate .cert-body { font-size: 0.55rem; }
-      .certificate .cert-body .qr-container-cert #certQR { transform: scale(0.5); }
+      .certificate .club-logo .logo-wub { font-size: 1rem; letter-spacing: 4px; }
+      .certificate .club-logo .logo-eee { font-size: 0.75rem; letter-spacing: 3px; }
+      .certificate .club-logo .logo-bolt { font-size: 0.75rem; }
+      .certificate .cert-title h1 { font-size: 0.75rem; }
+      .certificate .cert-body .cert-name { font-size: 0.65rem; }
+      .certificate .cert-body { font-size: 0.5rem; }
+      .certificate .cert-body .qr-container-cert #certQR { transform: scale(0.4); }
     }
 
     @keyframes slideUp {
@@ -2027,11 +2036,10 @@
         periodEnd: cert.periodEnd ? new Date(cert.periodEnd).toLocaleDateString() : 'N/A'
       });
       
-      // Smaller QR for certificate
       new QRCode(qrContainer, {
         text: qrData,
-        width: 65,
-        height: 65,
+        width: 70,
+        height: 70,
         colorDark: '#0b3b7a',
         colorLight: '#ffffff',
         correctLevel: QRCode.CorrectLevel.H
@@ -2268,14 +2276,13 @@
           <circle cx="100" cy="100" r="90" fill="#0b3b7a" opacity="0.06"/>
           <circle cx="100" cy="100" r="80" fill="none" stroke="#0b3b7a" stroke-width="1.5" opacity="0.25"/>
           <path d="M100 30 L115 75 L95 80 L110 120 L85 100 L95 90 L75 70 L100 70 Z" fill="#f5a623" opacity="0.85"/>
-          <text x="100" y="138" font-family="'Playfair Display', serif" font-size="22" font-weight="700" fill="#0b3b7a" text-anchor="middle" letter-spacing="5">WUB</text>
-          <text x="100" y="168" font-family="'Playfair Display', serif" font-size="17" font-weight="700" fill="#0b3b7a" text-anchor="middle" letter-spacing="4">EEE</text>
+          <text x="100" y="138" font-family="'Playfair Display', serif" font-size="20" font-weight="700" fill="#0b3b7a" text-anchor="middle" letter-spacing="5">WUB</text>
+          <text x="100" y="168" font-family="'Playfair Display', serif" font-size="16" font-weight="700" fill="#0b3b7a" text-anchor="middle" letter-spacing="4">EEE</text>
           <text x="100" y="192" font-family="'Inter', sans-serif" font-size="8" font-weight="600" fill="#3c6e9c" text-anchor="middle" letter-spacing="3">CLUB</text>
           <text x="100" y="210" font-family="'Inter', sans-serif" font-size="5" font-weight="500" fill="#6b8aaa" text-anchor="middle" letter-spacing="1">SINCE 2011</text>
         </svg>
       `;
 
-      // Generate QR for certificate
       setTimeout(() => {
         generateCertQR(record);
       }, 100);
@@ -2301,16 +2308,15 @@
                 <div class="cert-subtitle">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
               </div>
               
-              <!-- BODY -->
-               <div class="cert-body">
+              <!-- BODY - MATCHES PDF FORMAT -->
+              <div class="cert-body">
                 <p>This is to certify that</p>
                 <div class="cert-name">${escapeHtml(record.fullName)}</div>
-                <p style="text-align:center; margin-top:0;">Student ID: <span class="highlight">${escapeHtml(record.studentId)}</span></p>
-                <p style="margin-top:0.6rem;">Has been an active member/participant of the <span class="highlight">EEE Club of World University of Bangladesh.</p>
+                <div class="cert-student-id">Student ID: <span class="highlight">${escapeHtml(record.studentId)}</span></div>
+                <p>has been an active member/participant of the <span class="highlight">EEE Club of World University of Bangladesh</span>.</p>
                 <p>During the period <span class="highlight">${startDateStr}</span> to <span class="highlight">${endDateStr}</span>, he/she has actively participated in various academic, technical, and extracurricular activities organized by the club, including workshops, seminars, and competitions.</p>
-                <p style="margin-top:0.6rem;">We appreciate his/her dedication, enthusiasm, and contribution to the development of technical knowledge and teamwork within the club.</p>
-                 <p style="margin-top:0.6rem;">We wish him every success in life.</p>
-
+                <p>We appreciate his/her dedication, enthusiasm, and contribution to the development of technical knowledge and teamwork within the club.</p>
+                <p>We wish him/her every success in life.</p>
                 
                 <!-- QR CODE - Bottom Right -->
                 <div class="qr-footer">
@@ -2756,11 +2762,13 @@
     console.log('🏫 WUB EEE Club Registration System loaded successfully!');
     console.log('📧 Admin: eee-club@eee.wub.edu.bd');
     console.log('🔑 Password: Eee123@580Eee');
-    console.log('📜 Certificate: A4 size (210mm × 297mm) - FIXED');
+    console.log('📜 Certificate: EXACT PDF FORMAT - A4 size (210mm × 297mm)');
+    console.log('📝 Format matches your PDF exactly');
     console.log('📱 QR Code on certificate with FULL member information');
     console.log('📝 NB: Auto-generated, no signature needed');
     console.log('☁️ Cloud sync enabled with JSONBin.io');
     console.log('✏️ Edit & Delete options available in Admin Panel');
+    console.log('📄 Download PDF & Print Certificate (A4) options available');
   })();
 </script>
 </body>
