@@ -6,11 +6,14 @@
   <title>WUB EEE Club · Registration & Certificate System</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
+    /* ============================================
+       MAIN SYSTEM STYLES
+       ============================================ */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: #f0f5fe;
@@ -843,15 +846,20 @@
     }
     .edit-modal .btn-save:hover { background: #1f8a5a; }
 
+    @keyframes slideUp {
+      from { transform: translateY(100px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
     /* ============================================
-       SINGLE PAGE A4 CERTIFICATE
-       0.5 INCH MARGINS - FULL BORDER
+       A4 CERTIFICATE - PREMIUM DESIGN
+       210mm × 297mm
        ============================================ */
     @page {
       size: A4 portrait;
-      margin: 0.5in;
+      margin: 0;
     }
-    
+
     .certificate-wrapper {
       display: flex;
       justify-content: center;
@@ -863,305 +871,511 @@
       min-height: auto;
       overflow: hidden;
     }
-    
+
     @media print {
       .certificate-wrapper {
         width: 210mm;
         height: 297mm;
       }
     }
-    
+
     .certificate {
       width: 100%;
       height: auto;
       min-height: 297mm;
-      background: linear-gradient(135deg, #f8faff 0%, #e8f0fe 100%);
-      border: 6px double #0b3b7a;
-      padding: 0;
-      text-align: center;
+      background: #fcfcfd;
       position: relative;
-      border-radius: 0;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-      margin: 10px auto;
+      padding: 10mm 9mm;
       display: flex;
       flex-direction: column;
+      font-family: 'Inter', sans-serif;
     }
-    
+
     @media print {
       .certificate {
         width: 100%;
         height: 100vh;
         min-height: 100vh;
-        border: 6px double #0b3b7a;
-        padding: 0;
+        padding: 8mm 7mm;
         box-shadow: none;
         border-radius: 0;
         margin: 0;
-        background: linear-gradient(135deg, #f8faff 0%, #e8f0fe 100%);
       }
     }
-    
-    /* FULL BORDER - Inside the 0.5in margin */
-    .certificate .cert-border {
-      border: 2px solid #0b3b7a;
-      padding: 0.35in 0.3in;
-      border-radius: 0;
-      position: relative;
+
+    /* Background Pattern */
+    .certificate::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image:
+        radial-gradient(circle at 20% 50%, rgba(11, 59, 122, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(11, 59, 122, 0.02) 0%, transparent 50%),
+        repeating-linear-gradient(45deg,
+          transparent,
+          transparent 20px,
+          rgba(11, 59, 122, 0.008) 20px,
+          rgba(11, 59, 122, 0.008) 21px),
+        repeating-linear-gradient(-45deg,
+          transparent,
+          transparent 20px,
+          rgba(11, 59, 122, 0.008) 20px,
+          rgba(11, 59, 122, 0.008) 21px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Watermark */
+    .certificate .watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.04;
+      font-size: 12rem;
+      color: #0b3b7a;
+      font-family: 'Playfair Display', serif;
+      letter-spacing: 10px;
+      pointer-events: none;
+      z-index: 0;
+      line-height: 1;
+      text-align: center;
+    }
+    .certificate .watermark .bolt {
+      font-size: 6rem;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+
+    /* Double Border */
+    .certificate .border-outer {
+      border: 3px solid #0b3b7a;
+      padding: 6mm 5mm;
       flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
-      margin: 0.05in;
-      flex-grow: 1;
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(1px);
     }
-    
-    @media print {
-      .certificate .cert-border {
-        padding: 0.3in 0.25in;
-        margin: 0.05in;
-      }
+
+    .certificate .border-inner {
+      border: 2px solid #d4af37;
+      padding: 5mm 4.5mm;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
     }
-    
-    .certificate .cert-seal {
+
+    /* Corner Ornaments */
+    .certificate .corner {
       position: absolute;
-      top: 8px;
-      right: 12px;
-      font-size: 2rem;
-      color: #0b3b7a;
-      opacity: 0.1;
+      font-size: 1.6rem;
+      color: #d4af37;
+      opacity: 0.6;
+      z-index: 2;
     }
-    
-    /* ===== LOGO ===== */
-    .certificate .club-logo {
+    .certificate .corner-tl { top: 2mm; left: 2mm; }
+    .certificate .corner-tr { top: 2mm; right: 2mm; transform: scaleX(-1); }
+    .certificate .corner-bl { bottom: 2mm; left: 2mm; transform: scaleY(-1); }
+    .certificate .corner-br { bottom: 2mm; right: 2mm; transform: scale(-1, -1); }
+
+    /* Seal */
+    .certificate .seal {
+      position: absolute;
+      top: 5mm;
+      right: 5mm;
+      width: 28mm;
+      height: 28mm;
+      border-radius: 50%;
+      border: 2.5px solid #d4af37;
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-bottom: 0.04rem;
-      padding-bottom: 0.04rem;
-      border-bottom: 1.5px solid #dde6f2;
-    }
-    
-    .certificate .club-logo .logo-bolt {
-      font-size: 1.2rem;
-      color: #f5a623;
-      margin-bottom: 0.01rem;
-    }
-    
-    .certificate .club-logo .logo-wub {
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 2px 12px rgba(11, 59, 122, 0.08);
+      z-index: 2;
       font-family: 'Playfair Display', serif;
-      font-size: 1.6rem;
-      font-weight: 700;
       color: #0b3b7a;
-      letter-spacing: 8px;
-      line-height: 1.05;
     }
-    
-    .certificate .club-logo .logo-eee {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #0b3b7a;
-      letter-spacing: 6px;
-      line-height: 1.05;
+    .certificate .seal .seal-icon {
+      font-size: 1.4rem;
+      color: #d4af37;
+      margin-bottom: 0.1rem;
     }
-    
-    .certificate .club-logo .logo-club {
-      font-size: 0.6rem;
-      color: #3c6e9c;
-      letter-spacing: 4px;
-      font-weight: 600;
-      margin-top: 0.01rem;
-    }
-    
-    .certificate .club-logo .logo-since {
+    .certificate .seal .seal-text {
       font-size: 0.45rem;
-      color: #6b8aaa;
-      letter-spacing: 2px;
-      font-weight: 500;
-      margin-top: 0.01rem;
-    }
-    
-    /* ===== TITLE ===== */
-    .certificate .cert-title h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.1rem;
-      color: #0b2b5c;
+      font-weight: 700;
       letter-spacing: 1px;
+      text-align: center;
+      line-height: 1.3;
+      padding: 0 2px;
+    }
+    .certificate .seal .seal-year {
+      font-size: 0.5rem;
       font-weight: 700;
-      margin: 0.04rem 0 0.02rem;
-    }
-    
-    .certificate .cert-title .cert-subtitle {
-      font-size: 0.45rem;
-      color: #3c6e9c;
+      color: #d4af37;
       letter-spacing: 2px;
-      border-bottom: 1px solid #dde6f2;
-      padding-bottom: 0.04rem;
-      margin-top: 0.01rem;
+      margin-top: 0.05rem;
     }
-    
-    /* ===== BODY ===== */
-    .certificate .cert-body {
-      text-align: left;
-      padding: 0.03in 0.02in;
+
+    /* Header */
+    .certificate .header {
+      text-align: center;
+      margin-bottom: 0.3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .certificate .header .logo-placeholder {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 0.2rem;
+    }
+    .certificate .header .logo-placeholder .logo-icon {
+      font-size: 2rem;
+      color: #0b3b7a;
+    }
+    .certificate .header .logo-placeholder .logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #0b3b7a;
+      letter-spacing: 2px;
+    }
+
+    .certificate .header .university {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #0b3b7a;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-top: 0.1rem;
+    }
+    .certificate .header .department {
       font-size: 0.65rem;
-      color: #1f3a66;
-      line-height: 1.5;
+      font-weight: 400;
+      color: #4a6a8a;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    .certificate .header .club-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #d4af37;
+      letter-spacing: 5px;
+      margin-top: 0.05rem;
+    }
+
+    .certificate .header .divider {
+      width: 60%;
+      height: 2px;
+      background: linear-gradient(to right, transparent, #d4af37, #0b3b7a, #d4af37, transparent);
+      margin: 0.2rem auto 0.1rem;
+    }
+
+    /* Title */
+    .certificate .title-section {
+      text-align: center;
+      margin: 0.1rem 0 0.2rem;
+      position: relative;
+      z-index: 1;
+    }
+    .certificate .title-section .main-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #0b3b7a;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+    .certificate .title-section .main-title .gold {
+      color: #d4af37;
+    }
+    .certificate .title-section .sub-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      font-weight: 400;
+      color: #4a6a8a;
+      letter-spacing: 6px;
+      font-style: italic;
+      margin-top: 0.05rem;
+    }
+
+    /* Body */
+    .certificate .body {
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
+      padding: 0.05in 0;
       position: relative;
-    }
-    
-    @media print {
-      .certificate .cert-body {
-        padding: 0.02in 0.015in;
-        font-size: 0.6rem;
-      }
-    }
-    
-    .certificate .cert-body .cert-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 1rem;
-      color: #0b2b5c;
-      text-align: center;
-      margin: 0.02rem 0;
-    }
-    
-    @media print {
-      .certificate .cert-body .cert-name {
-        font-size: 0.85rem;
-      }
-    }
-    
-    .certificate .cert-body .cert-student-id {
-      text-align: center;
-      font-size: 0.7rem;
-      font-weight: 500;
-      margin-bottom: 0.1rem;
-    }
-    
-    .certificate .cert-body .cert-student-id .highlight {
-      color: #0b3b7a;
-      font-weight: 600;
-    }
-    
-    .certificate .cert-body p {
-      margin-bottom: 0.03rem;
-      text-align: justify;
-    }
-    
-    .certificate .cert-body .highlight {
-      color: #0b3b7a;
-      font-weight: 600;
-    }
-    
-    /* ===== QR CODE - Bottom Right ===== */
-    .certificate .cert-body .qr-footer {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      margin-top: 0.02rem;
-      padding-top: 0.02rem;
-      border-top: 1px dashed #dde6f2;
-    }
-    
-    .certificate .cert-body .qr-container-cert {
-      text-align: center;
-      padding: 0.01rem 0.02rem;
-    }
-    
-    .certificate .cert-body .qr-container-cert #certQR {
-      display: inline-block;
-    }
-    
-    .certificate .cert-body .qr-container-cert .qr-label {
-      font-size: 0.35rem;
-      color: #6b8aaa;
-      text-align: center;
-      margin-top: 0.01rem;
-      letter-spacing: 0.5px;
-    }
-    
-    /* ===== SIGNATURE ===== */
-    .certificate .cert-body .signature-line {
-      margin-top: 0.06in;
-      display: flex;
-      justify-content: space-between;
-      border-top: 1px solid #dde6f2;
-      padding-top: 0.08rem;
-      font-size: 0.55rem;
-      color: #506e92;
-    }
-    
-    .certificate .cert-body .signature-line .signature {
-      font-family: 'Playfair Display', cursive;
-      font-size: 0.65rem;
-      color: #0b2b5c;
-    }
-    
-    .certificate .cert-body .signature-line .sig-label {
-      font-size: 0.4rem;
-      color: #6b8aaa;
-      font-weight: 500;
-    }
-    
-    /* ===== NB NOTE ===== */
-    .certificate .cert-body .nb-note {
-      font-size: 0.4rem;
-      color: #888;
-      text-align: center;
-      margin-top: 0.03rem;
-      font-style: italic;
-      border-top: 1px dashed #dde6f2;
-      padding-top: 0.03rem;
-    }
-    
-    /* ===== FOOTER ===== */
-    .certificate .cert-footer {
-      display: flex;
-      justify-content: space-between;
-      border-top: 1px solid #dde6f2;
-      padding-top: 0.04rem;
-      font-size: 0.4rem;
-      color: #506e92;
-    }
-    
-    .certificate .cert-footer .cert-id {
-      font-weight: 500;
-    }
-    
-    .certificate .cert-footer .cert-id strong {
-      color: #0b3b7a;
+      z-index: 1;
     }
 
-    /* ============================================
-       RESPONSIVE FIXES
-       ============================================ */
+    .certificate .body .recipient {
+      text-align: center;
+      margin: 0.1rem 0;
+    }
+    .certificate .body .recipient .name {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #0b3b7a;
+      letter-spacing: 3px;
+      border-bottom: 2px solid #d4af37;
+      display: inline-block;
+      padding: 0 0.5rem 0.15rem;
+    }
+    .certificate .body .recipient .student-id {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #4a6a8a;
+      margin-top: 0.05rem;
+      letter-spacing: 2px;
+    }
+    .certificate .body .recipient .student-id span {
+      color: #0b3b7a;
+      font-weight: 600;
+    }
+
+    .certificate .body .cert-text {
+      font-size: 0.78rem;
+      line-height: 1.8;
+      color: #2a3a5a;
+      text-align: justify;
+      margin: 0.2rem 0;
+      padding: 0 0.1in;
+    }
+    .certificate .body .cert-text .highlight {
+      color: #0b3b7a;
+      font-weight: 600;
+    }
+    .certificate .body .cert-text .gold-highlight {
+      color: #d4af37;
+      font-weight: 600;
+    }
+
+    /* Signatures */
+    .certificate .signatures {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 0.3in;
+      padding-top: 0.2in;
+      border-top: 1px solid #dde6f2;
+      position: relative;
+      z-index: 1;
+    }
+    .certificate .signatures .sig-block {
+      text-align: center;
+      flex: 1;
+    }
+    .certificate .signatures .sig-block .sig-line {
+      font-family: 'Playfair Display', cursive;
+      font-size: 0.9rem;
+      color: #0b3b7a;
+      letter-spacing: 1px;
+      border-bottom: 1.5px solid #0b3b7a;
+      padding-bottom: 0.1rem;
+      margin-bottom: 0.1rem;
+      display: inline-block;
+      min-width: 80px;
+    }
+    .certificate .signatures .sig-block .sig-title {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #0b3b7a;
+      letter-spacing: 1px;
+    }
+    .certificate .signatures .sig-block .sig-org {
+      font-size: 0.5rem;
+      color: #6b8aaa;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    /* Footer */
+    .certificate .footer {
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid #dde6f2;
+      padding-top: 0.15rem;
+      margin-top: 0.1rem;
+      font-size: 0.55rem;
+      color: #6b8aaa;
+      position: relative;
+      z-index: 1;
+    }
+    .certificate .footer .footer-id {
+      font-weight: 500;
+    }
+    .certificate .footer .footer-id strong {
+      color: #0b3b7a;
+      font-weight: 600;
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        margin: 0;
+        display: block;
+        min-height: 100vh;
+      }
+      .container { display: none; }
+      .cert-modal {
+        position: static;
+        background: white;
+        display: block !important;
+        backdrop-filter: none;
+        width: 100%;
+        height: 100vh;
+      }
+      .cert-modal-content {
+        max-width: 100%;
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+        background: white;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+      }
+      .cert-modal-close { display: none !important; }
+      #downloadCertBtn { display: none !important; }
+      #printCertBtn { display: none !important; }
+
+      .certificate-wrapper {
+        padding: 0;
+        margin: 0;
+        background: white;
+        width: 100%;
+        height: 100vh;
+      }
+
+      .certificate {
+        width: 100%;
+        height: 100vh;
+        min-height: 100vh;
+        padding: 8mm 7mm;
+        box-shadow: none;
+        border-radius: 0;
+        margin: 0;
+      }
+      .certificate .border-outer { padding: 5mm 4mm; }
+      .certificate .border-inner { padding: 4mm 3.5mm; }
+      .certificate .seal {
+        width: 24mm;
+        height: 24mm;
+        top: 4mm;
+        right: 4mm;
+      }
+      .certificate .seal .seal-icon { font-size: 1.2rem; }
+      .certificate .seal .seal-text { font-size: 0.4rem; }
+      .certificate .seal .seal-year { font-size: 0.45rem; }
+      .certificate .header .logo-placeholder .logo-text { font-size: 1.6rem; }
+      .certificate .header .university { font-size: 0.8rem; }
+      .certificate .header .club-name { font-size: 1rem; }
+      .certificate .title-section .main-title { font-size: 1.8rem; }
+      .certificate .body .recipient .name { font-size: 2rem; }
+      .certificate .body .cert-text { font-size: 0.72rem; }
+      .certificate .signatures .sig-block .sig-line { font-size: 0.8rem; min-width: 60px; }
+      .certificate .watermark { font-size: 8rem; }
+      .certificate .watermark .bolt { font-size: 4rem; }
+      .certificate .corner { font-size: 1.2rem; }
+      .no-print { display: none !important; }
+    }
+
+    /* Responsive */
     @media screen and (max-width: 800px) {
-      .certificate-wrapper { 
+      .certificate-wrapper {
+        width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
         padding: 0.5rem;
       }
-      .certificate { 
-        padding: 0; 
-        margin: 10px; 
-        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      .certificate {
+        width: 100%;
         min-height: auto;
+        padding: 6mm 5mm;
+        margin: 0;
       }
-      .certificate .cert-border { padding: 0.25in 0.2in; min-height: auto; margin: 0.03in; }
-      .certificate .club-logo .logo-wub { font-size: 1.2rem; letter-spacing: 6px; }
-      .certificate .club-logo .logo-eee { font-size: 0.9rem; letter-spacing: 4px; }
-      .certificate .club-logo .logo-bolt { font-size: 0.9rem; }
-      .certificate .cert-title h1 { font-size: 0.9rem; }
-      .certificate .cert-body .cert-name { font-size: 0.8rem; }
-      .certificate .cert-body { font-size: 0.6rem; padding: 0.15rem; }
-      .certificate .cert-body .qr-footer { flex-direction: column; align-items: center; }
-      .certificate .cert-body .signature-line { flex-direction: column; gap: 0.3rem; align-items: center; }
-      .certificate .cert-footer { flex-direction: column; gap: 0.2rem; align-items: center; }
+      .certificate .border-outer { padding: 4mm 3mm; }
+      .certificate .border-inner { padding: 3mm 2.5mm; }
+      .certificate .seal {
+        width: 20mm;
+        height: 20mm;
+        top: 3mm;
+        right: 3mm;
+      }
+      .certificate .seal .seal-icon { font-size: 1rem; }
+      .certificate .seal .seal-text { font-size: 0.35rem; }
+      .certificate .seal .seal-year { font-size: 0.4rem; }
+      .certificate .header .logo-placeholder .logo-text { font-size: 1.4rem; }
+      .certificate .header .university { font-size: 0.7rem; letter-spacing: 2px; }
+      .certificate .header .club-name { font-size: 0.9rem; }
+      .certificate .title-section .main-title { font-size: 1.5rem; }
+      .certificate .body .recipient .name { font-size: 1.6rem; }
+      .certificate .body .cert-text { font-size: 0.65rem; padding: 0 0.05in; }
+      .certificate .signatures { flex-wrap: wrap; gap: 0.5rem; }
+      .certificate .signatures .sig-block { min-width: 80px; }
+      .certificate .signatures .sig-block .sig-line { font-size: 0.7rem; min-width: 50px; }
+      .certificate .footer { flex-wrap: wrap; gap: 0.2rem; justify-content: center; }
+      .certificate .watermark { font-size: 6rem; }
+      .certificate .watermark .bolt { font-size: 3rem; }
+      .certificate .corner { font-size: 1rem; }
       .cert-modal-content { padding: 0.5rem; }
-      .certificate .cert-body .qr-container-cert #certQR { transform: scale(0.6); }
+    }
+
+    @media screen and (max-width: 480px) {
+      .certificate { padding: 4mm 3mm; }
+      .certificate .border-outer { padding: 3mm 2mm; }
+      .certificate .border-inner { padding: 2mm 1.5mm; }
+      .certificate .seal {
+        width: 16mm;
+        height: 16mm;
+        top: 2mm;
+        right: 2mm;
+      }
+      .certificate .seal .seal-icon { font-size: 0.8rem; }
+      .certificate .seal .seal-text { font-size: 0.3rem; }
+      .certificate .header .logo-placeholder .logo-text { font-size: 1rem; }
+      .certificate .header .university { font-size: 0.55rem; }
+      .certificate .header .club-name { font-size: 0.7rem; }
+      .certificate .title-section .main-title { font-size: 1.1rem; letter-spacing: 2px; }
+      .certificate .title-section .sub-title { font-size: 0.7rem; }
+      .certificate .body .recipient .name { font-size: 1.2rem; }
+      .certificate .body .recipient .student-id { font-size: 0.65rem; }
+      .certificate .body .cert-text { font-size: 0.55rem; line-height: 1.6; }
+      .certificate .signatures .sig-block .sig-line { font-size: 0.6rem; min-width: 40px; }
+      .certificate .signatures .sig-block .sig-title { font-size: 0.5rem; }
+      .certificate .footer { font-size: 0.45rem; }
+      .certificate .corner { font-size: 0.8rem; }
+      .certificate .watermark { font-size: 4rem; }
+      .certificate .watermark .bolt { font-size: 2rem; }
+      .container { padding: 0.5rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .club-header h1 { font-size: 1.3rem; }
+      .club-header { flex-direction: column; align-items: flex-start; }
+      .tabs .tab-btn { font-size: 0.75rem; padding: 0.3rem 0.6rem; }
+      .admin-actions button { font-size: 0.65rem; padding: 0.2rem 0.5rem; white-space: normal; }
+      .qr-container { flex-direction: column; align-items: center; }
+      .qr-instructions { width: 100%; }
+      .payment-section { flex-direction: column; align-items: stretch; }
+      .trxid-input input { max-width: 100%; }
+      .payment-actions { justify-content: flex-start; }
+      table { font-size: 0.6rem; min-width: 650px; }
     }
 
     @media (max-width: 640px) {
@@ -1178,7 +1392,7 @@
       table { font-size: 0.6rem; min-width: 650px; }
       th, td { padding: 0.15rem 0.1rem; }
       .tabs .tab-btn { font-size: 0.75rem; padding: 0.3rem 0.6rem; }
-      .admin-actions button { font-size: 0.65rem; padding: 0.2rem 0.5rem; }
+      .admin-actions button { font-size: 0.65rem; padding: 0.2rem 0.5rem; white-space: normal; }
       .qr-container { flex-direction: column; align-items: center; }
       .qr-instructions { width: 100%; }
       .certificate { padding: 0; margin: 5px; }
@@ -1190,32 +1404,20 @@
       .certificate .cert-body .cert-name { font-size: 0.65rem; }
       .certificate .cert-body { font-size: 0.5rem; padding: 0.1rem; }
       .certificate .cert-body .qr-container-cert #certQR { transform: scale(0.4); }
-      .past-student-fields.show {
-        grid-template-columns: 1fr;
-      }
+      .past-student-fields.show { grid-template-columns: 1fr; }
       .sync-status { font-size: 0.7rem; padding: 0.3rem 0.6rem; }
       .admin-actions { gap: 0.4rem; }
-      .admin-actions button { font-size: 0.6rem; padding: 0.2rem 0.4rem; white-space: normal; }
       .cert-modal-content { padding: 0.5rem; max-height: 95vh; }
       .cert-modal-close { width: 28px; height: 28px; font-size: 0.9rem; }
     }
 
-    @media (max-width: 480px) {
-      .container { padding: 0.5rem; }
-      .club-header h1 { font-size: 1.1rem; }
-      .club-header i { font-size: 2rem; }
-      .tabs .tab-btn { font-size: 0.65rem; padding: 0.2rem 0.4rem; }
-      .payment-section { padding: 0.8rem; }
-      .payment-actions button { font-size: 0.7rem; padding: 0.3rem 0.6rem; }
-      .success-box { padding: 0.8rem; }
-      .success-box .id-badge { font-size: 0.7rem; padding: 0.2rem 0.6rem; }
-      table { font-size: 0.5rem; min-width: 500px; }
-      th, td { padding: 0.1rem 0.05rem; }
+    .no-print {
+      display: block;
     }
-
-    @keyframes slideUp {
-      from { transform: translateY(100px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+    @media print {
+      .no-print {
+        display: none !important;
+      }
     }
   </style>
 </head>
@@ -1416,7 +1618,7 @@
       <h3 style="color:#0b2b5c; margin-top:0.5rem;">Admin Panel</h3>
       <p style="color:#6b8aaa;">Manage members, generate certificates, and view all registrations</p>
     </div>
-    
+
     <div class="admin-actions">
       <button class="btn-primary" id="refreshAdminBtn"><i class="fas fa-sync"></i> Refresh from Cloud</button>
       <button class="btn-success" id="generateAllCertsBtn"><i class="fas fa-certificate"></i> Generate Eligible</button>
@@ -1424,7 +1626,7 @@
       <button class="btn-warning" id="forceGenerateBtn"><i class="fas fa-bolt"></i> Force Generate (Test)</button>
       <button class="btn-danger" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
-    
+
     <div class="admin-table-wrap">
       <table>
         <thead>
@@ -1520,7 +1722,7 @@
     const JSONBIN_BIN_ID = '6a3a40f6f5f4af5e2921c0d2';
     const JSONBIN_API_KEY = '$2a$10$uxxlv8nJapUJj6YbaVCY4u1EBDwX6.jOssFoyi0I7e8CyDKeTIc5W';
     const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
-    
+
     // ============================================
     // CONSTANTS
     // ============================================
@@ -1558,7 +1760,7 @@
     function updateSyncStatus(status, message) {
       const dot = document.getElementById('syncDot');
       const text = document.getElementById('syncText');
-      
+
       dot.className = 'sync-dot';
       if (status === 'online') {
         dot.classList.add('online');
@@ -1575,12 +1777,12 @@
     async function syncDataToCloud(records, lastId) {
       try {
         updateSyncStatus('syncing', '⏳ Saving to cloud...');
-        
+
         const data = {
           records: records,
           lastId: lastId || getLastSerial()
         };
-        
+
         const response = await fetch(JSONBIN_URL, {
           method: 'PUT',
           headers: {
@@ -1589,7 +1791,7 @@
           },
           body: JSON.stringify(data)
         });
-        
+
         if (response.ok) {
           updateSyncStatus('online', '✅ Data saved to cloud');
           return true;
@@ -1608,14 +1810,14 @@
     async function fetchDataFromCloud() {
       try {
         updateSyncStatus('syncing', '⏳ Fetching from cloud...');
-        
+
         const response = await fetch(JSONBIN_URL, {
           method: 'GET',
           headers: {
             'X-Master-Key': JSONBIN_API_KEY
           }
         });
-        
+
         if (response.ok) {
           const data = await response.json();
           updateSyncStatus('online', '✅ Data fetched from cloud');
@@ -1635,7 +1837,7 @@
     async function syncFromCloud() {
       if (isSyncing) return;
       isSyncing = true;
-      
+
       try {
         const cloudData = await fetchDataFromCloud();
         if (cloudData && cloudData.records) {
@@ -1643,11 +1845,11 @@
           const cloudRecords = cloudData.records || [];
           const mergedRecords = mergeRecords(localRecords, cloudRecords);
           saveRegistrations(mergedRecords);
-          
+
           if (cloudData.lastId && cloudData.lastId > getLastSerial()) {
             setLastSerial(cloudData.lastId);
           }
-          
+
           renderAdminTable();
           showToast('✅ Data synced from cloud successfully!');
         } else if (cloudData && cloudData.records && cloudData.records.length === 0) {
@@ -1659,7 +1861,7 @@
         console.error('Sync error:', error);
         updateSyncStatus('offline', '⚠️ Cloud error - Using local data');
       }
-      
+
       isSyncing = false;
     }
 
@@ -1677,31 +1879,31 @@
       const stored = localStorage.getItem(ID_KEY);
       return stored ? parseInt(stored, 10) : 0;
     }
-    
+
     function setLastSerial(serial) {
       localStorage.setItem(ID_KEY, String(serial));
     }
-    
+
     function generateClubId(serial) {
       return `WUB-EEE-${year}-${String(serial).padStart(4, '0')}`;
     }
-    
+
     function getRegistrations() {
       const data = localStorage.getItem(STORAGE_KEY);
       return data ? JSON.parse(data) : [];
     }
-    
+
     function saveRegistrations(records) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
       const lastId = getLastSerial();
       setTimeout(() => syncDataToCloud(records, lastId), 100);
     }
-    
+
     function getCertificates() {
       const data = localStorage.getItem(CERT_KEY);
       return data ? JSON.parse(data) : {};
     }
-    
+
     function saveCertificates(certs) {
       localStorage.setItem(CERT_KEY, JSON.stringify(certs));
     }
@@ -1745,12 +1947,12 @@
         document.getElementById('loginOverlay').classList.remove('open');
         document.getElementById('loginOverlay').classList.add('hidden');
         errorEl.classList.remove('show');
-        
+
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('adminTabBtn').classList.add('active');
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.getElementById('tab-admin').classList.add('active');
-        
+
         renderAdminTable();
         showToast('✅ Welcome Admin!');
         setTimeout(syncFromCloud, 500);
@@ -1772,12 +1974,12 @@
       isLoggedIn = false;
       document.getElementById('loginOverlay').classList.remove('hidden');
       document.getElementById('loginOverlay').classList.add('open');
-      
+
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelector('[data-tab="register"]').classList.add('active');
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       document.getElementById('tab-register').classList.add('active');
-      
+
       showToast('👋 Logged out successfully');
     });
 
@@ -1793,13 +1995,13 @@
     function showToast(message, isError = false) {
       const existing = document.querySelector('.notification-toast');
       if (existing) existing.remove();
-      
+
       const toast = document.createElement('div');
       toast.className = 'notification-toast';
       toast.style.background = isError ? '#b22234' : '#1b754b';
       toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
       document.body.appendChild(toast);
-      
+
       setTimeout(() => {
         toast.classList.add('hidden');
         setTimeout(() => toast.remove(), 500);
@@ -1828,7 +2030,7 @@
       const trxInput = document.getElementById('trxidInput');
       const verifyBtn = document.getElementById('verifyTrxidBtn');
       const submitBtn = document.getElementById('submitBtn');
-      
+
       if (paymentCompleted && verifiedTrxID) {
         statusEl.innerHTML = `<i class="fas fa-check-circle" style="color:#1b754b;"></i> Paid (TrxID: ${verifiedTrxID})`;
         statusEl.className = 'payment-status done';
@@ -1916,20 +2118,20 @@
       if (isPastStudent) {
         startYear = document.getElementById('startYear').value.trim();
         endYear = document.getElementById('endYear').value.trim();
-        
+
         if (!startYear || !endYear) {
           alert('⚠️ Please enter both Start Year and End Year for past student.');
           return;
         }
-        
+
         const startNum = parseInt(startYear);
         const endNum = parseInt(endYear);
-        
+
         if (isNaN(startNum) || isNaN(endNum) || startNum > endNum) {
           alert('⚠️ Please enter valid years (Start Year must be before End Year).');
           return;
         }
-        
+
         if (startNum >= 2024) {
           alert('⚠️ For past students, Start Year must be before 2024.');
           return;
@@ -1983,7 +2185,7 @@
       saveRegistrations(records);
 
       await sendConfirmationEmail(record);
-      
+
       const box = document.getElementById('successBox');
       const span = document.getElementById('displayClubId');
       if (span) span.textContent = clubId;
@@ -2000,7 +2202,7 @@
       renderAdminTable();
       document.getElementById('successBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
       document.getElementById('submitBtn').disabled = true;
-      
+
       showToast('🎉 Registration complete! Data saved to cloud.');
     });
 
@@ -2010,7 +2212,7 @@
     function generateQRCode(record) {
       const qrContainer = document.getElementById('qrcode');
       qrContainer.innerHTML = '';
-      
+
       const qrData = JSON.stringify({
         clubId: record.clubId,
         name: record.fullName,
@@ -2023,7 +2225,7 @@
         startYear: record.startYear || null,
         endYear: record.endYear || null
       });
-      
+
       new QRCode(qrContainer, {
         text: qrData,
         width: 180,
@@ -2039,10 +2241,10 @@
       const qrContainer = document.getElementById('certQR');
       if (!qrContainer) return;
       qrContainer.innerHTML = '';
-      
+
       const certs = getCertificates();
       const cert = certs[record.clubId] || {};
-      
+
       const qrData = JSON.stringify({
         name: record.fullName,
         studentId: record.studentId,
@@ -2060,7 +2262,7 @@
         periodStart: cert.periodStart ? new Date(cert.periodStart).toLocaleDateString() : 'N/A',
         periodEnd: cert.periodEnd ? new Date(cert.periodEnd).toLocaleDateString() : 'N/A'
       });
-      
+
       new QRCode(qrContainer, {
         text: qrData,
         width: 55,
@@ -2078,7 +2280,7 @@
         showToast('❌ No QR code to download', true);
         return;
       }
-      
+
       const link = document.createElement('a');
       link.download = `WUB_EEE_QR_${document.getElementById('qrClubId').textContent}.png`;
       link.href = canvas.toDataURL('image/png');
@@ -2093,7 +2295,7 @@
         showToast('❌ No QR code to share', true);
         return;
       }
-      
+
       canvas.toBlob(function(blob) {
         const file = new File([blob], 'WUB_EEE_QR.png', { type: 'image/png' });
         if (navigator.share) {
@@ -2232,12 +2434,12 @@
       if (certs[record.clubId]) {
         return certs[record.clubId];
       }
-      
+
       const certNumber = getCertificateNumber(record.clubId);
       const now = new Date();
-      
+
       let startDate, endDate;
-      
+
       if (record.isPastStudent && record.startYear && record.endYear) {
         startDate = new Date(parseInt(record.startYear), 0, 1);
         endDate = new Date(parseInt(record.endYear), 11, 31);
@@ -2247,7 +2449,7 @@
         endDate = new Date(joinDate);
         endDate.setFullYear(endDate.getFullYear() + 2);
       }
-      
+
       const certData = {
         clubId: record.clubId,
         certNumber: certNumber,
@@ -2262,7 +2464,7 @@
         startYear: record.startYear || null,
         endYear: record.endYear || null
       };
-      
+
       certs[record.clubId] = certData;
       saveCertificates(certs);
       return certData;
@@ -2270,13 +2472,13 @@
 
     function renderCertificate(record) {
       const cert = generateCertificate(record);
-      
+
       let startDateStr, endDateStr;
-      
+
       if (cert.periodStart && cert.periodEnd) {
         const startDate = new Date(cert.periodStart);
         const endDate = new Date(cert.periodEnd);
-        
+
         startDateStr = startDate.toLocaleDateString('en-US', {
           year: 'numeric', month: 'long', day: 'numeric'
         });
@@ -2287,7 +2489,7 @@
         const now = new Date();
         const twoYearsAgo = new Date(now);
         twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
-        
+
         startDateStr = twoYearsAgo.toLocaleDateString('en-US', {
           year: 'numeric', month: 'long', day: 'numeric'
         });
@@ -2296,91 +2498,122 @@
         });
       }
 
-      const logoSvg = `
-        <svg width="50" height="50" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:0.02rem;">
-          <circle cx="100" cy="100" r="90" fill="#0b3b7a" opacity="0.06"/>
-          <circle cx="100" cy="100" r="80" fill="none" stroke="#0b3b7a" stroke-width="1.5" opacity="0.25"/>
-          <path d="M100 30 L115 75 L95 80 L110 120 L85 100 L95 90 L75 70 L100 70 Z" fill="#f5a623" opacity="0.85"/>
-          <text x="100" y="138" font-family="'Playfair Display', serif" font-size="18" font-weight="700" fill="#0b3b7a" text-anchor="middle" letter-spacing="4">WUB</text>
-          <text x="100" y="168" font-family="'Playfair Display', serif" font-size="14" font-weight="700" fill="#0b3b7a" text-anchor="middle" letter-spacing="3">EEE</text>
-          <text x="100" y="192" font-family="'Inter', sans-serif" font-size="7" font-weight="600" fill="#3c6e9c" text-anchor="middle" letter-spacing="2">CLUB</text>
-          <text x="100" y="210" font-family="'Inter', sans-serif" font-size="4.5" font-weight="500" fill="#6b8aaa" text-anchor="middle" letter-spacing="1">SINCE 2011</text>
-        </svg>
-      `;
-
+      // Generate QR for certificate
       setTimeout(() => {
         generateCertQR(record);
       }, 100);
-      
+
       return `
         <div class="certificate-wrapper">
           <div class="certificate" id="certificatePrint">
-            <div class="cert-border">
-              <div class="cert-seal"><i class="fas fa-certificate"></i></div>
-              
-              <!-- LOGO -->
-              <div class="club-logo">
-                ${logoSvg}
-                <div class="logo-wub">WUB</div>
-                <div class="logo-eee">EEE</div>
-                <div class="logo-club">CLUB</div>
-                <div class="logo-since">SINCE 2011</div>
-              </div>
-              
-              <!-- TITLE -->
-              <div class="cert-title">
-                <h1>🏆 CERTIFICATE OF MEMBERSHIP</h1>
-                <div class="cert-subtitle">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
-              </div>
-              
-              <!-- BODY -->
-              <div class="cert-body">
-                <p>This is to certify that</p>
-                <div class="cert-name">${escapeHtml(record.fullName)}</div>
-                <div class="cert-student-id">Student ID: <span class="highlight">${escapeHtml(record.studentId)}</span></div>
-                <p>has been an active member/participant of the <span class="highlight">EEE Club of World University of Bangladesh</span>.</p>
-                <p>During the period <span class="highlight">${startDateStr}</span> to <span class="highlight">${endDateStr}</span>, he/she has actively participated in various academic, technical, and extracurricular activities organized by the club, including workshops, seminars, and competitions.</p>
-                <p>We appreciate his/her dedication, enthusiasm, and contribution to the development of technical knowledge and teamwork within the club.</p>
-                <p>We wish him/her every success in life.</p>
-                
-                <!-- QR CODE -->
-                <div class="qr-footer">
-                  <div style="flex:1;"></div>
-                  <div class="qr-container-cert">
-                    <div id="certQR"></div>
-                    <div class="qr-label">Scan to Verify Membership</div>
-                  </div>
-                </div>
-                
-                <!-- SIGNATURE -->
-                <div class="signature-line">
-                  <div style="text-align:center;">
-                    <div class="signature">_________________</div>
-                    <div>President</div>
-                    <div class="sig-label">WUB EEE Club</div>
-                  </div>
-                  <div style="text-align:center;">
-                    <div class="signature">_________________</div>
-                    <div>Advisor</div>
-                    <div class="sig-label">WUB EEE Club</div>
-                  </div>
-                </div>
-                
-                <!-- NB NOTE -->
-                <div class="nb-note">
-                  <strong>NB:</strong> This certificate is automatically generated. No physical signature is required. For verification, please contact the EEE Club.
-                </div>
-              </div>
-              
-              <!-- FOOTER -->
-              <div class="cert-footer">
-                <div class="cert-id">Certificate No: <strong>${cert.certNumber}</strong></div>
-                <div class="cert-id">Club ID: <strong>${record.clubId}</strong></div>
-                <div class="cert-id">Issued: <strong>${new Date(cert.generatedDate).toLocaleDateString()}</strong></div>
-              </div>
+
+            <!-- Watermark -->
+            <div class="watermark">
+              <span class="bolt">⚡</span>
+              WUB EEE
             </div>
+
+            <!-- Outer Border -->
+            <div class="border-outer">
+              <!-- Inner Border -->
+              <div class="border-inner">
+
+                <!-- Corner Ornaments -->
+                <span class="corner corner-tl">✦</span>
+                <span class="corner corner-tr">✦</span>
+                <span class="corner corner-bl">✦</span>
+                <span class="corner corner-br">✦</span>
+
+                <!-- Seal -->
+                <div class="seal">
+                  <div class="seal-icon">⚡</div>
+                  <div class="seal-text">WUB EEE CLUB</div>
+                  <div class="seal-year">SINCE 2011</div>
+                </div>
+
+                <!-- Header -->
+                <div class="header">
+                  <div class="logo-placeholder">
+                    <span class="logo-icon">⚡</span>
+                    <span class="logo-text">WUB</span>
+                  </div>
+                  <div class="university">World University of Bangladesh</div>
+                  <div class="department">Department of Electrical &amp; Electronic Engineering</div>
+                  <div class="club-name">WUB EEE Club</div>
+                  <div class="divider"></div>
+                </div>
+
+                <!-- Title -->
+                <div class="title-section">
+                  <div class="main-title">
+                    Certificate of <span class="gold">Participation</span>
+                  </div>
+                  <div class="sub-title">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+                </div>
+
+                <!-- Body -->
+                <div class="body">
+
+                  <!-- Recipient -->
+                  <div class="recipient">
+                    <div class="name">${escapeHtml(record.fullName)}</div>
+                    <div class="student-id">Student ID: <span>${escapeHtml(record.studentId)}</span></div>
+                  </div>
+
+                  <!-- Certificate Text -->
+                  <div class="cert-text">
+                    <p>
+                      This is to certify that <span class="highlight">${escapeHtml(record.fullName)}</span>,
+                      Student ID <span class="highlight">${escapeHtml(record.studentId)}</span>, has actively participated
+                      in various academic, technical, leadership, and extracurricular activities organized
+                      by the <span class="gold-highlight">WUB EEE Club</span> during the membership period
+                      from <span class="highlight">${startDateStr}</span> to
+                      <span class="highlight">${endDateStr}</span>.
+                    </p>
+                    <p style="margin-top:0.1rem;">
+                      The club acknowledges and appreciates the recipient's dedication, commitment,
+                      teamwork, and valuable contribution towards the advancement of engineering
+                      knowledge, innovation, and professional development.
+                    </p>
+                  </div>
+
+                  <!-- Signatures -->
+                  <div class="signatures">
+                    <div class="sig-block">
+                      <div class="sig-line">_________________</div>
+                      <div class="sig-title">President</div>
+                      <div class="sig-org">WUB EEE Club</div>
+                    </div>
+                    <div class="sig-block">
+                      <div class="sig-line">_________________</div>
+                      <div class="sig-title">Advisor</div>
+                      <div class="sig-org">WUB EEE Club</div>
+                    </div>
+                    <div class="sig-block">
+                      <div class="sig-line">_________________</div>
+                      <div class="sig-title">Chairman</div>
+                      <div class="sig-org">Department of EEE</div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <!-- Footer -->
+                <div class="footer">
+                  <div class="footer-id">Certificate No: <strong>${cert.certNumber}</strong></div>
+                  <div class="footer-id">Club ID: <strong>${record.clubId}</strong></div>
+                  <div class="footer-id">Issue Date: <strong>${new Date(cert.generatedDate).toLocaleDateString()}</strong></div>
+                </div>
+
+              </div>
+              <!-- End Inner Border -->
+            </div>
+            <!-- End Outer Border -->
+
           </div>
+          <!-- End Certificate -->
         </div>
+        <!-- End Certificate Wrapper -->
       `;
     }
 
@@ -2389,18 +2622,18 @@
     // ============================================
     function renderAdminTable() {
       if (!isLoggedIn) return;
-      
+
       const records = getRegistrations();
       const tbody = document.getElementById('adminTableBody');
       if (!tbody) return;
-      
+
       if (records.length === 0) {
         tbody.innerHTML = `<tr class="empty-row"><td colspan="8">No registered members yet.</td></tr>`;
         return;
       }
 
       const certs = getCertificates();
-      
+
       tbody.innerHTML = records.map((r, idx) => {
         const paid = r.paymentStatus && r.paymentStatus.includes('Paid');
         const hasCert = !!certs[r.clubId];
@@ -2408,16 +2641,16 @@
         const isPast = isPastMember(r.joinDate) || r.isPastStudent;
         const joinDate = new Date(r.joinDate).toLocaleDateString();
         const pastInfo = r.isPastStudent && r.startYear && r.endYear ? `${r.startYear}-${r.endYear}` : '';
-        
+
         let certStatus = '';
         let certAction = '';
         let actions = '';
-        
+
         actions = `
           <button class="action-btn edit" onclick="editMember('${r.clubId}')"><i class="fas fa-edit"></i></button>
           <button class="action-btn delete" onclick="deleteMember('${r.clubId}')"><i class="fas fa-trash"></i></button>
         `;
-        
+
         if (hasCert) {
           certStatus = `<span class="badge-cert"><i class="fas fa-check-circle"></i> Issued</span>`;
           certAction = `<button class="cert-btn download" onclick="viewCertificate('${r.clubId}')"><i class="fas fa-eye"></i> View</button>`;
@@ -2432,7 +2665,7 @@
           certStatus = `<span class="badge-no-cert"><i class="fas fa-hourglass-half"></i> ${yearsLeft} year(s)</span>`;
           certAction = `<span style="font-size:0.7rem; color:#6b8aaa;">Not eligible</span>`;
         }
-        
+
         return `<tr>
           <td>${idx+1}</td>
           <td><strong>${escapeHtml(r.fullName || '')}</strong></td>
@@ -2456,7 +2689,7 @@
         showToast('❌ Member not found', true);
         return;
       }
-      
+
       document.getElementById('editClubId').value = clubId;
       document.getElementById('editFullName').value = record.fullName || '';
       document.getElementById('editStudentId').value = record.studentId || '';
@@ -2465,7 +2698,7 @@
       document.getElementById('editSemester').value = record.semester || '3rd';
       document.getElementById('editGender').value = record.gender || 'Male';
       document.getElementById('editInterest').value = record.interest || 'Technical Workshop';
-      
+
       document.getElementById('editModal').classList.add('open');
     };
 
@@ -2481,7 +2714,7 @@
 
     document.getElementById('editForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      
+
       const clubId = document.getElementById('editClubId').value;
       const fullName = document.getElementById('editFullName').value.trim();
       const studentId = document.getElementById('editStudentId').value.trim();
@@ -2490,19 +2723,19 @@
       const semester = document.getElementById('editSemester').value;
       const gender = document.getElementById('editGender').value;
       const interest = document.getElementById('editInterest').value;
-      
+
       if (!fullName || !studentId || !email) {
         showToast('⚠️ Please fill in all required fields.', true);
         return;
       }
-      
+
       const records = getRegistrations();
       const index = records.findIndex(r => r.clubId === clubId);
       if (index === -1) {
         showToast('❌ Member not found', true);
         return;
       }
-      
+
       records[index].fullName = fullName;
       records[index].studentId = studentId;
       records[index].email = email;
@@ -2510,10 +2743,10 @@
       records[index].semester = semester;
       records[index].gender = gender;
       records[index].interest = interest;
-      
+
       saveRegistrations(records);
       renderAdminTable();
-      
+
       document.getElementById('editModal').classList.remove('open');
       showToast('✅ Member updated successfully!');
     });
@@ -2522,20 +2755,20 @@
       if (!confirm('Are you sure you want to delete this member? This action cannot be undone.')) {
         return;
       }
-      
+
       const records = getRegistrations();
       const index = records.findIndex(r => r.clubId === clubId);
       if (index === -1) {
         showToast('❌ Member not found', true);
         return;
       }
-      
+
       const certs = getCertificates();
       if (certs[clubId]) {
         delete certs[clubId];
         saveCertificates(certs);
       }
-      
+
       records.splice(index, 1);
       saveRegistrations(records);
       renderAdminTable();
@@ -2552,13 +2785,13 @@
         showToast('❌ Member not found', true);
         return;
       }
-      
+
       const certs = getCertificates();
       if (!certs[clubId]) {
         showToast('❌ No certificate found for this member', true);
         return;
       }
-      
+
       document.getElementById('certificateContainer').innerHTML = renderCertificate(record);
       document.getElementById('certModal').classList.add('open');
       window._currentCertRecord = record;
@@ -2571,18 +2804,18 @@
         showToast('❌ Member not found', true);
         return;
       }
-      
+
       const certs = getCertificates();
       if (certs[clubId]) {
         showToast('⚠️ Certificate already exists for this member');
         return;
       }
-      
+
       if (!isEligibleForCertificate(record.joinDate)) {
         showToast('⚠️ Member is not eligible yet (need 2 years)', true);
         return;
       }
-      
+
       generateCertificate(record);
       renderAdminTable();
       showToast(`✅ Certificate generated for ${record.fullName}`);
@@ -2596,18 +2829,18 @@
         showToast('❌ Member not found', true);
         return;
       }
-      
+
       const certs = getCertificates();
       if (certs[clubId]) {
         showToast('⚠️ Certificate already exists for this member');
         return;
       }
-      
+
       if (!isPastMember(record.joinDate) && !record.isPastStudent) {
         showToast('⚠️ Member is not a past member (need 2+ years)', true);
         return;
       }
-      
+
       generateCertificate(record);
       renderAdminTable();
       showToast(`✅ Certificate generated for past member ${record.fullName}`);
@@ -2631,17 +2864,17 @@
         showToast('❌ No members to generate certificates for', true);
         return;
       }
-      
+
       let count = 0;
       const certs = getCertificates();
-      
+
       records.forEach(r => {
         if (!certs[r.clubId] && (isPastMember(r.joinDate) || r.isPastStudent)) {
           generateCertificate(r);
           count++;
         }
       });
-      
+
       renderAdminTable();
       showToast(`✅ Generated ${count} certificate(s) for past members`);
     });
@@ -2652,17 +2885,17 @@
         showToast('❌ No members to generate certificates for', true);
         return;
       }
-      
+
       let count = 0;
       const certs = getCertificates();
-      
+
       records.forEach(r => {
         if (!certs[r.clubId]) {
           generateCertificate(r);
           count++;
         }
       });
-      
+
       renderAdminTable();
       showToast(`✅ Force generated ${count} certificate(s) for all members`);
     });
@@ -2671,14 +2904,14 @@
       const records = getRegistrations();
       let count = 0;
       const certs = getCertificates();
-      
+
       records.forEach(r => {
         if (!certs[r.clubId] && isEligibleForCertificate(r.joinDate)) {
           generateCertificate(r);
           count++;
         }
       });
-      
+
       renderAdminTable();
       showToast(`✅ Generated ${count} certificate(s) for eligible members`);
     });
@@ -2706,21 +2939,21 @@
         showToast('❌ No certificate to download', true);
         return;
       }
-      
+
       const certs = getCertificates();
       const cert = certs[record.clubId];
       if (!cert) {
         showToast('❌ Certificate not found', true);
         return;
       }
-      
+
       const btn = this;
       const originalText = btn.innerHTML;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
       btn.disabled = true;
-      
+
       const certificateElement = document.getElementById('certificateContainer');
-      
+
       const opt = {
         margin: 0,
         filename: `Certificate_${record.clubId}.pdf`,
@@ -2739,7 +2972,7 @@
         },
         pagebreak: { mode: 'avoid-all' }
       };
-      
+
       html2pdf().set(opt).from(certificateElement).save().then(function() {
         btn.innerHTML = originalText;
         btn.disabled = false;
@@ -2763,12 +2996,12 @@
           document.getElementById('loginError').classList.remove('show');
           return;
         }
-        
+
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         this.classList.add('active');
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.getElementById('tab-' + this.dataset.tab).classList.add('active');
-        
+
         if (this.dataset.tab === 'admin' && isLoggedIn) {
           renderAdminTable();
           setTimeout(syncFromCloud, 300);
@@ -2787,8 +3020,8 @@
     console.log('🏫 WUB EEE Club Registration System loaded successfully!');
     console.log('📧 Admin: eee-club@eee.wub.edu.bd');
     console.log('🔑 Password: Eee123@580Eee');
-    console.log('📜 Certificate: SINGLE A4 PAGE - 0.5 INCH MARGINS - FULL BORDER');
-    console.log('📐 Border: Full border on all sides inside the margins');
+    console.log('📜 Certificate: Premium A4 Certificate of Participation');
+    console.log('📐 Design: Double border, Gold accents, University style');
     console.log('📱 QR Code on certificate with FULL member information');
     console.log('📝 NB: Auto-generated, no signature needed');
     console.log('☁️ Cloud sync enabled with JSONBin.io');
