@@ -6,7 +6,7 @@
   <title>WUB EEE Club · Registration & Certificate System</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -852,8 +852,7 @@
     }
 
     /* ============================================
-       A4 CERTIFICATE - PREMIUM DESIGN
-       210mm × 297mm
+       PREMIUM A4 CERTIFICATE - INTEGRATED
        ============================================ */
     @page {
       size: A4 portrait;
@@ -879,54 +878,78 @@
       }
     }
 
+    /* --- Premium Certificate Design --- */
     .certificate {
-      width: 100%;
-      height: auto;
+      width: 210mm;
       min-height: 297mm;
-      background: #fcfcfd;
+      background: #fbfcfd;
       position: relative;
-      padding: 10mm 9mm;
+      padding: 12mm 11mm 10mm 11mm;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+      border-radius: 4px;
       display: flex;
       flex-direction: column;
-      font-family: 'Inter', sans-serif;
+      background-image:
+        radial-gradient(circle at 15% 20%, rgba(11, 59, 122, 0.02) 1px, transparent 1px),
+        radial-gradient(circle at 85% 75%, rgba(11, 59, 122, 0.02) 1px, transparent 1px),
+        repeating-linear-gradient(45deg, rgba(11, 59, 122, 0.01) 0px, rgba(11, 59, 122, 0.01) 1px, transparent 1px, transparent 8px),
+        repeating-linear-gradient(-45deg, rgba(11, 59, 122, 0.01) 0px, rgba(11, 59, 122, 0.01) 1px, transparent 1px, transparent 8px),
+        linear-gradient(135deg, rgba(212, 175, 55, 0.02) 0%, transparent 60%);
+      background-size: 100% 100%, 100% 100%, 20px 20px, 20px 20px, 100% 100%;
+      background-blend-mode: normal;
     }
 
     @media print {
       .certificate {
-        width: 100%;
-        height: 100vh;
-        min-height: 100vh;
-        padding: 8mm 7mm;
         box-shadow: none;
         border-radius: 0;
-        margin: 0;
+        width: 100%;
+        min-height: 100vh;
+        padding: 12mm 11mm 10mm 11mm;
+        margin: 0 auto;
       }
     }
 
-    /* Background Pattern */
+    /* Double border */
     .certificate::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image:
-        radial-gradient(circle at 20% 50%, rgba(11, 59, 122, 0.02) 0%, transparent 50%),
-        radial-gradient(circle at 80% 50%, rgba(11, 59, 122, 0.02) 0%, transparent 50%),
-        repeating-linear-gradient(45deg,
-          transparent,
-          transparent 20px,
-          rgba(11, 59, 122, 0.008) 20px,
-          rgba(11, 59, 122, 0.008) 21px),
-        repeating-linear-gradient(-45deg,
-          transparent,
-          transparent 20px,
-          rgba(11, 59, 122, 0.008) 20px,
-          rgba(11, 59, 122, 0.008) 21px);
+      top: 6mm;
+      left: 6mm;
+      right: 6mm;
+      bottom: 6mm;
+      border: 1.8px solid #0B3B7A;
       pointer-events: none;
-      z-index: 0;
+      border-radius: 2px;
     }
+
+    .certificate::after {
+      content: '';
+      position: absolute;
+      top: 7.8mm;
+      left: 7.8mm;
+      right: 7.8mm;
+      bottom: 7.8mm;
+      border: 1.2px solid #D4AF37;
+      pointer-events: none;
+      border-radius: 2px;
+    }
+
+    /* Corner ornaments */
+    .certificate .corner {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-color: #D4AF37;
+      border-style: solid;
+      border-width: 0;
+      opacity: 0.7;
+      z-index: 2;
+    }
+    .certificate .corner-tl { top: 9mm; left: 9mm; border-top-width: 2.5px; border-left-width: 2.5px; }
+    .certificate .corner-tr { top: 9mm; right: 9mm; border-top-width: 2.5px; border-right-width: 2.5px; }
+    .certificate .corner-bl { bottom: 9mm; left: 9mm; border-bottom-width: 2.5px; border-left-width: 2.5px; }
+    .certificate .corner-br { bottom: 9mm; right: 9mm; border-bottom-width: 2.5px; border-right-width: 2.5px; }
 
     /* Watermark */
     .certificate .watermark {
@@ -935,310 +958,319 @@
       left: 50%;
       transform: translate(-50%, -50%);
       opacity: 0.04;
-      font-size: 12rem;
-      color: #0b3b7a;
-      font-family: 'Playfair Display', serif;
-      letter-spacing: 10px;
       pointer-events: none;
-      z-index: 0;
-      line-height: 1;
-      text-align: center;
-    }
-    .certificate .watermark .bolt {
-      font-size: 6rem;
-      display: block;
-      margin-bottom: 0.2rem;
-    }
-
-    /* Double Border */
-    .certificate .border-outer {
-      border: 3px solid #0b3b7a;
-      padding: 6mm 5mm;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      z-index: 1;
-      background: rgba(255, 255, 255, 0.6);
-      backdrop-filter: blur(1px);
-    }
-
-    .certificate .border-inner {
-      border: 2px solid #d4af37;
-      padding: 5mm 4.5mm;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-    }
-
-    /* Corner Ornaments */
-    .certificate .corner {
-      position: absolute;
-      font-size: 1.6rem;
-      color: #d4af37;
-      opacity: 0.6;
-      z-index: 2;
-    }
-    .certificate .corner-tl { top: 2mm; left: 2mm; }
-    .certificate .corner-tr { top: 2mm; right: 2mm; transform: scaleX(-1); }
-    .certificate .corner-bl { bottom: 2mm; left: 2mm; transform: scaleY(-1); }
-    .certificate .corner-br { bottom: 2mm; right: 2mm; transform: scale(-1, -1); }
-
-    /* Seal */
-    .certificate .seal {
-      position: absolute;
-      top: 5mm;
-      right: 5mm;
-      width: 28mm;
-      height: 28mm;
-      border-radius: 50%;
-      border: 2.5px solid #d4af37;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255, 255, 255, 0.85);
-      box-shadow: 0 2px 12px rgba(11, 59, 122, 0.08);
-      z-index: 2;
+      font-size: 120px;
+      font-weight: 700;
+      color: #0B3B7A;
+      letter-spacing: 6px;
       font-family: 'Playfair Display', serif;
-      color: #0b3b7a;
+      text-transform: uppercase;
+      white-space: nowrap;
+      z-index: 0;
     }
-    .certificate .seal .seal-icon {
-      font-size: 1.4rem;
-      color: #d4af37;
-      margin-bottom: 0.1rem;
+    .certificate .watermark span {
+      display: inline-block;
+      transform: rotate(-6deg);
+      border: 2px solid rgba(11, 59, 122, 0.1);
+      padding: 0.1em 0.3em;
+      border-radius: 50px;
+      background: rgba(255,255,255,0.1);
     }
-    .certificate .seal .seal-text {
-      font-size: 0.45rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-align: center;
-      line-height: 1.3;
-      padding: 0 2px;
-    }
-    .certificate .seal .seal-year {
-      font-size: 0.5rem;
-      font-weight: 700;
-      color: #d4af37;
-      letter-spacing: 2px;
-      margin-top: 0.05rem;
+
+    /* Content layer */
+    .certificate .content {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
 
     /* Header */
     .certificate .header {
       text-align: center;
-      margin-bottom: 0.3rem;
-      position: relative;
-      z-index: 1;
+      margin-bottom: 5px;
     }
-
-    .certificate .header .logo-placeholder {
+    .certificate .logo-placeholder {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 0.8rem;
-      margin-bottom: 0.2rem;
+      margin-bottom: 2px;
     }
-    .certificate .header .logo-placeholder .logo-icon {
-      font-size: 2rem;
-      color: #0b3b7a;
-    }
-    .certificate .header .logo-placeholder .logo-text {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #0b3b7a;
-      letter-spacing: 2px;
-    }
-
-    .certificate .header .university {
-      font-family: 'Playfair Display', serif;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #0b3b7a;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      margin-top: 0.1rem;
-    }
-    .certificate .header .department {
-      font-size: 0.65rem;
-      font-weight: 400;
-      color: #4a6a8a;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-    }
-    .certificate .header .club-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #d4af37;
-      letter-spacing: 5px;
-      margin-top: 0.05rem;
-    }
-
-    .certificate .header .divider {
-      width: 60%;
-      height: 2px;
-      background: linear-gradient(to right, transparent, #d4af37, #0b3b7a, #d4af37, transparent);
-      margin: 0.2rem auto 0.1rem;
-    }
-
-    /* Title */
-    .certificate .title-section {
-      text-align: center;
-      margin: 0.1rem 0 0.2rem;
-      position: relative;
-      z-index: 1;
-    }
-    .certificate .title-section .main-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 2.2rem;
-      font-weight: 900;
-      color: #0b3b7a;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-    }
-    .certificate .title-section .main-title .gold {
-      color: #d4af37;
-    }
-    .certificate .title-section .sub-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 0.95rem;
-      font-weight: 400;
-      color: #4a6a8a;
-      letter-spacing: 6px;
-      font-style: italic;
-      margin-top: 0.05rem;
-    }
-
-    /* Body */
-    .certificate .body {
-      flex: 1;
+    .certificate .logo-symbol {
+      width: 70px;
+      height: 70px;
+      background: #0B3B7A;
+      border-radius: 50%;
       display: flex;
-      flex-direction: column;
+      align-items: center;
       justify-content: center;
-      padding: 0.05in 0;
-      position: relative;
-      z-index: 1;
-    }
-
-    .certificate .body .recipient {
-      text-align: center;
-      margin: 0.1rem 0;
-    }
-    .certificate .body .recipient .name {
+      color: white;
       font-family: 'Playfair Display', serif;
-      font-size: 2.4rem;
       font-weight: 700;
-      color: #0b3b7a;
-      letter-spacing: 3px;
-      border-bottom: 2px solid #d4af37;
-      display: inline-block;
-      padding: 0 0.5rem 0.15rem;
+      font-size: 28px;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 12px rgba(11, 59, 122, 0.2);
+      border: 2px solid #D4AF37;
     }
-    .certificate .body .recipient .student-id {
-      font-size: 0.85rem;
+    .certificate .logo-symbol small {
+      font-size: 14px;
+      font-weight: 400;
+      margin-left: 2px;
+    }
+    .certificate .uni-name {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 24px;
+      letter-spacing: 1.5px;
+      color: #0B3B7A;
+      margin-top: 4px;
+      line-height: 1.2;
+    }
+    .certificate .uni-name .dept {
+      font-weight: 400;
+      font-size: 16px;
+      letter-spacing: 1px;
+      color: #1e4a7a;
+      display: block;
+      margin-top: -2px;
+    }
+    .certificate .club-name {
+      font-family: 'Inter', sans-serif;
       font-weight: 500;
-      color: #4a6a8a;
-      margin-top: 0.05rem;
-      letter-spacing: 2px;
+      font-size: 17px;
+      letter-spacing: 3px;
+      color: #D4AF37;
+      text-transform: uppercase;
+      margin-top: 1px;
+      border-top: 1px solid rgba(212, 175, 55, 0.3);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+      display: inline-block;
+      padding: 0 14px;
+      background: rgba(212, 175, 55, 0.04);
     }
-    .certificate .body .recipient .student-id span {
-      color: #0b3b7a;
-      font-weight: 600;
+    .certificate .divider {
+      width: 80%;
+      height: 1.5px;
+      background: linear-gradient(90deg, transparent, #D4AF37, #0B3B7A, #D4AF37, transparent);
+      margin: 6px auto 8px auto;
+      opacity: 0.6;
     }
 
-    .certificate .body .cert-text {
-      font-size: 0.78rem;
-      line-height: 1.8;
-      color: #2a3a5a;
+    /* Seal */
+    .certificate .seal {
+      position: absolute;
+      top: 12mm;
+      right: 13mm;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid #D4AF37;
+      background: rgba(212, 175, 55, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 12px;
+      color: #0B3B7A;
+      text-align: center;
+      line-height: 1.2;
+      box-shadow: 0 0 0 1px #0B3B7A;
+      z-index: 5;
+      padding: 2px;
+    }
+    .certificate .seal span {
+      display: block;
+      transform: scale(0.9);
+    }
+
+    /* Main Title */
+    .certificate .main-title {
+      text-align: center;
+      margin: 8px 0 6px 0;
+    }
+    .certificate .main-title h1 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 38px;
+      letter-spacing: 5px;
+      color: #0B3B7A;
+      text-shadow: 0 0 0 #0B3B7A;
+      margin-bottom: 2px;
+    }
+    .certificate .main-title .sub {
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      font-size: 17px;
+      letter-spacing: 4px;
+      color: #3a4f6b;
+      text-transform: uppercase;
+      border-top: 1px solid rgba(212, 175, 55, 0.25);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+      display: inline-block;
+      padding: 2px 20px;
+    }
+
+    /* Recipient */
+    .certificate .recipient {
+      text-align: center;
+      margin: 12px 0 8px 0;
+    }
+    .certificate .recipient-name {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 44px;
+      letter-spacing: 4px;
+      color: #0B3B7A;
+      background: linear-gradient(180deg, #0B3B7A 60%, #1f4f82);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      border-bottom: 2px dashed #D4AF37;
+      display: inline-block;
+      padding: 0 20px 4px 20px;
+      margin-bottom: 2px;
+      line-height: 1.2;
+    }
+    .certificate .student-id {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 18px;
+      letter-spacing: 2px;
+      color: #1e3f5e;
+      background: rgba(212, 175, 55, 0.08);
+      display: inline-block;
+      padding: 2px 18px;
+      border-radius: 30px;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    /* Body Text */
+    .certificate .body-text {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #1a2d44;
       text-align: justify;
-      margin: 0.2rem 0;
-      padding: 0 0.1in;
+      padding: 10px 4px 4px 4px;
+      margin: 6px 0 6px 0;
+      border-top: 1px solid rgba(11, 59, 122, 0.08);
+      border-bottom: 1px solid rgba(11, 59, 122, 0.08);
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(1px);
     }
-    .certificate .body .cert-text .highlight {
-      color: #0b3b7a;
-      font-weight: 600;
-    }
-    .certificate .body .cert-text .gold-highlight {
-      color: #d4af37;
+    .certificate .body-text strong {
+      color: #0B3B7A;
       font-weight: 600;
     }
 
     /* Signatures */
     .certificate .signatures {
       display: flex;
-      justify-content: space-around;
-      margin-top: 0.3in;
-      padding-top: 0.2in;
-      border-top: 1px solid #dde6f2;
-      position: relative;
-      z-index: 1;
+      justify-content: space-between;
+      margin: 18px 0 8px 0;
+      padding: 0 4px;
     }
-    .certificate .signatures .sig-block {
+    .certificate .sig-block {
       text-align: center;
       flex: 1;
     }
-    .certificate .signatures .sig-block .sig-line {
-      font-family: 'Playfair Display', cursive;
-      font-size: 0.9rem;
-      color: #0b3b7a;
-      letter-spacing: 1px;
-      border-bottom: 1.5px solid #0b3b7a;
-      padding-bottom: 0.1rem;
-      margin-bottom: 0.1rem;
-      display: inline-block;
-      min-width: 80px;
+    .certificate .sig-line {
+      width: 100%;
+      max-width: 140px;
+      height: 2px;
+      background: #0B3B7A;
+      margin: 0 auto 8px auto;
+      opacity: 0.5;
     }
-    .certificate .signatures .sig-block .sig-title {
-      font-size: 0.65rem;
+    .certificate .sig-title {
+      font-family: 'Playfair Display', serif;
       font-weight: 600;
-      color: #0b3b7a;
-      letter-spacing: 1px;
-    }
-    .certificate .signatures .sig-block .sig-org {
-      font-size: 0.5rem;
-      color: #6b8aaa;
-      font-weight: 500;
+      font-size: 18px;
+      color: #0B3B7A;
       letter-spacing: 0.5px;
+    }
+    .certificate .sig-sub {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 12px;
+      color: #3f5a78;
+      letter-spacing: 1px;
+      margin-top: 2px;
     }
 
     /* Footer */
     .certificate .footer {
+      margin-top: auto;
       display: flex;
       justify-content: space-between;
-      border-top: 1px solid #dde6f2;
-      padding-top: 0.15rem;
-      margin-top: 0.1rem;
-      font-size: 0.55rem;
-      color: #6b8aaa;
-      position: relative;
-      z-index: 1;
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 12px;
+      color: #1f3a55;
+      border-top: 1px solid rgba(212, 175, 55, 0.3);
+      padding-top: 8px;
+      letter-spacing: 0.3px;
     }
-    .certificate .footer .footer-id {
-      font-weight: 500;
+    .certificate .footer-item {
+      background: rgba(11, 59, 122, 0.02);
+      padding: 2px 8px;
+      border-radius: 20px;
+      border: 1px solid rgba(212, 175, 55, 0.1);
     }
-    .certificate .footer .footer-id strong {
-      color: #0b3b7a;
+    .certificate .footer-item strong {
+      color: #0B3B7A;
       font-weight: 600;
     }
 
-    /* Print Styles */
+    /* Responsive */
+    @media screen and (max-width: 800px) {
+      .certificate {
+        width: 100%;
+        min-height: auto;
+        padding: 8mm;
+        margin: 10px;
+      }
+      .certificate .uni-name { font-size: 20px; }
+      .certificate .main-title h1 { font-size: 30px; }
+      .certificate .recipient-name { font-size: 34px; }
+      .certificate .signatures { flex-wrap: wrap; gap: 12px; }
+      .certificate .sig-line { max-width: 100px; }
+      .certificate .seal { width: 40px; height: 40px; font-size: 10px; top: 10mm; right: 11mm; }
+      .certificate .watermark { font-size: 60px; }
+    }
+
+    @media screen and (max-width: 480px) {
+      .certificate { padding: 6mm; }
+      .certificate .uni-name { font-size: 16px; }
+      .certificate .uni-name .dept { font-size: 12px; }
+      .certificate .main-title h1 { font-size: 22px; letter-spacing: 2px; }
+      .certificate .recipient-name { font-size: 24px; }
+      .certificate .body-text { font-size: 12px; }
+      .certificate .student-id { font-size: 14px; }
+      .certificate .sig-title { font-size: 14px; }
+      .certificate .footer { font-size: 10px; flex-wrap: wrap; gap: 4px; justify-content: center; }
+      .certificate .seal { width: 32px; height: 32px; font-size: 8px; top: 8mm; right: 9mm; }
+      .certificate .corner { width: 16px; height: 16px; }
+      .certificate .watermark { font-size: 40px; }
+    }
+
+    /* Print styles */
     @media print {
       body {
         background: white;
         padding: 0;
         margin: 0;
         display: block;
-        min-height: 100vh;
       }
       .container { display: none; }
       .cert-modal {
         position: static;
         background: white;
         display: block !important;
-        backdrop-filter: none;
         width: 100%;
         height: 100vh;
       }
@@ -1265,150 +1297,15 @@
       }
 
       .certificate {
-        width: 100%;
-        height: 100vh;
-        min-height: 100vh;
-        padding: 8mm 7mm;
         box-shadow: none;
         border-radius: 0;
-        margin: 0;
-      }
-      .certificate .border-outer { padding: 5mm 4mm; }
-      .certificate .border-inner { padding: 4mm 3.5mm; }
-      .certificate .seal {
-        width: 24mm;
-        height: 24mm;
-        top: 4mm;
-        right: 4mm;
-      }
-      .certificate .seal .seal-icon { font-size: 1.2rem; }
-      .certificate .seal .seal-text { font-size: 0.4rem; }
-      .certificate .seal .seal-year { font-size: 0.45rem; }
-      .certificate .header .logo-placeholder .logo-text { font-size: 1.6rem; }
-      .certificate .header .university { font-size: 0.8rem; }
-      .certificate .header .club-name { font-size: 1rem; }
-      .certificate .title-section .main-title { font-size: 1.8rem; }
-      .certificate .body .recipient .name { font-size: 2rem; }
-      .certificate .body .cert-text { font-size: 0.72rem; }
-      .certificate .signatures .sig-block .sig-line { font-size: 0.8rem; min-width: 60px; }
-      .certificate .watermark { font-size: 8rem; }
-      .certificate .watermark .bolt { font-size: 4rem; }
-      .certificate .corner { font-size: 1.2rem; }
-      .no-print { display: none !important; }
-    }
-
-    /* Responsive */
-    @media screen and (max-width: 800px) {
-      .certificate-wrapper {
         width: 100%;
-        border-radius: 8px;
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-        padding: 0.5rem;
+        min-height: 100vh;
+        padding: 12mm 11mm 10mm 11mm;
+        margin: 0 auto;
       }
-      .certificate {
-        width: 100%;
-        min-height: auto;
-        padding: 6mm 5mm;
-        margin: 0;
-      }
-      .certificate .border-outer { padding: 4mm 3mm; }
-      .certificate .border-inner { padding: 3mm 2.5mm; }
-      .certificate .seal {
-        width: 20mm;
-        height: 20mm;
-        top: 3mm;
-        right: 3mm;
-      }
-      .certificate .seal .seal-icon { font-size: 1rem; }
-      .certificate .seal .seal-text { font-size: 0.35rem; }
-      .certificate .seal .seal-year { font-size: 0.4rem; }
-      .certificate .header .logo-placeholder .logo-text { font-size: 1.4rem; }
-      .certificate .header .university { font-size: 0.7rem; letter-spacing: 2px; }
-      .certificate .header .club-name { font-size: 0.9rem; }
-      .certificate .title-section .main-title { font-size: 1.5rem; }
-      .certificate .body .recipient .name { font-size: 1.6rem; }
-      .certificate .body .cert-text { font-size: 0.65rem; padding: 0 0.05in; }
-      .certificate .signatures { flex-wrap: wrap; gap: 0.5rem; }
-      .certificate .signatures .sig-block { min-width: 80px; }
-      .certificate .signatures .sig-block .sig-line { font-size: 0.7rem; min-width: 50px; }
-      .certificate .footer { flex-wrap: wrap; gap: 0.2rem; justify-content: center; }
-      .certificate .watermark { font-size: 6rem; }
-      .certificate .watermark .bolt { font-size: 3rem; }
-      .certificate .corner { font-size: 1rem; }
-      .cert-modal-content { padding: 0.5rem; }
-    }
-
-    @media screen and (max-width: 480px) {
-      .certificate { padding: 4mm 3mm; }
-      .certificate .border-outer { padding: 3mm 2mm; }
-      .certificate .border-inner { padding: 2mm 1.5mm; }
-      .certificate .seal {
-        width: 16mm;
-        height: 16mm;
-        top: 2mm;
-        right: 2mm;
-      }
-      .certificate .seal .seal-icon { font-size: 0.8rem; }
-      .certificate .seal .seal-text { font-size: 0.3rem; }
-      .certificate .header .logo-placeholder .logo-text { font-size: 1rem; }
-      .certificate .header .university { font-size: 0.55rem; }
-      .certificate .header .club-name { font-size: 0.7rem; }
-      .certificate .title-section .main-title { font-size: 1.1rem; letter-spacing: 2px; }
-      .certificate .title-section .sub-title { font-size: 0.7rem; }
-      .certificate .body .recipient .name { font-size: 1.2rem; }
-      .certificate .body .recipient .student-id { font-size: 0.65rem; }
-      .certificate .body .cert-text { font-size: 0.55rem; line-height: 1.6; }
-      .certificate .signatures .sig-block .sig-line { font-size: 0.6rem; min-width: 40px; }
-      .certificate .signatures .sig-block .sig-title { font-size: 0.5rem; }
-      .certificate .footer { font-size: 0.45rem; }
-      .certificate .corner { font-size: 0.8rem; }
-      .certificate .watermark { font-size: 4rem; }
-      .certificate .watermark .bolt { font-size: 2rem; }
-      .container { padding: 0.5rem; }
-      .form-row { grid-template-columns: 1fr; }
-      .club-header h1 { font-size: 1.3rem; }
-      .club-header { flex-direction: column; align-items: flex-start; }
-      .tabs .tab-btn { font-size: 0.75rem; padding: 0.3rem 0.6rem; }
-      .admin-actions button { font-size: 0.65rem; padding: 0.2rem 0.5rem; white-space: normal; }
-      .qr-container { flex-direction: column; align-items: center; }
-      .qr-instructions { width: 100%; }
-      .payment-section { flex-direction: column; align-items: stretch; }
-      .trxid-input input { max-width: 100%; }
-      .payment-actions { justify-content: flex-start; }
-      table { font-size: 0.6rem; min-width: 650px; }
-    }
-
-    @media (max-width: 640px) {
-      .container { padding: 1rem; }
-      .form-row { grid-template-columns: 1fr; }
-      .club-header h1 { font-size: 1.3rem; }
-      .club-header { flex-direction: column; align-items: flex-start; }
-      .skills-group { gap: 0.4rem 1rem; }
-      .success-box { flex-direction: column; align-items: flex-start; }
-      .slip-actions { width: 100%; justify-content: flex-start; }
-      .payment-section { flex-direction: column; align-items: stretch; }
-      .trxid-input input { max-width: 100%; }
-      .payment-actions { justify-content: flex-start; }
-      table { font-size: 0.6rem; min-width: 650px; }
-      th, td { padding: 0.15rem 0.1rem; }
-      .tabs .tab-btn { font-size: 0.75rem; padding: 0.3rem 0.6rem; }
-      .admin-actions button { font-size: 0.65rem; padding: 0.2rem 0.5rem; white-space: normal; }
-      .qr-container { flex-direction: column; align-items: center; }
-      .qr-instructions { width: 100%; }
-      .certificate { padding: 0; margin: 5px; }
-      .certificate .cert-border { padding: 0.15in 0.1in; }
-      .certificate .club-logo .logo-wub { font-size: 1rem; letter-spacing: 4px; }
-      .certificate .club-logo .logo-eee { font-size: 0.75rem; letter-spacing: 3px; }
-      .certificate .club-logo .logo-bolt { font-size: 0.75rem; }
-      .certificate .cert-title h1 { font-size: 0.75rem; }
-      .certificate .cert-body .cert-name { font-size: 0.65rem; }
-      .certificate .cert-body { font-size: 0.5rem; padding: 0.1rem; }
-      .certificate .cert-body .qr-container-cert #certQR { transform: scale(0.4); }
-      .past-student-fields.show { grid-template-columns: 1fr; }
-      .sync-status { font-size: 0.7rem; padding: 0.3rem 0.6rem; }
-      .admin-actions { gap: 0.4rem; }
-      .cert-modal-content { padding: 0.5rem; max-height: 95vh; }
-      .cert-modal-close { width: 28px; height: 28px; font-size: 0.9rem; }
+      .certificate .seal { box-shadow: 0 0 0 1px #0B3B7A; }
+      .certificate .corner { opacity: 0.8; }
     }
 
     .no-print {
@@ -2507,113 +2404,80 @@
         <div class="certificate-wrapper">
           <div class="certificate" id="certificatePrint">
 
+            <!-- Corner ornaments -->
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+
             <!-- Watermark -->
-            <div class="watermark">
-              <span class="bolt">⚡</span>
-              WUB EEE
-            </div>
+            <div class="watermark"><span>⚡ WUB EEE</span></div>
 
-            <!-- Outer Border -->
-            <div class="border-outer">
-              <!-- Inner Border -->
-              <div class="border-inner">
+            <!-- Seal -->
+            <div class="seal"><span>WUB<br>EEE</span></div>
 
-                <!-- Corner Ornaments -->
-                <span class="corner corner-tl">✦</span>
-                <span class="corner corner-tr">✦</span>
-                <span class="corner corner-bl">✦</span>
-                <span class="corner corner-br">✦</span>
-
-                <!-- Seal -->
-                <div class="seal">
-                  <div class="seal-icon">⚡</div>
-                  <div class="seal-text">WUB EEE CLUB</div>
-                  <div class="seal-year">SINCE 2011</div>
+            <div class="content">
+              <!-- Header -->
+              <div class="header">
+                <div class="logo-placeholder">
+                  <div class="logo-symbol">WUB <small>EEE</small></div>
                 </div>
-
-                <!-- Header -->
-                <div class="header">
-                  <div class="logo-placeholder">
-                    <span class="logo-icon">⚡</span>
-                    <span class="logo-text">WUB</span>
-                  </div>
-                  <div class="university">World University of Bangladesh</div>
-                  <div class="department">Department of Electrical &amp; Electronic Engineering</div>
-                  <div class="club-name">WUB EEE Club</div>
-                  <div class="divider"></div>
+                <div class="uni-name">
+                  WORLD UNIVERSITY OF BANGLADESH
+                  <span class="dept">Department of Electrical & Electronic Engineering</span>
                 </div>
-
-                <!-- Title -->
-                <div class="title-section">
-                  <div class="main-title">
-                    Certificate of <span class="gold">Participation</span>
-                  </div>
-                  <div class="sub-title">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
-                </div>
-
-                <!-- Body -->
-                <div class="body">
-
-                  <!-- Recipient -->
-                  <div class="recipient">
-                    <div class="name">${escapeHtml(record.fullName)}</div>
-                    <div class="student-id">Student ID: <span>${escapeHtml(record.studentId)}</span></div>
-                  </div>
-
-                  <!-- Certificate Text -->
-                  <div class="cert-text">
-                    <p>
-                      This is to certify that <span class="highlight">${escapeHtml(record.fullName)}</span>,
-                      Student ID <span class="highlight">${escapeHtml(record.studentId)}</span>, has actively participated
-                      in various academic, technical, leadership, and extracurricular activities organized
-                      by the <span class="gold-highlight">WUB EEE Club</span> during the membership period
-                      from <span class="highlight">${startDateStr}</span> to
-                      <span class="highlight">${endDateStr}</span>.
-                    </p>
-                    <p style="margin-top:0.1rem;">
-                      The club acknowledges and appreciates the recipient's dedication, commitment,
-                      teamwork, and valuable contribution towards the advancement of engineering
-                      knowledge, innovation, and professional development.
-                    </p>
-                  </div>
-
-                  <!-- Signatures -->
-                  <div class="signatures">
-                    <div class="sig-block">
-                      <div class="sig-line">_________________</div>
-                      <div class="sig-title">President</div>
-                      <div class="sig-org">WUB EEE Club</div>
-                    </div>
-                    <div class="sig-block">
-                      <div class="sig-line">_________________</div>
-                      <div class="sig-title">Advisor</div>
-                      <div class="sig-org">WUB EEE Club</div>
-                    </div>
-                    <div class="sig-block">
-                      <div class="sig-line">_________________</div>
-                      <div class="sig-title">Chairman</div>
-                      <div class="sig-org">Department of EEE</div>
-                    </div>
-                  </div>
-
-                </div>
-
-                <!-- Footer -->
-                <div class="footer">
-                  <div class="footer-id">Certificate No: <strong>${cert.certNumber}</strong></div>
-                  <div class="footer-id">Club ID: <strong>${record.clubId}</strong></div>
-                  <div class="footer-id">Issue Date: <strong>${new Date(cert.generatedDate).toLocaleDateString()}</strong></div>
-                </div>
-
+                <div class="club-name">WUB EEE Club</div>
+                <div class="divider"></div>
               </div>
-              <!-- End Inner Border -->
+
+              <!-- Main Title -->
+              <div class="main-title">
+                <h1>CERTIFICATE OF PARTICIPATION</h1>
+                <div class="sub">This certificate is proudly presented to</div>
+              </div>
+
+              <!-- Recipient -->
+              <div class="recipient">
+                <div class="recipient-name">${escapeHtml(record.fullName)}</div>
+                <div class="student-id">Student ID: ${escapeHtml(record.studentId)}</div>
+              </div>
+
+              <!-- Body Text -->
+              <div class="body-text">
+                This is to certify that <strong>${escapeHtml(record.fullName)}</strong>, Student ID <strong>${escapeHtml(record.studentId)}</strong>, has actively participated in various academic, technical, leadership, and extracurricular activities organized by the WUB EEE Club during the membership period from <strong>${startDateStr}</strong> to <strong>${endDateStr}</strong>.
+                <br><br>
+                The club acknowledges and appreciates the recipient's dedication, commitment, teamwork, and valuable contribution towards the advancement of engineering knowledge, innovation, and professional development.
+              </div>
+
+              <!-- Signatures -->
+              <div class="signatures">
+                <div class="sig-block">
+                  <div class="sig-line"></div>
+                  <div class="sig-title">President</div>
+                  <div class="sig-sub">WUB EEE Club</div>
+                </div>
+                <div class="sig-block">
+                  <div class="sig-line"></div>
+                  <div class="sig-title">Advisor</div>
+                  <div class="sig-sub">WUB EEE Club</div>
+                </div>
+                <div class="sig-block">
+                  <div class="sig-line"></div>
+                  <div class="sig-title">Chairman</div>
+                  <div class="sig-sub">Department of EEE</div>
+                </div>
+              </div>
+
+              <!-- Footer -->
+              <div class="footer">
+                <div class="footer-item"><strong>Certificate No:</strong> ${cert.certNumber}</div>
+                <div class="footer-item"><strong>Club ID:</strong> ${record.clubId}</div>
+                <div class="footer-item"><strong>Issue Date:</strong> ${new Date(cert.generatedDate).toLocaleDateString()}</div>
+              </div>
             </div>
-            <!-- End Outer Border -->
 
           </div>
-          <!-- End Certificate -->
         </div>
-        <!-- End Certificate Wrapper -->
       `;
     }
 
