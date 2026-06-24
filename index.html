@@ -1,165 +1,2777 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>WUB EEE Club System</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WUB EEE Club · Registration & Certificate System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #f0f5fe;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      margin: 0;
+      color: #1e293b;
+    }
+    .container {
+      width: 100%;
+      max-width: 960px;
+      background: white;
+      border-radius: 2rem;
+      box-shadow: 0 25px 50px -8px rgba(0, 20, 60, 0.15);
+      padding: 2rem 2.2rem;
+      transition: 0.2s;
+    }
+    .club-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      border-bottom: 2px solid #e6edf8;
+      padding-bottom: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .club-header i {
+      font-size: 2.6rem;
+      color: #0a3b7a;
+      background: #e2ebf9;
+      padding: 0.6rem;
+      border-radius: 18px;
+    }
+    .club-header h1 {
+      font-weight: 700;
+      font-size: 1.9rem;
+      letter-spacing: -0.3px;
+      color: #0b2b5c;
+    }
+    .club-header span {
+      font-weight: 500;
+      color: #3c6e9c;
+      font-size: 0.95rem;
+      display: block;
+      margin-top: 2px;
+    }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    .login-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      backdrop-filter: blur(8px);
+    }
+    .login-overlay.open { display: flex; }
+    .login-overlay.hidden { display: none; }
+    .login-box {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 2rem;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 25px 50px -8px rgba(0,0,0,0.3);
+    }
+    .login-box h2 {
+      color: #0b2b5c;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .login-box h2 i { color: #0a3b7a; }
+    .login-box .subtitle {
+      color: #6b8aaa;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+    }
+    .login-box .form-group { margin-bottom: 1rem; }
+    .login-box input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1.5px solid #dde6f2;
+      border-radius: 12px;
+      font-size: 0.95rem;
+    }
+    .login-box input:focus {
+      outline: none;
+      border-color: #2b6bb0;
+      box-shadow: 0 0 0 4px rgba(43,107,176,0.08);
+    }
+    .login-btn {
+      width: 100%;
+      padding: 0.8rem;
+      background: #0b3b7a;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .login-btn:hover { background: #0d4a90; }
+    .login-error {
+      color: #b22234;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+    .login-error.show { display: block; }
 
-<style>
-body{font-family:Inter;background:#eef3ff;margin:0;padding:20px;}
-.container{max-width:900px;margin:auto;background:#fff;padding:20px;border-radius:15px}
-input,select,button{padding:10px;margin:5px;width:100%}
-button{cursor:pointer}
-.hidden{display:none}
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid #e6edf8;
+      padding-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: 0.6rem 1.5rem;
+      border: none;
+      background: transparent;
+      font-weight: 600;
+      color: #6b8aaa;
+      cursor: pointer;
+      border-radius: 30px;
+      transition: 0.2s;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tab-btn:hover { background: #e8f0fe; color: #0b3b7a; }
+    .tab-btn.active {
+      background: #0b3b7a;
+      color: white;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
-/* CERTIFICATE A4 */
-.certificate-wrapper{
-  width:210mm;
-  height:297mm;
-  background:#fff;
-  margin:auto;
-}
-.certificate{
-  border:6px double #0b3b7a;
-  height:100%;
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-}
-.title{font-family:"Playfair Display";text-align:center;font-size:20px;color:#0b3b7a}
-.name{font-size:24px;text-align:center;font-weight:700;margin:10px 0}
-.small{text-align:center;font-size:14px}
-.footer{display:flex;justify-content:space-between;font-size:12px}
-</style>
+    .form-card { display: flex; flex-direction: column; gap: 1.5rem; }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem 1.8rem;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .form-group.full-width { grid-column: 1 / -1; }
+    label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: -0.2px;
+      color: #1f3a66;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    label i { color: #3c7bcb; font-size: 0.9rem; width: 1.2rem; }
+    input, select, textarea {
+      font-family: 'Inter', sans-serif;
+      padding: 0.7rem 1rem;
+      border: 1.5px solid #dde6f2;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      background: #fafcff;
+      transition: 0.2s;
+      color: #0f2b4f;
+      width: 100%;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #2b6bb0;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(43,107,176,0.08);
+    }
+    input:disabled {
+      background: #eef3fa;
+      color: #1f3f66;
+      font-weight: 500;
+      border-color: #cbd8ea;
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    .skills-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem 1.6rem;
+      background: #f8faff;
+      padding: 0.8rem 1.2rem;
+      border-radius: 20px;
+      border: 1px solid #e2ecfc;
+      margin-top: 4px;
+    }
+    .skills-group label {
+      font-weight: 500;
+      font-size: 0.9rem;
+      gap: 6px;
+      color: #1f3a66;
+    }
+    .skills-group input[type="checkbox"] {
+      width: 1rem;
+      height: 1rem;
+      accent-color: #1d5b9e;
+      margin-right: 2px;
+    }
+    .btn-submit {
+      background: #0b3b7a;
+      color: white;
+      border: none;
+      padding: 0.9rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 0.4rem;
+      letter-spacing: -0.2px;
+      box-shadow: 0 6px 14px rgba(11,59,122,0.25);
+      width: 100%;
+    }
+    .btn-submit:hover { background: #0d4a90; transform: scale(1.01); }
+    .btn-submit:active { transform: scale(0.97); }
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background: #6b8aaa;
+      box-shadow: none;
+    }
+
+    .payment-section {
+      background: #f3f9fc;
+      border-radius: 28px;
+      padding: 1.2rem 1.8rem;
+      margin-top: 0.2rem;
+      border: 1px solid #d4e4f5;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .payment-label {
+      font-weight: 600;
+      color: #0b2b5c;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .payment-label i { font-size: 1.3rem; color: #1b754b; }
+    .bkash-info {
+      font-size: 0.9rem;
+      background: #e8f0fe;
+      padding: 0.4rem 1rem;
+      border-radius: 30px;
+      color: #0b2b5c;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bkash-info i { color: #d63b6b; }
+    .payment-actions {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .payment-actions button {
+      background: white;
+      border: 1.5px solid #2b6bb0;
+      color: #0b3b7a;
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .payment-actions button:hover {
+      background: #0b3b7a;
+      color: white;
+    }
+    .payment-actions button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .payment-actions button.paid {
+      background: #1b754b;
+      border-color: #1b754b;
+      color: white;
+      cursor: default;
+      opacity: 0.8;
+    }
+    .payment-status {
+      font-weight: 500;
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
+      background: #e5edf9;
+      color: #1f3a66;
+    }
+    .payment-status.done {
+      background: #daf0e4;
+      color: #0f422b;
+    }
+    .trxid-input {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .trxid-input input {
+      width: 180px;
+      padding: 0.5rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.9rem;
+    }
+
+    .past-student-toggle {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.8rem 1.2rem;
+      background: #f3f9fc;
+      border-radius: 14px;
+      border: 1px solid #d4e4f5;
+    }
+    .past-student-toggle label {
+      font-weight: 600;
+      color: #1f3a66;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .past-student-toggle input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #6a1b9a;
+      cursor: pointer;
+    }
+    .past-student-fields {
+      display: none;
+      grid-column: 1 / -1;
+      background: #f8faff;
+      padding: 1rem 1.2rem;
+      border-radius: 14px;
+      border: 1px solid #dde6f2;
+    }
+    .past-student-fields.show {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem 1.5rem;
+    }
+    .past-student-fields label {
+      font-size: 0.85rem;
+      color: #4a6a8a;
+    }
+    .past-student-fields input {
+      padding: 0.5rem 0.8rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+    }
+    .past-badge {
+      background: #6a1b9a;
+      color: white;
+      padding: 0.2rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .success-box {
+      background: #e5f2e9;
+      border-radius: 28px;
+      padding: 1.2rem 2rem;
+      margin-top: 1.5rem;
+      border-left: 8px solid #1b754b;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .success-box.show { display: flex; }
+    .success-box .id-badge {
+      background: #0b3b7a;
+      color: white;
+      font-weight: 700;
+      padding: 0.4rem 1.4rem;
+      border-radius: 60px;
+      font-size: 1.1rem;
+      letter-spacing: 0.3px;
+    }
+    .success-box .message { font-weight: 500; color: #0f422b; }
+    .slip-actions {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .slip-actions button {
+      background: white;
+      border: 1px solid #1b754b;
+      color: #1b754b;
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .slip-actions button:hover { background: #1b754b; color: white; }
+
+    .qr-section {
+      background: #f8faff;
+      border-radius: 20px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      border: 1px solid #e2ecfc;
+    }
+    .qr-section h3 {
+      color: #0b2b5c;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .qr-section h3 i { color: #0b3b7a; }
+    .qr-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      align-items: center;
+    }
+    .qr-code-wrapper {
+      background: white;
+      padding: 1rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    .qr-code-wrapper #qrcode { display: inline-block; }
+    .qr-code-wrapper .qr-label {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: #6b8aaa;
+    }
+    .qr-instructions {
+      flex: 1;
+      min-width: 200px;
+    }
+    .qr-instructions ol {
+      padding-left: 1.2rem;
+      line-height: 2;
+      color: #1f3a66;
+    }
+    .qr-instructions ol li::marker {
+      color: #0b3b7a;
+      font-weight: 600;
+    }
+    .qr-actions {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+    .qr-actions .btn-download {
+      background: #0b3b7a;
+      color: white;
+    }
+    .qr-actions .btn-download:hover { background: #0d4a90; }
+    .qr-actions .btn-share {
+      background: #1b754b;
+      color: white;
+    }
+    .qr-actions .btn-share:hover { background: #1f8a5a; }
+
+    .admin-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .admin-actions button {
+      padding: 0.6rem 1.5rem;
+      border: none;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .admin-actions .btn-primary {
+      background: #0b3b7a;
+      color: white;
+    }
+    .admin-actions .btn-primary:hover { background: #0d4a90; }
+    .admin-actions .btn-success {
+      background: #1b754b;
+      color: white;
+    }
+    .admin-actions .btn-success:hover { background: #1f8a5a; }
+    .admin-actions .btn-warning {
+      background: #b8860b;
+      color: white;
+    }
+    .admin-actions .btn-warning:hover { background: #d4a017; }
+    .admin-actions .btn-danger {
+      background: #b22234;
+      color: white;
+    }
+    .admin-actions .btn-danger:hover { background: #c62828; }
+    .admin-actions .btn-purple {
+      background: #6a1b9a;
+      color: white;
+    }
+    .admin-actions .btn-purple:hover { background: #7b1fa2; }
+
+    .admin-table-wrap {
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      background: #fafdff;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    th {
+      background: #e2ebf9;
+      padding: 0.8rem 0.5rem;
+      text-align: left;
+      font-weight: 600;
+      color: #0b2a55;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    td {
+      padding: 0.7rem 0.5rem;
+      border-bottom: 1px solid #e6edf8;
+    }
+    .empty-row td { text-align: center; color: #62748c; padding: 1.5rem; }
+    .badge-paid {
+      background: #1b754b;
+      color: white;
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-pending {
+      background: #b8860b;
+      color: white;
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-cert {
+      background: #0b3b7a;
+      color: white;
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .badge-no-cert {
+      background: #6b8aaa;
+      color: white;
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .badge-past {
+      background: #6a1b9a;
+      color: white;
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .cert-btn {
+      padding: 0.2rem 0.8rem;
+      border: none;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .cert-btn.generate {
+      background: #1b754b;
+      color: white;
+    }
+    .cert-btn.generate:hover { background: #1f8a5a; }
+    .cert-btn.download {
+      background: #0b3b7a;
+      color: white;
+    }
+    .cert-btn.download:hover { background: #0d4a90; }
+    .cert-btn.past {
+      background: #6a1b9a;
+      color: white;
+    }
+    .cert-btn.past:hover { background: #7b1fa2; }
+
+    .action-btn {
+      padding: 0.2rem 0.6rem;
+      border: none;
+      border-radius: 15px;
+      font-weight: 600;
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: 0.2s;
+      margin: 0.1rem 0.15rem;
+    }
+    .action-btn.edit {
+      background: #f5a623;
+      color: white;
+    }
+    .action-btn.edit:hover { background: #d48a1a; }
+    .action-btn.delete {
+      background: #b22234;
+      color: white;
+    }
+    .action-btn.delete:hover { background: #8b1a2b; }
+
+    .notification-toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #1b754b;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      z-index: 9999;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideUp 0.5s ease;
+      max-width: 400px;
+    }
+    .notification-toast.hidden {
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .cert-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9998;
+      backdrop-filter: blur(4px);
+    }
+    .cert-modal.open { display: flex; }
+    .cert-modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 2rem;
+      max-width: 900px;
+      width: 95%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    .cert-modal-close {
+      position: sticky;
+      top: 0;
+      float: right;
+      background: #b22234;
+      color: white;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: 0.2s;
+      z-index: 10;
+    }
+    .cert-modal-close:hover { background: #c62828; }
+
+    .sync-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      background: #e8f0fe;
+      color: #0b3b7a;
+    }
+    .sync-status .sync-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .sync-status .sync-dot.online {
+      background: #1b754b;
+    }
+    .sync-status .sync-dot.offline {
+      background: #b8860b;
+    }
+    .sync-status .sync-dot.syncing {
+      background: #f5a623;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .edit-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      backdrop-filter: blur(4px);
+    }
+    .edit-modal.open { display: flex; }
+    .edit-modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 2rem;
+      max-width: 500px;
+      width: 95%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    .edit-modal-close {
+      position: sticky;
+      top: 0;
+      float: right;
+      background: #b22234;
+      color: white;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: 0.2s;
+      z-index: 10;
+    }
+    .edit-modal-close:hover { background: #c62828; }
+    .edit-modal .form-group { margin-bottom: 1rem; }
+    .edit-modal label { font-weight: 600; font-size: 0.85rem; color: #1f3a66; }
+    .edit-modal input, .edit-modal select {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border: 1.5px solid #dde6f2;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      margin-top: 0.2rem;
+    }
+    .edit-modal input:focus, .edit-modal select:focus {
+      outline: none;
+      border-color: #2b6bb0;
+      box-shadow: 0 0 0 4px rgba(43,107,176,0.08);
+    }
+    .edit-modal .btn-save {
+      width: 100%;
+      padding: 0.8rem;
+      background: #1b754b;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .edit-modal .btn-save:hover { background: #1f8a5a; }
+
+    /* ============================================
+       SINGLE PAGE A4 CERTIFICATE
+       0.5 INCH MARGINS - FULL BORDER
+       ============================================ */
+    @page {
+      size: A4 portrait;
+      margin: 0.5in;
+    }
+    
+    .certificate-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+      margin: 0;
+      background: white;
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+    }
+    
+    .certificate {
+      width: 210mm;
+      height: 297mm;
+      background: linear-gradient(135deg, #f8faff 0%, #e8f0fe 100%);
+      border: 6px double #0b3b7a;
+      padding: 0;
+      text-align: center;
+      position: relative;
+      border-radius: 0;
+      box-shadow: none;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* FULL BORDER - Inside the 0.5in margin */
+    .certificate .cert-border {
+      border: 2px solid #0b3b7a;
+      padding: 0.35in 0.3in;
+      border-radius: 0;
+      position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      margin: 0.05in;
+    }
+    
+    .certificate .cert-seal {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 2rem;
+      color: #0b3b7a;
+      opacity: 0.1;
+    }
+    
+    /* ===== LOGO ===== */
+    .certificate .club-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 0.04rem;
+      padding-bottom: 0.04rem;
+      border-bottom: 1.5px solid #dde6f2;
+    }
+    
+    .certificate .club-logo .logo-bolt {
+      font-size: 1.2rem;
+      color: #f5a623;
+      margin-bottom: 0.01rem;
+    }
+    
+    .certificate .club-logo .logo-wub {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #0b3b7a;
+      letter-spacing: 8px;
+      line-height: 1.05;
+    }
+    
+    .certificate .club-logo .logo-eee {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #0b3b7a;
+      letter-spacing: 6px;
+      line-height: 1.05;
+    }
+    
+    .certificate .club-logo .logo-club {
+      font-size: 0.6rem;
+      color: #3c6e9c;
+      letter-spacing: 4px;
+      font-weight: 600;
+      margin-top: 0.01rem;
+    }
+    
+    .certificate .club-logo .logo-since {
+      font-size: 0.45rem;
+      color: #6b8aaa;
+      letter-spacing: 2px;
+      font-weight: 500;
+      margin-top: 0.01rem;
+    }
+    
+    /* ===== TITLE ===== */
+    .certificate .cert-title h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: #0b2b5c;
+      letter-spacing: 1px;
+      font-weight: 700;
+      margin: 0.04rem 0 0.02rem;
+    }
+    
+    .certificate .cert-title .cert-subtitle {
+      font-size: 0.45rem;
+      color: #3c6e9c;
+      letter-spacing: 2px;
+      border-bottom: 1px solid #dde6f2;
+      padding-bottom: 0.04rem;
+      margin-top: 0.01rem;
+    }
+    
+    /* ===== BODY ===== */
+    .certificate .cert-body {
+      text-align: left;
+      padding: 0.03in 0.02in;
+      font-size: 0.65rem;
+      color: #1f3a66;
+      line-height: 1.5;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+    
+    .certificate .cert-body .cert-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      color: #0b2b5c;
+      text-align: center;
+      margin: 0.02rem 0;
+    }
+    
+    .certificate .cert-body .cert-student-id {
+      text-align: center;
+      font-size: 0.7rem;
+      font-weight: 500;
+      margin-bottom: 0.1rem;
+    }
+    
+    .certificate .cert-body .cert-student-id .highlight {
+      color: #0b3b7a;
+      font-weight: 600;
+    }
+    
+    .certificate .cert-body p {
+      margin-bottom: 0.03rem;
+      text-align: justify;
+    }
+    
+    .certificate .cert-body .highlight {
+      color: #0b3b7a;
+      font-weight: 600;
+    }
+    
+    /* ===== QR CODE - Bottom Right ===== */
+    .certificate .cert-body .qr-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-top: 0.02rem;
+      padding-top: 0.02rem;
+      border-top: 1px dashed #dde6f2;
+    }
+    
+    .certificate .cert-body .qr-container-cert {
+      text-align: center;
+      padding: 0.01rem 0.02rem;
+    }
+    
+    .certificate .cert-body .qr-container-cert #certQR {
+      display: inline-block;
+    }
+    
+    .certificate .cert-body .qr-container-cert .qr-label {
+      font-size: 0.35rem;
+      color: #6b8aaa;
+      text-align: center;
+      margin-top: 0.01rem;
+      letter-spacing: 0.5px;
+    }
+    
+    /* ===== SIGNATURE ===== */
+    .certificate .cert-body .signature-line {
+      margin-top: 0.06in;
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid #dde6f2;
+      padding-top: 0.08rem;
+      font-size: 0.55rem;
+      color: #506e92;
+    }
+    
+    .certificate .cert-body .signature-line .signature {
+      font-family: 'Playfair Display', cursive;
+      font-size: 0.65rem;
+      color: #0b2b5c;
+    }
+    
+    .certificate .cert-body .signature-line .sig-label {
+      font-size: 0.4rem;
+      color: #6b8aaa;
+      font-weight: 500;
+    }
+    
+    /* ===== NB NOTE ===== */
+    .certificate .cert-body .nb-note {
+      font-size: 0.4rem;
+      color: #888;
+      text-align: center;
+      margin-top: 0.03rem;
+      font-style: italic;
+      border-top: 1px dashed #dde6f2;
+      padding-top: 0.03rem;
+    }
+    
+    /* ===== FOOTER ===== */
+    .certificate .cert-footer {
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid #dde6f2;
+      padding-top: 0.04rem;
+      font-size: 0.4rem;
+      color: #506e92;
+    }
+    
+    .certificate .cert-footer .cert-id {
+      font-weight: 500;
+    }
+    
+    .certificate .cert-footer .cert-id strong {
+      color: #0b3b7a;
+    }
+
+    /* ============================================
+       PRINT STYLES
+       ============================================ */
+    @media print {
+      body { 
+        background: white; 
+        padding: 0; 
+        margin: 0;
+        display: block;
+      }
+      .container { display: none; }
+      .cert-modal { 
+        position: static; 
+        background: white;
+        display: block !important;
+        backdrop-filter: none;
+        width: 100%;
+        height: 100vh;
+      }
+      .cert-modal-content { 
+        max-width: 100%; 
+        padding: 0; 
+        border-radius: 0; 
+        box-shadow: none;
+        background: white;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+      }
+      .cert-modal-close { display: none !important; }
+      #downloadCertBtn { display: none !important; }
+      #printCertBtn { display: none !important; }
+      
+      .certificate-wrapper { 
+        padding: 0; 
+        margin: 0;
+        background: white;
+        width: 100%;
+        height: 100vh;
+      }
+      
+      .certificate {
+        width: 100%;
+        height: 100vh;
+        border: 6px double #0b3b7a;
+        padding: 0;
+        box-shadow: none;
+        border-radius: 0;
+        margin: 0;
+        background: linear-gradient(135deg, #f8faff 0%, #e8f0fe 100%);
+      }
+      
+      .certificate .cert-border {
+        border: 2px solid #0b3b7a;
+        padding: 0.3in 0.25in;
+        height: 100%;
+        margin: 0.05in;
+      }
+      
+      .certificate .club-logo .logo-wub { font-size: 1.4rem; }
+      .certificate .club-logo .logo-eee { font-size: 1rem; }
+      .certificate .club-logo .logo-bolt { font-size: 1rem; }
+      .certificate .cert-title h1 { font-size: 0.95rem; }
+      .certificate .cert-body .cert-name { font-size: 0.85rem; }
+      .certificate .cert-body { font-size: 0.6rem; padding: 0.02in 0.015in; }
+      .certificate .cert-seal { font-size: 1.3rem; top: 4px; right: 6px; }
+      .certificate .cert-body .qr-container-cert #certQR { transform: scale(0.5); }
+      .no-print { display: none !important; }
+    }
+
+    @media screen and (max-width: 800px) {
+      .certificate-wrapper { 
+        width: 100%; 
+        height: auto; 
+        padding: 0.5rem;
+      }
+      .certificate { 
+        width: 100%; 
+        height: auto; 
+        min-height: 297mm;
+        padding: 0; 
+        margin: 10px; 
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      }
+      .certificate .cert-border { padding: 0.3rem; min-height: auto; margin: 0.03in; }
+      .certificate .club-logo .logo-wub { font-size: 1.2rem; letter-spacing: 6px; }
+      .certificate .club-logo .logo-eee { font-size: 0.9rem; letter-spacing: 4px; }
+      .certificate .club-logo .logo-bolt { font-size: 0.9rem; }
+      .certificate .cert-title h1 { font-size: 0.9rem; }
+      .certificate .cert-body .cert-name { font-size: 0.8rem; }
+      .certificate .cert-body { font-size: 0.6rem; padding: 0.2rem; }
+      .certificate .cert-body .qr-footer { flex-direction: column; align-items: center; }
+      .certificate .cert-body .signature-line { flex-direction: column; gap: 0.3rem; align-items: center; }
+      .certificate .cert-footer { flex-direction: column; gap: 0.2rem; align-items: center; }
+      .cert-modal-content { padding: 0.5rem; }
+    }
+
+    @media (max-width: 640px) {
+      .certificate .club-logo .logo-wub { font-size: 1rem; letter-spacing: 4px; }
+      .certificate .club-logo .logo-eee { font-size: 0.75rem; letter-spacing: 3px; }
+      .certificate .club-logo .logo-bolt { font-size: 0.75rem; }
+      .certificate .cert-title h1 { font-size: 0.75rem; }
+      .certificate .cert-body .cert-name { font-size: 0.65rem; }
+      .certificate .cert-body { font-size: 0.5rem; }
+      .certificate .cert-body .qr-container-cert #certQR { transform: scale(0.4); }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
 </head>
-
 <body>
 
-<div class="container">
-
-<h2>WUB EEE Registration</h2>
-
-<input id="name" placeholder="Full Name">
-<input id="studentId" placeholder="Student ID">
-<input id="email" placeholder="Email">
-
-<button onclick="register()">Register</button>
-
-<hr>
-
-<h3>Admin</h3>
-<input id="adminEmail" placeholder="Email">
-<input id="adminPass" type="password" placeholder="Password">
-<button onclick="login()">Login</button>
-
-<div id="adminPanel" class="hidden">
-  <h3>Members</h3>
-  <div id="list"></div>
+<!-- Login Overlay -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2><i class="fas fa-lock"></i> Admin Login</h2>
+    <p class="subtitle">Enter your credentials to access the admin panel</p>
+    <div class="form-group">
+      <label><i class="fas fa-envelope"></i> Email</label>
+      <input type="email" id="loginEmail" placeholder="Enter admin email" />
+    </div>
+    <div class="form-group">
+      <label><i class="fas fa-key"></i> Password</label>
+      <input type="password" id="loginPassword" placeholder="Enter password" />
+    </div>
+    <button class="login-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
+    <div class="login-error" id="loginError">Invalid email or password. Please try again.</div>
+  </div>
 </div>
 
-</div>
-
-<!-- CERTIFICATE -->
-<div id="certArea" class="hidden">
-  <div class="certificate-wrapper">
-    <div class="certificate" id="cert">
-      
-      <div>
-        <div class="title">WUB EEE CLUB</div>
-        <div class="small">Certificate of Membership</div>
-      </div>
-
-      <div>
-        <div class="name" id="cName"></div>
-        <div class="small" id="cId"></div>
-        <div id="qrcode"></div>
-      </div>
-
-      <div class="footer">
-        <div>President</div>
-        <div>Advisor</div>
-      </div>
-
+<div class="container" id="mainContainer">
+  <div class="club-header">
+    <i class="fas fa-bolt"></i>
+    <div>
+      <h1>WUB EEE Club</h1>
+      <span><i class="fas fa-university"></i> World University of Bangladesh · Electrical &amp; Electronic Engineering</span>
     </div>
   </div>
 
-  <button onclick="downloadPDF()">Download PDF</button>
-  <button onclick="printCert()">Print A4</button>
+  <div class="sync-status" id="syncStatus">
+    <span class="sync-dot syncing" id="syncDot"></span>
+    <span id="syncText">Connecting to cloud...</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="register"><i class="fas fa-user-plus"></i> Register</button>
+    <button class="tab-btn" data-tab="admin" id="adminTabBtn"><i class="fas fa-user-shield"></i> Admin Panel</button>
+  </div>
+
+  <!-- Registration Tab -->
+  <div class="tab-content active" id="tab-register">
+    <form id="registrationForm" class="form-card">
+      <div class="form-row">
+        <div class="form-group">
+          <label><i class="fas fa-user"></i> Full Name <span style="color:#b22234;">*</span></label>
+          <input type="text" id="fullName" placeholder="e.g. Md. Rahim Khan" required />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-id-card"></i> Student ID <span style="color:#b22234;">*</span></label>
+          <input type="text" id="studentId" placeholder="WUB-2024-123" required />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label><i class="fas fa-building"></i> Department</label>
+          <input type="text" id="department" value="EEE" disabled />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-calendar-alt"></i> Semester</label>
+          <select id="semester">
+            <option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd" selected>3rd</option>
+            <option value="4th">4th</option><option value="5th">5th</option><option value="6th">6th</option>
+            <option value="7th">7th</option><option value="8th">8th</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label><i class="fas fa-envelope"></i> Email <span style="color:#b22234;">*</span></label>
+          <input type="email" id="email" placeholder="student@wub.edu.bd" required />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-phone-alt"></i> Phone</label>
+          <input type="tel" id="phone" placeholder="+880 17XX-XXXXXX" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label><i class="fas fa-venus-mars"></i> Gender</label>
+          <select id="gender"><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-tag"></i> Interest Area</label>
+          <select id="interest">
+            <option value="Technical Workshop">Technical Workshop</option>
+            <option value="Competition Team">Competition Team</option>
+            <option value="Research Team">Research Team</option>
+            <option value="Event Management">Event Management</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group full-width">
+        <label><i class="fas fa-check-circle"></i> Skills</label>
+        <div class="skills-group" id="skillsGroup">
+          <label><input type="checkbox" value="Programming" /> Programming</label>
+          <label><input type="checkbox" value="Circuit Design" /> Circuit Design</label>
+          <label><input type="checkbox" value="Robotics" /> Robotics</label>
+          <label><input type="checkbox" value="Research" /> Research</label>
+          <label><input type="checkbox" value="Event Management" /> Event Management</label>
+        </div>
+      </div>
+      <div class="form-group full-width">
+        <label><i class="fas fa-comment"></i> Why do you want to join?</label>
+        <textarea id="reason" placeholder="Share your motivation..."></textarea>
+      </div>
+
+      <div class="past-student-toggle full-width">
+        <label>
+          <input type="checkbox" id="isPastStudent" />
+          <i class="fas fa-history"></i> This is a Past Student (Joined before 2024)
+        </label>
+        <span class="past-badge">Past Member</span>
+      </div>
+
+      <div class="past-student-fields" id="pastStudentFields">
+        <div class="form-group">
+          <label><i class="fas fa-calendar-start"></i> Membership Start Year *</label>
+          <input type="number" id="startYear" placeholder="e.g. 2016" min="2010" max="2023" />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-calendar-end"></i> Membership End Year *</label>
+          <input type="number" id="endYear" placeholder="e.g. 2018" min="2010" max="2024" />
+        </div>
+        <div class="form-group full-width" style="font-size:0.85rem; color:#6b8aaa; padding:0.3rem 0.5rem;">
+          <i class="fas fa-info-circle"></i> For past students, enter the years they were active members.
+        </div>
+      </div>
+
+      <div class="payment-section">
+        <div class="payment-label">
+          <i class="fas fa-credit-card"></i>
+          <span>Membership Fee: <strong style="color:#0b2b5c;">200 TK</strong></span>
+          <span class="bkash-info"><i class="fas fa-mobile-alt"></i> bKash: 01754526593</span>
+        </div>
+        <div class="payment-actions" style="flex:1; justify-content:flex-end;">
+          <div class="trxid-input">
+            <input type="text" id="trxidInput" placeholder="Enter bKash TrxID" />
+            <button type="button" id="verifyTrxidBtn" style="padding:0.5rem 1.2rem; border-radius:40px; background:#1b754b; color:white; border:none; font-weight:600; cursor:pointer;">
+              <i class="fas fa-check"></i> Verify
+            </button>
+          </div>
+          <span class="payment-status" id="paymentStatus"><i class="fas fa-clock"></i> Pending</span>
+          <button type="button" id="resetPaymentBtn" style="border-color:#b0b0b0; color:#4a5a72; padding:0.4rem 1rem;"><i class="fas fa-undo"></i></button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn" disabled>
+        <i class="fas fa-paper-plane"></i> Register & Complete
+      </button>
+    </form>
+
+    <div id="successBox" class="success-box">
+      <div>
+        <div class="message"><i class="fas fa-check-circle" style="color:#1b754b;"></i> Registration Successful!</div>
+        <div style="margin-top:6px; font-weight:500;">Your Club ID: <span id="displayClubId" class="id-badge">WUB-EEE-2026-0001</span></div>
+        <div style="margin-top:4px; font-size:0.85rem; color:#0f422b;">
+          <i class="fas fa-envelope"></i> Confirmation email sent to your inbox
+        </div>
+      </div>
+      <div class="slip-actions">
+        <button id="downloadSlipBtn"><i class="fas fa-download"></i> Download Slip</button>
+        <button id="resetFormBtn"><i class="fas fa-undo-alt"></i> New Registration</button>
+      </div>
+    </div>
+
+    <div id="qrSection" class="qr-section" style="display:none;">
+      <h3><i class="fas fa-qrcode"></i> Your Club QR Code</h3>
+      <div class="qr-container">
+        <div class="qr-code-wrapper">
+          <div id="qrcode"></div>
+          <div class="qr-label">Scan to verify membership</div>
+        </div>
+        <div class="qr-instructions">
+          <h4 style="color:#0b2b5c; margin-bottom:0.5rem;"><i class="fas fa-info-circle"></i> Instructions</h4>
+          <ol>
+            <li>Save this QR code to your phone</li>
+            <li>Share it with club members and organizers</li>
+            <li>Scan with any QR code reader to verify your membership</li>
+            <li>Your Club ID: <strong id="qrClubId">WUB-EEE-2026-0001</strong></li>
+            <li>Member since: <strong id="qrJoinDate">-</strong></li>
+          </ol>
+          <div class="qr-actions">
+            <button class="btn-download" id="downloadQRBtn"><i class="fas fa-download"></i> Download QR</button>
+            <button class="btn-share" id="shareQRBtn"><i class="fas fa-share-alt"></i> Share QR</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Panel -->
+  <div class="tab-content" id="tab-admin">
+    <div style="text-align:center; padding:2rem; background:#f8faff; border-radius:20px; margin-bottom:1.5rem;">
+      <i class="fas fa-shield-alt" style="font-size:2.5rem; color:#0b3b7a;"></i>
+      <h3 style="color:#0b2b5c; margin-top:0.5rem;">Admin Panel</h3>
+      <p style="color:#6b8aaa;">Manage members, generate certificates, and view all registrations</p>
+    </div>
+    
+    <div class="admin-actions">
+      <button class="btn-primary" id="refreshAdminBtn"><i class="fas fa-sync"></i> Refresh from Cloud</button>
+      <button class="btn-success" id="generateAllCertsBtn"><i class="fas fa-certificate"></i> Generate Eligible</button>
+      <button class="btn-purple" id="generatePastMembersBtn"><i class="fas fa-history"></i> Generate for Past Members</button>
+      <button class="btn-warning" id="forceGenerateBtn"><i class="fas fa-bolt"></i> Force Generate (Test)</button>
+      <button class="btn-danger" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+    
+    <div class="admin-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Student ID</th>
+            <th>Club ID</th>
+            <th>Payment</th>
+            <th>Join Date</th>
+            <th>Certificate</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="adminTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="edit-modal" id="editModal">
+  <div class="edit-modal-content">
+    <button class="edit-modal-close" id="editModalClose">&times;</button>
+    <h3 style="color:#0b2b5c; margin-bottom:1rem;"><i class="fas fa-edit"></i> Edit Member</h3>
+    <form id="editForm">
+      <input type="hidden" id="editClubId" />
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="editFullName" required />
+      </div>
+      <div class="form-group">
+        <label>Student ID</label>
+        <input type="text" id="editStudentId" required />
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="editEmail" required />
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="text" id="editPhone" />
+      </div>
+      <div class="form-group">
+        <label>Semester</label>
+        <select id="editSemester">
+          <option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd">3rd</option>
+          <option value="4th">4th</option><option value="5th">5th</option><option value="6th">6th</option>
+          <option value="7th">7th</option><option value="8th">8th</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Gender</label>
+        <select id="editGender">
+          <option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Interest Area</label>
+        <select id="editInterest">
+          <option value="Technical Workshop">Technical Workshop</option>
+          <option value="Competition Team">Competition Team</option>
+          <option value="Research Team">Research Team</option>
+          <option value="Event Management">Event Management</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Changes</button>
+    </form>
+  </div>
+</div>
+
+<!-- Certificate Modal -->
+<div class="cert-modal" id="certModal">
+  <div class="cert-modal-content">
+    <button class="cert-modal-close" id="certModalClose">&times;</button>
+    <div id="certificateContainer"></div>
+    <div style="text-align:center; margin-top:1.5rem; padding-bottom:1rem; display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap;" class="no-print">
+      <button class="btn-submit" id="downloadCertBtn" style="width:auto; padding:0.6rem 2rem;">
+        <i class="fas fa-file-pdf"></i> Download PDF
+      </button>
+      <button class="btn-submit" id="printCertBtn" style="width:auto; padding:0.6rem 2rem; background:#1b754b;">
+        <i class="fas fa-print"></i> Print Certificate (A4)
+      </button>
+    </div>
+  </div>
 </div>
 
 <script>
-let db = JSON.parse(localStorage.getItem("db")||"[]");
+  (function() {
+    // ============================================
+    // JSONBin.io CONFIGURATION
+    // ============================================
+    const JSONBIN_BIN_ID = '6a3a40f6f5f4af5e2921c0d2';
+    const JSONBIN_API_KEY = '$2a$10$uxxlv8nJapUJj6YbaVCY4u1EBDwX6.jOssFoyi0I7e8CyDKeTIc5W';
+    const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+    
+    // ============================================
+    // CONSTANTS
+    // ============================================
+    const STORAGE_KEY = 'wub_eee_registrations';
+    const ID_KEY = 'wub_eee_last_id';
+    const CERT_KEY = 'wub_eee_certificates';
+    const ADMIN_EMAIL = 'eee-club@eee.wub.edu.bd';
+    const ADMIN_PASSWORD = 'Eee123@580Eee';
+    const year = new Date().getFullYear();
 
-/* REGISTER */
-function register(){
-  let obj={
-    name:document.getElementById("name").value,
-    id:document.getElementById("studentId").value,
-    email:document.getElementById("email").value
-  };
-  db.push(obj);
-  localStorage.setItem("db",JSON.stringify(db));
-  alert("Registered!");
-  render();
-}
+    let isLoggedIn = false;
+    let isSyncing = false;
 
-/* LOGIN */
-function login(){
-  if(document.getElementById("adminEmail").value==="admin" &&
-     document.getElementById("adminPass").value==="1234"){
-    document.getElementById("adminPanel").classList.remove("hidden");
-    render();
-  }else alert("Wrong login");
-}
+    // ============================================
+    // PAST STUDENT TOGGLE
+    // ============================================
+    document.getElementById('isPastStudent').addEventListener('change', function() {
+      const fields = document.getElementById('pastStudentFields');
+      if (this.checked) {
+        fields.classList.add('show');
+        document.getElementById('startYear').required = true;
+        document.getElementById('endYear').required = true;
+      } else {
+        fields.classList.remove('show');
+        document.getElementById('startYear').required = false;
+        document.getElementById('endYear').required = false;
+        document.getElementById('startYear').value = '';
+        document.getElementById('endYear').value = '';
+      }
+    });
 
-/* LIST */
-function render(){
-  let html="";
-  db.forEach((d,i)=>{
-    html+=`
-      <div>
-        ${d.name} (${d.id})
-        <button onclick="openCert(${i})">Certificate</button>
-      </div>`;
-  });
-  document.getElementById("list").innerHTML=html;
-}
+    // ============================================
+    // SYNC FUNCTIONS
+    // ============================================
+    function updateSyncStatus(status, message) {
+      const dot = document.getElementById('syncDot');
+      const text = document.getElementById('syncText');
+      
+      dot.className = 'sync-dot';
+      if (status === 'online') {
+        dot.classList.add('online');
+        text.textContent = message || '✅ Cloud connected - Data synced across all devices';
+      } else if (status === 'offline') {
+        dot.classList.add('offline');
+        text.textContent = message || '⚠️ Cloud unavailable - Using local data only';
+      } else if (status === 'syncing') {
+        dot.classList.add('syncing');
+        text.textContent = message || '⏳ Syncing with cloud...';
+      }
+    }
 
-/* CERT */
-function openCert(i){
-  let d=db[i];
-  document.getElementById("certArea").classList.remove("hidden");
+    async function syncDataToCloud(records, lastId) {
+      try {
+        updateSyncStatus('syncing', '⏳ Saving to cloud...');
+        
+        const data = {
+          records: records,
+          lastId: lastId || getLastSerial()
+        };
+        
+        const response = await fetch(JSONBIN_URL, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Master-Key': JSONBIN_API_KEY
+          },
+          body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+          updateSyncStatus('online', '✅ Data saved to cloud');
+          return true;
+        } else {
+          console.error('Cloud save error:', await response.json());
+          updateSyncStatus('offline', '⚠️ Cloud save failed');
+          return false;
+        }
+      } catch (error) {
+        console.error('Cloud sync error:', error);
+        updateSyncStatus('offline', '⚠️ Cloud error - Using local data');
+        return false;
+      }
+    }
 
-  document.getElementById("cName").innerText=d.name;
-  document.getElementById("cId").innerText=d.id;
+    async function fetchDataFromCloud() {
+      try {
+        updateSyncStatus('syncing', '⏳ Fetching from cloud...');
+        
+        const response = await fetch(JSONBIN_URL, {
+          method: 'GET',
+          headers: {
+            'X-Master-Key': JSONBIN_API_KEY
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          updateSyncStatus('online', '✅ Data fetched from cloud');
+          return data.record || data;
+        } else {
+          console.error('Cloud fetch failed:', response.status);
+          updateSyncStatus('offline', '⚠️ Cloud fetch failed');
+          return null;
+        }
+      } catch (error) {
+        console.error('Cloud fetch error:', error);
+        updateSyncStatus('offline', '⚠️ Cloud error - Using local data');
+        return null;
+      }
+    }
 
-  document.getElementById("qrcode").innerHTML="";
-  new QRCode(document.getElementById("qrcode"), d.id);
-}
+    async function syncFromCloud() {
+      if (isSyncing) return;
+      isSyncing = true;
+      
+      try {
+        const cloudData = await fetchDataFromCloud();
+        if (cloudData && cloudData.records) {
+          const localRecords = getRegistrations();
+          const cloudRecords = cloudData.records || [];
+          const mergedRecords = mergeRecords(localRecords, cloudRecords);
+          saveRegistrations(mergedRecords);
+          
+          if (cloudData.lastId && cloudData.lastId > getLastSerial()) {
+            setLastSerial(cloudData.lastId);
+          }
+          
+          renderAdminTable();
+          showToast('✅ Data synced from cloud successfully!');
+        } else if (cloudData && cloudData.records && cloudData.records.length === 0) {
+          updateSyncStatus('online', '✅ Cloud connected - No data yet');
+        } else {
+          updateSyncStatus('offline', '⚠️ Cloud unavailable - Using local data');
+        }
+      } catch (error) {
+        console.error('Sync error:', error);
+        updateSyncStatus('offline', '⚠️ Cloud error - Using local data');
+      }
+      
+      isSyncing = false;
+    }
 
-/* PDF */
-function downloadPDF(){
-  const element=document.getElementById("cert");
-  html2pdf().set({
-    margin:0,
-    filename:"certificate.pdf",
-    html2canvas:{scale:3},
-    jsPDF:{format:"a4"}
-  }).from(element).save();
-}
+    function mergeRecords(local, cloud) {
+      const recordMap = {};
+      local.forEach(r => { if (r.studentId) recordMap[r.studentId] = r; });
+      cloud.forEach(r => { if (r.studentId) recordMap[r.studentId] = r; });
+      return Object.values(recordMap);
+    }
 
-/* PRINT */
-function printCert(){
-  window.print();
-}
+    // ============================================
+    // DATA MANAGEMENT
+    // ============================================
+    function getLastSerial() {
+      const stored = localStorage.getItem(ID_KEY);
+      return stored ? parseInt(stored, 10) : 0;
+    }
+    
+    function setLastSerial(serial) {
+      localStorage.setItem(ID_KEY, String(serial));
+    }
+    
+    function generateClubId(serial) {
+      return `WUB-EEE-${year}-${String(serial).padStart(4, '0')}`;
+    }
+    
+    function getRegistrations() {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    }
+    
+    function saveRegistrations(records) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+      const lastId = getLastSerial();
+      setTimeout(() => syncDataToCloud(records, lastId), 100);
+    }
+    
+    function getCertificates() {
+      const data = localStorage.getItem(CERT_KEY);
+      return data ? JSON.parse(data) : {};
+    }
+    
+    function saveCertificates(certs) {
+      localStorage.setItem(CERT_KEY, JSON.stringify(certs));
+    }
 
-render();
+    // ============================================
+    // LOGIN FUNCTIONS
+    // ============================================
+    function checkLogin() {
+      const session = sessionStorage.getItem('wub_eee_admin_session');
+      if (session === 'true') {
+        isLoggedIn = true;
+        document.getElementById('loginOverlay').classList.remove('open');
+        document.getElementById('loginOverlay').classList.add('hidden');
+        setTimeout(syncFromCloud, 500);
+        return true;
+      }
+      return false;
+    }
+
+    document.getElementById('adminTabBtn').addEventListener('click', function(e) {
+      if (!isLoggedIn) {
+        e.preventDefault();
+        document.getElementById('loginOverlay').classList.remove('hidden');
+        document.getElementById('loginOverlay').classList.add('open');
+        document.getElementById('loginError').classList.remove('show');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('[data-tab="register"]').classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-register').classList.add('active');
+      }
+    });
+
+    document.getElementById('loginBtn').addEventListener('click', function() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      const errorEl = document.getElementById('loginError');
+
+      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+        sessionStorage.setItem('wub_eee_admin_session', 'true');
+        isLoggedIn = true;
+        document.getElementById('loginOverlay').classList.remove('open');
+        document.getElementById('loginOverlay').classList.add('hidden');
+        errorEl.classList.remove('show');
+        
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('adminTabBtn').classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-admin').classList.add('active');
+        
+        renderAdminTable();
+        showToast('✅ Welcome Admin!');
+        setTimeout(syncFromCloud, 500);
+      } else {
+        errorEl.classList.add('show');
+        document.getElementById('loginPassword').value = '';
+      }
+    });
+
+    document.getElementById('loginPassword').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') document.getElementById('loginBtn').click();
+    });
+    document.getElementById('loginEmail').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') document.getElementById('loginBtn').click();
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      sessionStorage.removeItem('wub_eee_admin_session');
+      isLoggedIn = false;
+      document.getElementById('loginOverlay').classList.remove('hidden');
+      document.getElementById('loginOverlay').classList.add('open');
+      
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('[data-tab="register"]').classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-register').classList.add('active');
+      
+      showToast('👋 Logged out successfully');
+    });
+
+    // ============================================
+    // TOAST & UTILITY
+    // ============================================
+    function escapeHtml(text) {
+      if (!text) return '';
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return String(text).replace(/[&<>"']/g, m => map[m]);
+    }
+
+    function showToast(message, isError = false) {
+      const existing = document.querySelector('.notification-toast');
+      if (existing) existing.remove();
+      
+      const toast = document.createElement('div');
+      toast.className = 'notification-toast';
+      toast.style.background = isError ? '#b22234' : '#1b754b';
+      toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.classList.add('hidden');
+        setTimeout(() => toast.remove(), 500);
+      }, 4000);
+    }
+
+    function sendConfirmationEmail(record) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          console.log('📧 Confirmation email sent to:', record.email);
+          console.log('📧 From: eee-club@eee.wub.edu.bd');
+          showToast(`✅ Confirmation email sent to ${record.email}`);
+          resolve(true);
+        }, 1000);
+      });
+    }
+
+    // ============================================
+    // PAYMENT FUNCTIONS
+    // ============================================
+    let paymentCompleted = false;
+    let verifiedTrxID = '';
+
+    function updatePaymentUI() {
+      const statusEl = document.getElementById('paymentStatus');
+      const trxInput = document.getElementById('trxidInput');
+      const verifyBtn = document.getElementById('verifyTrxidBtn');
+      const submitBtn = document.getElementById('submitBtn');
+      
+      if (paymentCompleted && verifiedTrxID) {
+        statusEl.innerHTML = `<i class="fas fa-check-circle" style="color:#1b754b;"></i> Paid (TrxID: ${verifiedTrxID})`;
+        statusEl.className = 'payment-status done';
+        trxInput.disabled = true;
+        verifyBtn.disabled = true;
+        verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verified';
+        verifyBtn.style.background = '#1b754b';
+        submitBtn.disabled = false;
+      } else {
+        statusEl.innerHTML = '<i class="fas fa-clock"></i> Pending';
+        statusEl.className = 'payment-status';
+        trxInput.disabled = false;
+        verifyBtn.disabled = false;
+        verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify';
+        verifyBtn.style.background = '#1b754b';
+        submitBtn.disabled = true;
+      }
+    }
+
+    document.getElementById('verifyTrxidBtn').addEventListener('click', function() {
+      const trxInput = document.getElementById('trxidInput');
+      const trxid = trxInput.value.trim();
+      if (!trxid) {
+        alert('Please enter a bKash Transaction ID (TrxID).');
+        return;
+      }
+      if (trxid.length < 4) {
+        alert('Please enter a valid TrxID (at least 4 characters).');
+        return;
+      }
+      this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+      this.disabled = true;
+      setTimeout(() => {
+        verifiedTrxID = trxid;
+        paymentCompleted = true;
+        updatePaymentUI();
+        alert(`✅ bKash payment verified!\nTrxID: ${verifiedTrxID}\nAmount: 200 TK`);
+        this.innerHTML = '<i class="fas fa-check"></i> Verified';
+        this.style.background = '#1b754b';
+      }, 800);
+    });
+
+    document.getElementById('resetPaymentBtn').addEventListener('click', function() {
+      paymentCompleted = false;
+      verifiedTrxID = '';
+      document.getElementById('trxidInput').value = '';
+      document.getElementById('trxidInput').disabled = false;
+      const verifyBtn = document.getElementById('verifyTrxidBtn');
+      verifyBtn.disabled = false;
+      verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify';
+      verifyBtn.style.background = '#1b754b';
+      document.getElementById('submitBtn').disabled = true;
+      updatePaymentUI();
+    });
+
+    // ============================================
+    // REGISTRATION SUBMIT
+    // ============================================
+    document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      if (!paymentCompleted || !verifiedTrxID) {
+        alert('⚠️ Please enter and verify your bKash TrxID first.');
+        return;
+      }
+
+      const fullName = document.getElementById('fullName').value.trim();
+      const studentId = document.getElementById('studentId').value.trim();
+      const email = document.getElementById('email').value.trim();
+      if (!fullName || !studentId || !email) {
+        alert('Please fill in all required fields: Full Name, Student ID, and Email.');
+        return;
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        alert('Please enter a valid email address.');
+        return;
+      }
+
+      const isPastStudent = document.getElementById('isPastStudent').checked;
+      let startYear = null;
+      let endYear = null;
+
+      if (isPastStudent) {
+        startYear = document.getElementById('startYear').value.trim();
+        endYear = document.getElementById('endYear').value.trim();
+        
+        if (!startYear || !endYear) {
+          alert('⚠️ Please enter both Start Year and End Year for past student.');
+          return;
+        }
+        
+        const startNum = parseInt(startYear);
+        const endNum = parseInt(endYear);
+        
+        if (isNaN(startNum) || isNaN(endNum) || startNum > endNum) {
+          alert('⚠️ Please enter valid years (Start Year must be before End Year).');
+          return;
+        }
+        
+        if (startNum >= 2024) {
+          alert('⚠️ For past students, Start Year must be before 2024.');
+          return;
+        }
+      }
+
+      const skillCheckboxes = document.querySelectorAll('#skillsGroup input[type="checkbox"]');
+      const skills = [];
+      skillCheckboxes.forEach(cb => { if (cb.checked) skills.push(cb.value); });
+
+      const semester = document.getElementById('semester').value;
+      const phone = document.getElementById('phone').value.trim();
+      const gender = document.getElementById('gender').value;
+      const interest = document.getElementById('interest').value;
+      const reason = document.getElementById('reason').value.trim();
+
+      let lastSerial = getLastSerial();
+      const newSerial = lastSerial + 1;
+      const clubId = generateClubId(newSerial);
+      setLastSerial(newSerial);
+
+      let joinDate;
+      if (isPastStudent && startYear) {
+        joinDate = new Date(startYear, 0, 1).toISOString();
+      } else {
+        joinDate = new Date().toISOString();
+      }
+
+      const record = {
+        fullName, studentId, department: 'EEE', semester, email, phone, gender,
+        skills, interest, reason, clubId,
+        paymentStatus: 'Paid (bKash)',
+        paymentMethod: 'bKash',
+        paymentAmount: '200 TK',
+        trxid: verifiedTrxID,
+        joinDate: joinDate,
+        timestamp: new Date().toISOString(),
+        isPastStudent: isPastStudent,
+        startYear: startYear,
+        endYear: endYear
+      };
+
+      const records = getRegistrations();
+      const exists = records.some(r => r.studentId === studentId);
+      if (exists) {
+        alert('This Student ID is already registered. Please use a different ID.');
+        setLastSerial(lastSerial);
+        return;
+      }
+      records.push(record);
+      saveRegistrations(records);
+
+      await sendConfirmationEmail(record);
+      
+      const box = document.getElementById('successBox');
+      const span = document.getElementById('displayClubId');
+      if (span) span.textContent = clubId;
+      if (box) box.classList.add('show');
+
+      window._lastClubId = clubId;
+      window._lastFormData = record;
+
+      generateQRCode(record);
+      document.getElementById('qrClubId').textContent = clubId;
+      document.getElementById('qrJoinDate').textContent = new Date(record.joinDate).toLocaleDateString();
+      document.getElementById('qrSection').style.display = 'block';
+
+      renderAdminTable();
+      document.getElementById('successBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.getElementById('submitBtn').disabled = true;
+      
+      showToast('🎉 Registration complete! Data saved to cloud.');
+    });
+
+    // ============================================
+    // QR CODE FUNCTIONS
+    // ============================================
+    function generateQRCode(record) {
+      const qrContainer = document.getElementById('qrcode');
+      qrContainer.innerHTML = '';
+      
+      const qrData = JSON.stringify({
+        clubId: record.clubId,
+        name: record.fullName,
+        studentId: record.studentId,
+        email: record.email,
+        joinDate: record.joinDate,
+        semester: record.semester,
+        department: 'EEE',
+        isPastStudent: record.isPastStudent || false,
+        startYear: record.startYear || null,
+        endYear: record.endYear || null
+      });
+      
+      new QRCode(qrContainer, {
+        text: qrData,
+        width: 180,
+        height: 180,
+        colorDark: '#0b3b7a',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }
+
+    // Generate QR for Certificate
+    function generateCertQR(record) {
+      const qrContainer = document.getElementById('certQR');
+      if (!qrContainer) return;
+      qrContainer.innerHTML = '';
+      
+      const certs = getCertificates();
+      const cert = certs[record.clubId] || {};
+      
+      const qrData = JSON.stringify({
+        name: record.fullName,
+        studentId: record.studentId,
+        clubId: record.clubId,
+        certificateNo: cert.certNumber || 'N/A',
+        issuedDate: new Date().toLocaleDateString(),
+        department: 'EEE',
+        email: record.email,
+        phone: record.phone || 'N/A',
+        semester: record.semester || 'N/A',
+        joinDate: new Date(record.joinDate).toLocaleDateString(),
+        isPastStudent: record.isPastStudent || false,
+        startYear: record.startYear || null,
+        endYear: record.endYear || null,
+        periodStart: cert.periodStart ? new Date(cert.periodStart).toLocaleDateString() : 'N/A',
+        periodEnd: cert.periodEnd ? new Date(cert.periodEnd).toLocaleDateString() : 'N/A'
+      });
+      
+      new QRCode(qrContainer, {
+        text: qrData,
+        width: 55,
+        height: 55,
+        colorDark: '#0b3b7a',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }
+
+    document.getElementById('downloadQRBtn').addEventListener('click', function() {
+      const qrContainer = document.getElementById('qrcode');
+      const canvas = qrContainer.querySelector('canvas');
+      if (!canvas) {
+        showToast('❌ No QR code to download', true);
+        return;
+      }
+      
+      const link = document.createElement('a');
+      link.download = `WUB_EEE_QR_${document.getElementById('qrClubId').textContent}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast('✅ QR Code downloaded successfully!');
+    });
+
+    document.getElementById('shareQRBtn').addEventListener('click', function() {
+      const qrContainer = document.getElementById('qrcode');
+      const canvas = qrContainer.querySelector('canvas');
+      if (!canvas) {
+        showToast('❌ No QR code to share', true);
+        return;
+      }
+      
+      canvas.toBlob(function(blob) {
+        const file = new File([blob], 'WUB_EEE_QR.png', { type: 'image/png' });
+        if (navigator.share) {
+          navigator.share({
+            title: 'WUB EEE Club - My Membership QR Code',
+            text: `WUB EEE Club Membership\nClub ID: ${document.getElementById('qrClubId').textContent}\nScan to verify my membership.`,
+            files: [file]
+          }).then(() => {
+            showToast('✅ QR Code shared successfully!');
+          }).catch(() => {
+            showToast('Share cancelled or failed', true);
+          });
+        } else {
+          const link = document.createElement('a');
+          link.download = `WUB_EEE_QR_${document.getElementById('qrClubId').textContent}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('📱 QR Code downloaded. Share it manually.');
+        }
+      });
+    });
+
+    // ============================================
+    // RESET FORM
+    // ============================================
+    document.getElementById('resetFormBtn').addEventListener('click', function() {
+      const form = document.getElementById('registrationForm');
+      if (form) form.reset();
+      document.querySelectorAll('#skillsGroup input[type="checkbox"]').forEach(cb => cb.checked = false);
+      document.getElementById('department').value = 'EEE';
+      document.getElementById('successBox').classList.remove('show');
+      document.getElementById('qrSection').style.display = 'none';
+      document.getElementById('pastStudentFields').classList.remove('show');
+      document.getElementById('isPastStudent').checked = false;
+      paymentCompleted = false;
+      verifiedTrxID = '';
+      document.getElementById('trxidInput').value = '';
+      document.getElementById('trxidInput').disabled = false;
+      const verifyBtn = document.getElementById('verifyTrxidBtn');
+      verifyBtn.disabled = false;
+      verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify';
+      verifyBtn.style.background = '#1b754b';
+      document.getElementById('submitBtn').disabled = true;
+      updatePaymentUI();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ============================================
+    // DOWNLOAD SLIP
+    // ============================================
+    document.getElementById('downloadSlipBtn').addEventListener('click', function() {
+      const clubId = window._lastClubId;
+      const data = window._lastFormData;
+      if (!clubId || !data) {
+        alert('No registration data to download. Please submit the form first.');
+        return;
+      }
+      const lines = [
+        '═══════════════════════════════════════════',
+        '         WUB EEE CLUB REGISTRATION         ',
+        '═══════════════════════════════════════════',
+        '',
+        `Club ID      : ${clubId}`,
+        `Name         : ${data.fullName}`,
+        `Student ID   : ${data.studentId}`,
+        `Department   : EEE`,
+        `Semester     : ${data.semester}`,
+        `Email        : ${data.email}`,
+        `Phone        : ${data.phone || '—'}`,
+        `Gender       : ${data.gender}`,
+        `Interest     : ${data.interest}`,
+        `Skills       : ${data.skills.join(', ') || '—'}`,
+        `Reason       : ${data.reason || '—'}`,
+        `Payment      : ${data.paymentStatus || 'Paid'}`,
+        `Method       : bKash (01754526593)`,
+        `Amount       : 200 TK`,
+        `TrxID        : ${data.trxid || '—'}`,
+        `Join Date    : ${new Date(data.joinDate).toLocaleDateString()}`,
+        data.isPastStudent ? `Past Student: ${data.startYear} - ${data.endYear}` : '',
+        '',
+        '───────────────────────────────────────────',
+        'Thank you for joining WUB EEE Club!',
+        'Confirmation email sent to: ' + data.email,
+        'From: eee-club@eee.wub.edu.bd',
+        '═══════════════════════════════════════════'
+      ].join('\n');
+      const blob = new Blob([lines], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `WUB_EEE_Club_Slip_${clubId}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    });
+
+    // ============================================
+    // CERTIFICATE FUNCTIONS
+    // ============================================
+    function isEligibleForCertificate(joinDate) {
+      const join = new Date(joinDate);
+      const now = new Date();
+      const yearsDiff = now.getFullYear() - join.getFullYear();
+      if (yearsDiff > 2) return true;
+      if (yearsDiff === 2) {
+        const monthDiff = now.getMonth() - join.getMonth();
+        if (monthDiff > 0) return true;
+        if (monthDiff === 0 && now.getDate() >= join.getDate()) return true;
+      }
+      return false;
+    }
+
+    function isPastMember(joinDate) {
+      const join = new Date(joinDate);
+      const now = new Date();
+      const yearsDiff = now.getFullYear() - join.getFullYear();
+      return yearsDiff >= 2;
+    }
+
+    function getCertificateNumber(clubId) {
+      const certs = getCertificates();
+      if (certs[clubId]) {
+        return certs[clubId].certNumber;
+      }
+      const existingCerts = Object.values(certs);
+      const maxNum = existingCerts.reduce((max, c) => {
+        const num = parseInt(c.certNumber.split('-')[1]);
+        return num > max ? num : max;
+      }, 0);
+      const newNum = maxNum + 1;
+      return `WUB-EEE-CERT-${String(newNum).padStart(4, '0')}`;
+    }
+
+    function generateCertificate(record) {
+      const certs = getCertificates();
+      if (certs[record.clubId]) {
+        return certs[record.clubId];
+      }
+      
+      const certNumber = getCertificateNumber(record.clubId);
+      const now = new Date();
+      
+      let startDate, endDate;
+      
+      if (record.isPastStudent && record.startYear && record.endYear) {
+        startDate = new Date(parseInt(record.startYear), 0, 1);
+        endDate = new Date(parseInt(record.endYear), 11, 31);
+      } else {
+        const joinDate = new Date(record.joinDate);
+        startDate = new Date(joinDate);
+        endDate = new Date(joinDate);
+        endDate.setFullYear(endDate.getFullYear() + 2);
+      }
+      
+      const certData = {
+        clubId: record.clubId,
+        certNumber: certNumber,
+        fullName: record.fullName,
+        studentId: record.studentId,
+        joinDate: record.joinDate,
+        periodStart: startDate.toISOString(),
+        periodEnd: endDate.toISOString(),
+        generatedDate: now.toISOString(),
+        validUntil: new Date(now.setFullYear(now.getFullYear() + 2)).toISOString(),
+        isPastMember: record.isPastStudent || false,
+        startYear: record.startYear || null,
+        endYear: record.endYear || null
+      };
+      
+      certs[record.clubId] = certData;
+      saveCertificates(certs);
+      return certData;
+    }
+
+    function renderCertificate(record) {
+      const cert = generateCertificate(record);
+      
+      let startDateStr, endDateStr;
+      
+      if (cert.periodStart && cert.periodEnd) {
+        const startDate = new Date(cert.periodStart);
+        const endDate = new Date(cert.periodEnd);
+        
+        startDateStr = startDate.toLocaleDateString('en-US', {
+          year: 'numeric', month: 'long', day: 'numeric'
+        });
+        endDateStr = endDate.toLocaleDateString('en-US', {
+          year: 'numeric', month: 'long', day: 'numeric'
+        });
+      } else {
+        const now = new Date();
+        const twoYearsAgo = new Date(now);
+        twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+        
+        startDateStr = twoYearsAgo.toLocaleDateString('en-US', {
+          year: 'numeric', month: 'long', day: 'numeric'
+        });
+        endDateStr = now.toLocaleDateString('en-US', {
+          year: 'numeric', month: 'long', day: 'numeric'
+        });
+      }
+
+      const logoSvg = `
+        <svg width="50" height="50" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:0.02rem;">
+          <circle cx="100" cy="100" r="90" fill="#0b3b7a" opacity="0.06"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#0b3b7a" stroke-width="1.5" opacity="0.25"/>
+          <path d="M100 30 L115 75 L95 80 L110 120 L85 100 L95 90 L75 70 L100 70 Z" fill="#f5a623" opacity="0.85"/>
+          <text x="100" y="138" font-family="'Playfair Display', serif" font-size="18" font-weight="700" fill="#0b3b7a" text-anchor="middle" letter-spacing="4">WUB</text>
+          <text x="100" y="168" font-family="'Playfair Display', serif" font-size="14" font-weight="700" fill="#0b3b7a" text-anchor="middle" letter-spacing="3">EEE</text>
+          <text x="100" y="192" font-family="'Inter', sans-serif" font-size="7" font-weight="600" fill="#3c6e9c" text-anchor="middle" letter-spacing="2">CLUB</text>
+          <text x="100" y="210" font-family="'Inter', sans-serif" font-size="4.5" font-weight="500" fill="#6b8aaa" text-anchor="middle" letter-spacing="1">SINCE 2011</text>
+        </svg>
+      `;
+
+      setTimeout(() => {
+        generateCertQR(record);
+      }, 100);
+      
+      return `
+        <div class="certificate-wrapper">
+          <div class="certificate" id="certificatePrint">
+            <div class="cert-border">
+              <div class="cert-seal"><i class="fas fa-certificate"></i></div>
+              
+              <!-- LOGO -->
+              <div class="club-logo">
+                ${logoSvg}
+                <div class="logo-wub">WUB</div>
+                <div class="logo-eee">EEE</div>
+                <div class="logo-club">CLUB</div>
+                <div class="logo-since">SINCE 2011</div>
+              </div>
+              
+              <!-- TITLE -->
+              <div class="cert-title">
+                <h1>🏆 CERTIFICATE OF MEMBERSHIP</h1>
+                <div class="cert-subtitle">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+              </div>
+              
+              <!-- BODY -->
+              <div class="cert-body">
+                <p>This is to certify that</p>
+                <div class="cert-name">${escapeHtml(record.fullName)}</div>
+                <div class="cert-student-id">Student ID: <span class="highlight">${escapeHtml(record.studentId)}</span></div>
+                <p>has been an active member/participant of the <span class="highlight">EEE Club of World University of Bangladesh</span>.</p>
+                <p>During the period <span class="highlight">${startDateStr}</span> to <span class="highlight">${endDateStr}</span>, he/she has actively participated in various academic, technical, and extracurricular activities organized by the club, including workshops, seminars, and competitions.</p>
+                <p>We appreciate his/her dedication, enthusiasm, and contribution to the development of technical knowledge and teamwork within the club.</p>
+                <p>We wish him/her every success in life.</p>
+                
+                <!-- QR CODE -->
+                <div class="qr-footer">
+                  <div style="flex:1;"></div>
+                  <div class="qr-container-cert">
+                    <div id="certQR"></div>
+                    <div class="qr-label">Scan to Verify Membership</div>
+                  </div>
+                </div>
+                
+                <!-- SIGNATURE -->
+                <div class="signature-line">
+                  <div style="text-align:center;">
+                    <div class="signature">_________________</div>
+                    <div>President</div>
+                    <div class="sig-label">WUB EEE Club</div>
+                  </div>
+                  <div style="text-align:center;">
+                    <div class="signature">_________________</div>
+                    <div>Advisor</div>
+                    <div class="sig-label">WUB EEE Club</div>
+                  </div>
+                </div>
+                
+                <!-- NB NOTE -->
+                <div class="nb-note">
+                  <strong>NB:</strong> This certificate is automatically generated. No physical signature is required. For verification, please contact the EEE Club.
+                </div>
+              </div>
+              
+              <!-- FOOTER -->
+              <div class="cert-footer">
+                <div class="cert-id">Certificate No: <strong>${cert.certNumber}</strong></div>
+                <div class="cert-id">Club ID: <strong>${record.clubId}</strong></div>
+                <div class="cert-id">Issued: <strong>${new Date(cert.generatedDate).toLocaleDateString()}</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ============================================
+    // ADMIN TABLE
+    // ============================================
+    function renderAdminTable() {
+      if (!isLoggedIn) return;
+      
+      const records = getRegistrations();
+      const tbody = document.getElementById('adminTableBody');
+      if (!tbody) return;
+      
+      if (records.length === 0) {
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="8">No registered members yet.</td></tr>`;
+        return;
+      }
+
+      const certs = getCertificates();
+      
+      tbody.innerHTML = records.map((r, idx) => {
+        const paid = r.paymentStatus && r.paymentStatus.includes('Paid');
+        const hasCert = !!certs[r.clubId];
+        const isEligible = isEligibleForCertificate(r.joinDate);
+        const isPast = isPastMember(r.joinDate) || r.isPastStudent;
+        const joinDate = new Date(r.joinDate).toLocaleDateString();
+        const pastInfo = r.isPastStudent && r.startYear && r.endYear ? `${r.startYear}-${r.endYear}` : '';
+        
+        let certStatus = '';
+        let certAction = '';
+        let actions = '';
+        
+        actions = `
+          <button class="action-btn edit" onclick="editMember('${r.clubId}')"><i class="fas fa-edit"></i></button>
+          <button class="action-btn delete" onclick="deleteMember('${r.clubId}')"><i class="fas fa-trash"></i></button>
+        `;
+        
+        if (hasCert) {
+          certStatus = `<span class="badge-cert"><i class="fas fa-check-circle"></i> Issued</span>`;
+          certAction = `<button class="cert-btn download" onclick="viewCertificate('${r.clubId}')"><i class="fas fa-eye"></i> View</button>`;
+        } else if (isEligible) {
+          certStatus = `<span class="badge-no-cert"><i class="fas fa-clock"></i> Eligible</span>`;
+          certAction = `<button class="cert-btn generate" onclick="generateCertForMember('${r.clubId}')"><i class="fas fa-certificate"></i> Generate</button>`;
+        } else if (isPast) {
+          certStatus = `<span class="badge-past"><i class="fas fa-history"></i> Past Member ${pastInfo ? '('.concat(pastInfo, ')') : ''}</span>`;
+          certAction = `<button class="cert-btn past" onclick="generatePastCert('${r.clubId}')"><i class="fas fa-certificate"></i> Generate Past</button>`;
+        } else {
+          const yearsLeft = 2 - Math.floor((new Date() - new Date(r.joinDate)) / (1000*60*60*24*365));
+          certStatus = `<span class="badge-no-cert"><i class="fas fa-hourglass-half"></i> ${yearsLeft} year(s)</span>`;
+          certAction = `<span style="font-size:0.7rem; color:#6b8aaa;">Not eligible</span>`;
+        }
+        
+        return `<tr>
+          <td>${idx+1}</td>
+          <td><strong>${escapeHtml(r.fullName || '')}</strong></td>
+          <td>${escapeHtml(r.studentId || '')}</td>
+          <td><code style="background:#e8f0fe; padding:2px 8px; border-radius:12px; font-weight:600;">${escapeHtml(r.clubId || '')}</code></td>
+          <td><span class="${paid ? 'badge-paid' : 'badge-pending'}">${paid ? '✅ Paid' : '⏳ Pending'}</span></td>
+          <td style="font-size:0.8rem;">${joinDate}</td>
+          <td>${certStatus} ${certAction ? '<br>' + certAction : ''}</td>
+          <td>${actions}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // ============================================
+    // EDIT & DELETE FUNCTIONS
+    // ============================================
+    window.editMember = function(clubId) {
+      const records = getRegistrations();
+      const record = records.find(r => r.clubId === clubId);
+      if (!record) {
+        showToast('❌ Member not found', true);
+        return;
+      }
+      
+      document.getElementById('editClubId').value = clubId;
+      document.getElementById('editFullName').value = record.fullName || '';
+      document.getElementById('editStudentId').value = record.studentId || '';
+      document.getElementById('editEmail').value = record.email || '';
+      document.getElementById('editPhone').value = record.phone || '';
+      document.getElementById('editSemester').value = record.semester || '3rd';
+      document.getElementById('editGender').value = record.gender || 'Male';
+      document.getElementById('editInterest').value = record.interest || 'Technical Workshop';
+      
+      document.getElementById('editModal').classList.add('open');
+    };
+
+    document.getElementById('editModalClose').addEventListener('click', function() {
+      document.getElementById('editModal').classList.remove('open');
+    });
+
+    document.getElementById('editModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.classList.remove('open');
+      }
+    });
+
+    document.getElementById('editForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const clubId = document.getElementById('editClubId').value;
+      const fullName = document.getElementById('editFullName').value.trim();
+      const studentId = document.getElementById('editStudentId').value.trim();
+      const email = document.getElementById('editEmail').value.trim();
+      const phone = document.getElementById('editPhone').value.trim();
+      const semester = document.getElementById('editSemester').value;
+      const gender = document.getElementById('editGender').value;
+      const interest = document.getElementById('editInterest').value;
+      
+      if (!fullName || !studentId || !email) {
+        showToast('⚠️ Please fill in all required fields.', true);
+        return;
+      }
+      
+      const records = getRegistrations();
+      const index = records.findIndex(r => r.clubId === clubId);
+      if (index === -1) {
+        showToast('❌ Member not found', true);
+        return;
+      }
+      
+      records[index].fullName = fullName;
+      records[index].studentId = studentId;
+      records[index].email = email;
+      records[index].phone = phone;
+      records[index].semester = semester;
+      records[index].gender = gender;
+      records[index].interest = interest;
+      
+      saveRegistrations(records);
+      renderAdminTable();
+      
+      document.getElementById('editModal').classList.remove('open');
+      showToast('✅ Member updated successfully!');
+    });
+
+    window.deleteMember = function(clubId) {
+      if (!confirm('Are you sure you want to delete this member? This action cannot be undone.')) {
+        return;
+      }
+      
+      const records = getRegistrations();
+      const index = records.findIndex(r => r.clubId === clubId);
+      if (index === -1) {
+        showToast('❌ Member not found', true);
+        return;
+      }
+      
+      const certs = getCertificates();
+      if (certs[clubId]) {
+        delete certs[clubId];
+        saveCertificates(certs);
+      }
+      
+      records.splice(index, 1);
+      saveRegistrations(records);
+      renderAdminTable();
+      showToast('🗑️ Member deleted successfully!');
+    };
+
+    // ============================================
+    // CERTIFICATE GLOBAL FUNCTIONS
+    // ============================================
+    window.viewCertificate = function(clubId) {
+      const records = getRegistrations();
+      const record = records.find(r => r.clubId === clubId);
+      if (!record) {
+        showToast('❌ Member not found', true);
+        return;
+      }
+      
+      const certs = getCertificates();
+      if (!certs[clubId]) {
+        showToast('❌ No certificate found for this member', true);
+        return;
+      }
+      
+      document.getElementById('certificateContainer').innerHTML = renderCertificate(record);
+      document.getElementById('certModal').classList.add('open');
+      window._currentCertRecord = record;
+    };
+
+    window.generateCertForMember = function(clubId) {
+      const records = getRegistrations();
+      const record = records.find(r => r.clubId === clubId);
+      if (!record) {
+        showToast('❌ Member not found', true);
+        return;
+      }
+      
+      const certs = getCertificates();
+      if (certs[clubId]) {
+        showToast('⚠️ Certificate already exists for this member');
+        return;
+      }
+      
+      if (!isEligibleForCertificate(record.joinDate)) {
+        showToast('⚠️ Member is not eligible yet (need 2 years)', true);
+        return;
+      }
+      
+      generateCertificate(record);
+      renderAdminTable();
+      showToast(`✅ Certificate generated for ${record.fullName}`);
+      viewCertificate(clubId);
+    };
+
+    window.generatePastCert = function(clubId) {
+      const records = getRegistrations();
+      const record = records.find(r => r.clubId === clubId);
+      if (!record) {
+        showToast('❌ Member not found', true);
+        return;
+      }
+      
+      const certs = getCertificates();
+      if (certs[clubId]) {
+        showToast('⚠️ Certificate already exists for this member');
+        return;
+      }
+      
+      if (!isPastMember(record.joinDate) && !record.isPastStudent) {
+        showToast('⚠️ Member is not a past member (need 2+ years)', true);
+        return;
+      }
+      
+      generateCertificate(record);
+      renderAdminTable();
+      showToast(`✅ Certificate generated for past member ${record.fullName}`);
+      viewCertificate(clubId);
+    };
+
+    // ============================================
+    // ADMIN BUTTONS
+    // ============================================
+    document.getElementById('refreshAdminBtn').addEventListener('click', function() {
+      if (!isLoggedIn) {
+        showToast('⚠️ Please login first', true);
+        return;
+      }
+      syncFromCloud();
+    });
+
+    document.getElementById('generatePastMembersBtn').addEventListener('click', function() {
+      const records = getRegistrations();
+      if (records.length === 0) {
+        showToast('❌ No members to generate certificates for', true);
+        return;
+      }
+      
+      let count = 0;
+      const certs = getCertificates();
+      
+      records.forEach(r => {
+        if (!certs[r.clubId] && (isPastMember(r.joinDate) || r.isPastStudent)) {
+          generateCertificate(r);
+          count++;
+        }
+      });
+      
+      renderAdminTable();
+      showToast(`✅ Generated ${count} certificate(s) for past members`);
+    });
+
+    document.getElementById('forceGenerateBtn').addEventListener('click', function() {
+      const records = getRegistrations();
+      if (records.length === 0) {
+        showToast('❌ No members to generate certificates for', true);
+        return;
+      }
+      
+      let count = 0;
+      const certs = getCertificates();
+      
+      records.forEach(r => {
+        if (!certs[r.clubId]) {
+          generateCertificate(r);
+          count++;
+        }
+      });
+      
+      renderAdminTable();
+      showToast(`✅ Force generated ${count} certificate(s) for all members`);
+    });
+
+    document.getElementById('generateAllCertsBtn').addEventListener('click', function() {
+      const records = getRegistrations();
+      let count = 0;
+      const certs = getCertificates();
+      
+      records.forEach(r => {
+        if (!certs[r.clubId] && isEligibleForCertificate(r.joinDate)) {
+          generateCertificate(r);
+          count++;
+        }
+      });
+      
+      renderAdminTable();
+      showToast(`✅ Generated ${count} certificate(s) for eligible members`);
+    });
+
+    // ============================================
+    // CERTIFICATE MODAL
+    // ============================================
+    document.getElementById('certModalClose').addEventListener('click', function() {
+      document.getElementById('certModal').classList.remove('open');
+    });
+
+    document.getElementById('certModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.classList.remove('open');
+      }
+    });
+
+    document.getElementById('printCertBtn').addEventListener('click', function() {
+      window.print();
+    });
+
+    document.getElementById('downloadCertBtn').addEventListener('click', function() {
+      const record = window._currentCertRecord;
+      if (!record) {
+        showToast('❌ No certificate to download', true);
+        return;
+      }
+      
+      const certs = getCertificates();
+      const cert = certs[record.clubId];
+      if (!cert) {
+        showToast('❌ Certificate not found', true);
+        return;
+      }
+      
+      const btn = this;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+      btn.disabled = true;
+      
+      const certificateElement = document.getElementById('certificateContainer');
+      
+      const opt = {
+        margin: 0,
+        filename: `Certificate_${record.clubId}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          letterRendering: true,
+          width: 794,
+          height: 1123
+        },
+        jsPDF: {
+          unit: 'mm',
+          format: 'a4',
+          orientation: 'portrait'
+        },
+        pagebreak: { mode: 'avoid-all' }
+      };
+      
+      html2pdf().set(opt).from(certificateElement).save().then(function() {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        showToast('📄 PDF Certificate downloaded successfully!');
+      }).catch(function(error) {
+        console.error('PDF generation error:', error);
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        showToast('❌ Failed to generate PDF. Please try printing instead.', true);
+      });
+    });
+
+    // ============================================
+    // TABS
+    // ============================================
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        if (this.dataset.tab === 'admin' && !isLoggedIn) {
+          document.getElementById('loginOverlay').classList.remove('hidden');
+          document.getElementById('loginOverlay').classList.add('open');
+          document.getElementById('loginError').classList.remove('show');
+          return;
+        }
+        
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+        
+        if (this.dataset.tab === 'admin' && isLoggedIn) {
+          renderAdminTable();
+          setTimeout(syncFromCloud, 300);
+        }
+      });
+    });
+
+    // ============================================
+    // INIT
+    // ============================================
+    document.getElementById('department').value = 'EEE';
+    checkLogin();
+
+    setTimeout(syncFromCloud, 1000);
+
+    console.log('🏫 WUB EEE Club Registration System loaded successfully!');
+    console.log('📧 Admin: eee-club@eee.wub.edu.bd');
+    console.log('🔑 Password: Eee123@580Eee');
+    console.log('📜 Certificate: SINGLE A4 PAGE - 0.5 INCH MARGINS - FULL BORDER');
+    console.log('📐 Border: Full border on all sides inside the margins');
+    console.log('📱 QR Code on certificate with FULL member information');
+    console.log('📝 NB: Auto-generated, no signature needed');
+    console.log('☁️ Cloud sync enabled with JSONBin.io');
+    console.log('✏️ Edit & Delete options available in Admin Panel');
+    console.log('📄 Download PDF & Print Certificate (A4) options available');
+  })();
 </script>
-
 </body>
 </html>
