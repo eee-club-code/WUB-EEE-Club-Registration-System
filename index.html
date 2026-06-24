@@ -67,12 +67,11 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.7);
       display: none;
       justify-content: center;
       align-items: center;
       z-index: 10000;
-      backdrop-filter: blur(8px);
     }
     .login-overlay.open { display: flex; }
     .login-overlay.hidden { display: none; }
@@ -138,6 +137,7 @@
       border-bottom: 2px solid #e6edf8;
       padding-bottom: 0.5rem;
       flex-wrap: wrap;
+      min-height: 44px;
     }
     .tab-btn {
       padding: 0.6rem 1.5rem;
@@ -152,6 +152,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      white-space: nowrap;
     }
     .tab-btn:hover { background: #e8f0fe; color: #0b3b7a; }
     .tab-btn.active {
@@ -340,9 +341,11 @@
       align-items: center;
       gap: 0.5rem;
       flex-wrap: wrap;
+      min-width: 0;
     }
     .trxid-input input {
-      width: 180px;
+      width: 100%;
+      max-width: 180px;
       padding: 0.5rem 0.8rem;
       border-radius: 30px;
       font-size: 0.9rem;
@@ -421,8 +424,9 @@
       font-weight: 700;
       padding: 0.4rem 1.4rem;
       border-radius: 60px;
-      font-size: 1.1rem;
-      letter-spacing: 0.3px;
+      font-size: clamp(0.8rem, 2.5vw, 1.1rem);
+      word-break: break-all;
+      text-align: center;
     }
     .success-box .message { font-weight: 500; color: #0f422b; }
     .slip-actions {
@@ -444,6 +448,7 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      white-space: nowrap;
     }
     .slip-actions button:hover { background: #1b754b; color: white; }
 
@@ -527,6 +532,7 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      white-space: nowrap;
     }
     .admin-actions .btn-primary {
       background: #0b3b7a;
@@ -560,6 +566,7 @@
     }
     table {
       width: 100%;
+      min-width: 780px;
       border-collapse: collapse;
       font-size: 0.85rem;
       background: #fafdff;
@@ -629,6 +636,7 @@
       font-size: 0.75rem;
       cursor: pointer;
       transition: 0.2s;
+      white-space: nowrap;
     }
     .cert-btn.generate {
       background: #1b754b;
@@ -655,6 +663,7 @@
       cursor: pointer;
       transition: 0.2s;
       margin: 0.1rem 0.15rem;
+      white-space: nowrap;
     }
     .action-btn.edit {
       background: #f5a623;
@@ -700,7 +709,6 @@
       justify-content: center;
       align-items: center;
       z-index: 9998;
-      backdrop-filter: blur(4px);
     }
     .cert-modal.open { display: flex; }
     .cert-modal-content {
@@ -711,6 +719,7 @@
       width: 95%;
       max-height: 90vh;
       overflow-y: auto;
+      overflow-x: hidden;
       position: relative;
     }
     .cert-modal-close {
@@ -741,12 +750,15 @@
       margin-bottom: 1rem;
       background: #e8f0fe;
       color: #0b3b7a;
+      flex-wrap: wrap;
+      word-break: break-word;
     }
     .sync-status .sync-dot {
       width: 10px;
       height: 10px;
       border-radius: 50%;
       display: inline-block;
+      flex-shrink: 0;
     }
     .sync-status .sync-dot.online {
       background: #1b754b;
@@ -774,7 +786,6 @@
       justify-content: center;
       align-items: center;
       z-index: 9999;
-      backdrop-filter: blur(4px);
     }
     .edit-modal.open { display: flex; }
     .edit-modal-content {
@@ -848,24 +859,46 @@
       padding: 0;
       margin: 0;
       background: white;
-      width: 210mm;
-      height: 297mm;
+      width: 100%;
+      min-height: auto;
       overflow: hidden;
     }
     
+    @media print {
+      .certificate-wrapper {
+        width: 210mm;
+        height: 297mm;
+      }
+    }
+    
     .certificate {
-      width: 210mm;
-      height: 297mm;
+      width: 100%;
+      height: auto;
+      min-height: 297mm;
       background: linear-gradient(135deg, #f8faff 0%, #e8f0fe 100%);
       border: 6px double #0b3b7a;
       padding: 0;
       text-align: center;
       position: relative;
       border-radius: 0;
-      box-shadow: none;
-      margin: 0;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      margin: 10px auto;
       display: flex;
       flex-direction: column;
+    }
+    
+    @media print {
+      .certificate {
+        width: 100%;
+        height: 100vh;
+        min-height: 100vh;
+        border: 6px double #0b3b7a;
+        padding: 0;
+        box-shadow: none;
+        border-radius: 0;
+        margin: 0;
+        background: linear-gradient(135deg, #f8faff 0%, #e8f0fe 100%);
+      }
     }
     
     /* FULL BORDER - Inside the 0.5in margin */
@@ -880,6 +913,14 @@
       justify-content: space-between;
       height: 100%;
       margin: 0.05in;
+      flex-grow: 1;
+    }
+    
+    @media print {
+      .certificate .cert-border {
+        padding: 0.3in 0.25in;
+        margin: 0.05in;
+      }
     }
     
     .certificate .cert-seal {
@@ -974,12 +1015,25 @@
       position: relative;
     }
     
+    @media print {
+      .certificate .cert-body {
+        padding: 0.02in 0.015in;
+        font-size: 0.6rem;
+      }
+    }
+    
     .certificate .cert-body .cert-name {
       font-family: 'Playfair Display', serif;
       font-size: 1rem;
       color: #0b2b5c;
       text-align: center;
       margin: 0.02rem 0;
+    }
+    
+    @media print {
+      .certificate .cert-body .cert-name {
+        font-size: 0.85rem;
+      }
     }
     
     .certificate .cert-body .cert-student-id {
@@ -1084,110 +1138,79 @@
     }
 
     /* ============================================
-       PRINT STYLES
+       RESPONSIVE FIXES
        ============================================ */
-    @media print {
-      body { 
-        background: white; 
-        padding: 0; 
-        margin: 0;
-        display: block;
-      }
-      .container { display: none; }
-      .cert-modal { 
-        position: static; 
-        background: white;
-        display: block !important;
-        backdrop-filter: none;
-        width: 100%;
-        height: 100vh;
-      }
-      .cert-modal-content { 
-        max-width: 100%; 
-        padding: 0; 
-        border-radius: 0; 
-        box-shadow: none;
-        background: white;
-        width: 100%;
-        height: 100vh;
-        overflow: hidden;
-      }
-      .cert-modal-close { display: none !important; }
-      #downloadCertBtn { display: none !important; }
-      #printCertBtn { display: none !important; }
-      
-      .certificate-wrapper { 
-        padding: 0; 
-        margin: 0;
-        background: white;
-        width: 100%;
-        height: 100vh;
-      }
-      
-      .certificate {
-        width: 100%;
-        height: 100vh;
-        border: 6px double #0b3b7a;
-        padding: 0;
-        box-shadow: none;
-        border-radius: 0;
-        margin: 0;
-        background: linear-gradient(135deg, #f8faff 0%, #e8f0fe 100%);
-      }
-      
-      .certificate .cert-border {
-        border: 2px solid #0b3b7a;
-        padding: 0.3in 0.25in;
-        height: 100%;
-        margin: 0.05in;
-      }
-      
-      .certificate .club-logo .logo-wub { font-size: 1.4rem; }
-      .certificate .club-logo .logo-eee { font-size: 1rem; }
-      .certificate .club-logo .logo-bolt { font-size: 1rem; }
-      .certificate .cert-title h1 { font-size: 0.95rem; }
-      .certificate .cert-body .cert-name { font-size: 0.85rem; }
-      .certificate .cert-body { font-size: 0.6rem; padding: 0.02in 0.015in; }
-      .certificate .cert-seal { font-size: 1.3rem; top: 4px; right: 6px; }
-      .certificate .cert-body .qr-container-cert #certQR { transform: scale(0.5); }
-      .no-print { display: none !important; }
-    }
-
     @media screen and (max-width: 800px) {
       .certificate-wrapper { 
-        width: 100%; 
-        height: auto; 
         padding: 0.5rem;
       }
       .certificate { 
-        width: 100%; 
-        height: auto; 
-        min-height: 297mm;
         padding: 0; 
         margin: 10px; 
         box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        min-height: auto;
       }
-      .certificate .cert-border { padding: 0.3rem; min-height: auto; margin: 0.03in; }
+      .certificate .cert-border { padding: 0.25in 0.2in; min-height: auto; margin: 0.03in; }
       .certificate .club-logo .logo-wub { font-size: 1.2rem; letter-spacing: 6px; }
       .certificate .club-logo .logo-eee { font-size: 0.9rem; letter-spacing: 4px; }
       .certificate .club-logo .logo-bolt { font-size: 0.9rem; }
       .certificate .cert-title h1 { font-size: 0.9rem; }
       .certificate .cert-body .cert-name { font-size: 0.8rem; }
-      .certificate .cert-body { font-size: 0.6rem; padding: 0.2rem; }
+      .certificate .cert-body { font-size: 0.6rem; padding: 0.15rem; }
       .certificate .cert-body .qr-footer { flex-direction: column; align-items: center; }
       .certificate .cert-body .signature-line { flex-direction: column; gap: 0.3rem; align-items: center; }
       .certificate .cert-footer { flex-direction: column; gap: 0.2rem; align-items: center; }
       .cert-modal-content { padding: 0.5rem; }
+      .certificate .cert-body .qr-container-cert #certQR { transform: scale(0.6); }
     }
 
     @media (max-width: 640px) {
+      .container { padding: 1rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .club-header h1 { font-size: 1.3rem; }
+      .club-header { flex-direction: column; align-items: flex-start; }
+      .skills-group { gap: 0.4rem 1rem; }
+      .success-box { flex-direction: column; align-items: flex-start; }
+      .slip-actions { width: 100%; justify-content: flex-start; }
+      .payment-section { flex-direction: column; align-items: stretch; }
+      .trxid-input input { max-width: 100%; }
+      .payment-actions { justify-content: flex-start; }
+      table { font-size: 0.6rem; min-width: 650px; }
+      th, td { padding: 0.15rem 0.1rem; }
+      .tabs .tab-btn { font-size: 0.75rem; padding: 0.3rem 0.6rem; }
+      .admin-actions button { font-size: 0.65rem; padding: 0.2rem 0.5rem; }
+      .qr-container { flex-direction: column; align-items: center; }
+      .qr-instructions { width: 100%; }
+      .certificate { padding: 0; margin: 5px; }
+      .certificate .cert-border { padding: 0.15in 0.1in; }
       .certificate .club-logo .logo-wub { font-size: 1rem; letter-spacing: 4px; }
       .certificate .club-logo .logo-eee { font-size: 0.75rem; letter-spacing: 3px; }
       .certificate .club-logo .logo-bolt { font-size: 0.75rem; }
       .certificate .cert-title h1 { font-size: 0.75rem; }
       .certificate .cert-body .cert-name { font-size: 0.65rem; }
-      .certificate .cert-body { font-size: 0.5rem; }
+      .certificate .cert-body { font-size: 0.5rem; padding: 0.1rem; }
       .certificate .cert-body .qr-container-cert #certQR { transform: scale(0.4); }
+      .past-student-fields.show {
+        grid-template-columns: 1fr;
+      }
+      .sync-status { font-size: 0.7rem; padding: 0.3rem 0.6rem; }
+      .admin-actions { gap: 0.4rem; }
+      .admin-actions button { font-size: 0.6rem; padding: 0.2rem 0.4rem; white-space: normal; }
+      .cert-modal-content { padding: 0.5rem; max-height: 95vh; }
+      .cert-modal-close { width: 28px; height: 28px; font-size: 0.9rem; }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 0.5rem; }
+      .club-header h1 { font-size: 1.1rem; }
+      .club-header i { font-size: 2rem; }
+      .tabs .tab-btn { font-size: 0.65rem; padding: 0.2rem 0.4rem; }
+      .payment-section { padding: 0.8rem; }
+      .payment-actions button { font-size: 0.7rem; padding: 0.3rem 0.6rem; }
+      .success-box { padding: 0.8rem; }
+      .success-box .id-badge { font-size: 0.7rem; padding: 0.2rem 0.6rem; }
+      table { font-size: 0.5rem; min-width: 500px; }
+      th, td { padding: 0.1rem 0.05rem; }
     }
 
     @keyframes slideUp {
