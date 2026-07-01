@@ -1,121 +1,313 @@
-\documentclass[a4paper,12pt]{article}
-\usepackage[utf8]{inputenc}
-\usepackage{geometry}
-\geometry{a4paper, margin=1.8cm, top=2.2cm, bottom=1.8cm}
-\usepackage{graphicx}
-\usepackage{xcolor}
-\usepackage{fontspec}   % optional, use with XeLaTeX
-\setmainfont{Georgia}   % fallback; use any serif font
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate · A4 · EEE Club</title>
+    <style>
+        /* Reset & base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-% Custom colors
-\definecolor{gold}{RGB}{201,168,76}
-\definecolor{navy}{RGB}{26,42,74}
+        body {
+            background: #e6e9ef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Times New Roman', Times, serif;
+            padding: 20px;
+        }
 
-\begin{document}
+        /* A4 canvas – exactly one page */
+        .certificate {
+            width: 210mm;
+            min-height: 297mm;
+            max-height: 297mm;          /* enforce single page */
+            background: #ffffff;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            padding: 18mm 14mm 14mm 14mm;  /* generous margins */
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #d0d4dc;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;           /* cut anything beyond A4 */
+            page-break-after: avoid;    /* for print */
+            break-inside: avoid;
+        }
 
-\pagestyle{empty}
-\noindent
-\begin{center}
+        /* decorative border (optional but elegant) */
+        .certificate::before {
+            content: '';
+            position: absolute;
+            top: 8mm;
+            left: 8mm;
+            right: 8mm;
+            bottom: 8mm;
+            border: 1.5px solid #b8a88a;
+            border-radius: 2px;
+            pointer-events: none;
+            opacity: 0.3;
+        }
 
-% --- Decorative border (using minipage) ---
-\fboxsep=12pt
-\fboxrule=1.5pt
-\colorbox{white}{%
-\begin{minipage}[t][24.5cm][t]{16.5cm}
-\centering
+        /* main content flex */
+        .cert-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
 
-\vspace{0.3cm}
+        /* header / seal area */
+        .top-symbol {
+            text-align: center;
+            margin-bottom: 6mm;
+            letter-spacing: 2px;
+        }
 
-% --- Seal (circle) ---
-\begin{minipage}{1.8cm}
-\centering
-\fboxrule=2pt
-\fcolorbox{gold}{gold}{%
-\begin{minipage}{1.4cm}
-\centering \vspace{0.2cm}
-{\color{white}\bfseries\scriptsize WUB\\[0.1cm]EEE}
-\vspace{0.2cm}
-\end{minipage}}
-\end{minipage}
+        .top-symbol .univ {
+            font-size: 14pt;
+            font-weight: 600;
+            color: #2c3e4e;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
 
-\vspace{0.2cm}
+        .top-symbol .club {
+            font-size: 12pt;
+            font-weight: 500;
+            color: #3e5a6b;
+            margin-top: 2px;
+            letter-spacing: 1.5px;
+        }
 
-% --- University ---
-{\large \bfseries \textcolor{navy}{WORLD UNIVERSITY OF BANGLADESH}}\\[0.1cm]
-{\large \bfseries \textcolor{navy}{EEE CLUB}}
+        .cert-title {
+            text-align: center;
+            font-size: 28pt;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #1e2c3a;
+            border-bottom: 2px solid #c9b99a;
+            padding-bottom: 5mm;
+            margin-bottom: 7mm;
+            text-transform: uppercase;
+            font-family: 'Times New Roman', Times, serif;
+        }
 
-\vspace{0.4cm}
+        .cert-body {
+            font-size: 14.5pt;
+            line-height: 1.6;
+            color: #1f2a36;
+            text-align: justify;
+            padding: 0 2mm;
+        }
 
-% --- Title ---
-\fcolorbox{gold}{white}{%
-\begin{minipage}{10cm}
-\centering
-{\Large \bfseries \textcolor{navy}{CERTIFICATE OF PARTICIPATION}}
-\end{minipage}}
+        .cert-body strong {
+            color: #0b1c2b;
+        }
 
-\vspace{0.6cm}
+        .name-line {
+            font-size: 26pt;
+            font-weight: 700;
+            text-align: center;
+            margin: 3mm 0 1mm 0;
+            letter-spacing: 1.5px;
+            color: #1e3b4f;
+            font-family: 'Times New Roman', Times, serif;
+        }
 
-% --- Body ---
-{\large This is to certify that}
+        .id-line {
+            text-align: center;
+            font-size: 14pt;
+            font-weight: 500;
+            color: #2f455b;
+            margin-bottom: 5mm;
+            letter-spacing: 1px;
+        }
 
-\vspace{0.2cm}
+        .description {
+            margin: 4mm 0 3mm 0;
+            text-indent: 0;
+        }
 
-{\Huge \bfseries \textcolor{navy}{Kazi-Su-Aman Warsi}}\\[0.1cm]
-{\large \bfseries Student ID: WUB09/20/74/4701}
+        .description span {
+            display: inline-block;
+        }
 
-\vspace{0.4cm}
+        .activities {
+            margin: 3mm 0 4mm 0;
+            font-style: italic;
+            color: #1f3a4b;
+            background: #f8f6f0;
+            padding: 4mm 6mm;
+            border-radius: 4px;
+            border-left: 4px solid #b8a88a;
+            font-size: 14pt;
+        }
 
-has been an active member/participant of the EEE Club of \\
-World University of Bangladesh.
+        .appreciation {
+            margin: 4mm 0 5mm 0;
+            font-weight: 500;
+            color: #1e2e3c;
+        }
 
-\vspace{0.3cm}
+        .signature-area {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8mm;
+            padding-top: 4mm;
+            border-top: 1px dashed #c0b6a2;
+            font-size: 13pt;
+        }
 
-During the period \textbf{January 1, 2021} to \textbf{December 31, 2023}, \\
-he/she has actively participated in various academic, technical, \\
-and extracurricular activities including workshops, seminars, \\
-and competitions.
+        .signature-area div {
+            display: flex;
+            flex-direction: column;
+        }
 
-\vspace{0.3cm}
+        .signature-area .label {
+            font-weight: 400;
+            color: #3f4d5c;
+            margin-bottom: 3px;
+            font-size: 12pt;
+        }
 
-\itshape
-We appreciate his/her dedication, enthusiasm, and contribution \\
-to the development of technical knowledge and teamwork within \\
-the club.
+        .signature-area .line {
+            width: 50mm;
+            border-bottom: 1px solid #2f3e4b;
+            margin: 6px 0 4px 0;
+        }
 
-\vspace{0.8cm}
+        .signature-area .sub {
+            font-size: 11pt;
+            color: #3f5565;
+        }
 
-% --- Signatures ---
-\begin{minipage}{6cm}
-\centering
-\rule{5cm}{0.4pt}\\[0.1cm]
-{\bfseries Signature (President)}\\
-{\footnotesize EEE Club, WUB}
-\end{minipage}
-\hfill
-\begin{minipage}{6cm}
-\centering
-\rule{5cm}{0.4pt}\\[0.1cm]
-{\bfseries Signature (Advisor)}\\
-{\footnotesize EEE Club, WUB}
-\end{minipage}
+        /* ensure everything fits in one A4 page */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+                display: block;
+            }
+            .certificate {
+                box-shadow: none;
+                border: none;
+                border-radius: 0;
+                width: 100%;
+                min-height: 100vh;
+                max-height: 100vh;
+                padding: 18mm 14mm 14mm 14mm;
+                margin: 0 auto;
+                page-break-after: avoid;
+                break-inside: avoid;
+                overflow: hidden;
+            }
+            .certificate::before {
+                display: none; /* clean print */
+            }
+        }
 
-\vspace{0.6cm}
+        /* fallback for screen preview */
+        @media screen and (max-width: 800px) {
+            .certificate {
+                width: 100%;
+                min-height: auto;
+                max-height: none;
+                padding: 20px 18px;
+            }
+            .cert-title {
+                font-size: 22pt;
+            }
+            .name-line {
+                font-size: 20pt;
+            }
+            .signature-area .line {
+                width: 30mm;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- A4 single-page certificate -->
+    <div class="certificate">
+        <div class="cert-content">
+            <!-- header / university & club -->
+            <div class="top-symbol">
+                <div class="univ">World University of Bangladesh</div>
+                <div class="club">⚡ EEE Club ⚡</div>
+            </div>
 
-% --- Footer ---
-\begin{minipage}{7cm}
-\raggedright
-{\small \bfseries Certificate No: WUB-EEE-2026-0004}
-\end{minipage}
-\hfill
-\begin{minipage}{7cm}
-\raggedleft
-{\small \bfseries Date: \underline{\hspace{3cm}}}
-\end{minipage}
+            <!-- title -->
+            <div class="cert-title">Certificate of Participation</div>
 
-\vspace{0.2cm}
+            <!-- body -->
+            <div class="cert-body">
+                <p style="text-align:center; font-size:15pt; margin-bottom:2mm;">
+                    This is to certify that
+                </p>
 
-\end{minipage}%
-} % end colorbox
+                <!-- name -->
+                <div class="name-line">Kazi-Su-Aman Warsi</div>
 
-\end{center}
-\end{document}
+                <!-- student ID -->
+                <div class="id-line">Student ID: WUB09/20/74/4701</div>
+
+                <!-- main description -->
+                <div class="description">
+                    has been an active member/participant of the <strong>EEE Club</strong> 
+                    of <strong>World University of Bangladesh</strong>.
+                </div>
+
+                <div style="margin: 2mm 0 2mm 0; font-size:14.5pt;">
+                    during the period <strong>January 1, 2021 to December 31, 2023</strong>, 
+                    he/she has actively participated in various academic, technical, 
+                    and extracurricular activities including workshops, seminars, and competitions.
+                </div>
+
+                <!-- highlight activities -->
+                <div class="activities">
+                    ✦ workshops &nbsp;·&nbsp; seminars &nbsp;·&nbsp; technical competitions ✦
+                </div>
+
+                <!-- appreciation -->
+                <div class="appreciation">
+                    We appreciate his/her dedication, enthusiasm, and contribution to the 
+                    development of technical knowledge and teamwork within the club.
+                </div>
+
+                <!-- signature & date (clean layout) -->
+                <div class="signature-area">
+                    <div>
+                        <span class="label">Date</span>
+                        <div class="line" style="width:45mm;"></div>
+                        <span class="sub">(dd/mm/yyyy)</span>
+                    </div>
+                    <div>
+                        <span class="label">Signature</span>
+                        <div class="line" style="width:45mm;"></div>
+                        <span class="sub">Club Representative</span>
+                    </div>
+                    <div>
+                        <span class="label">Seal</span>
+                        <div style="width:30mm; height:18mm; border:1.5px solid #8a7a64; border-radius:50%; margin-top:4px; display:flex; align-items:center; justify-content:center; color:#6b5d4a; font-size:10pt; background:#fcfaf5;">
+                            ⚡ EEE
+                        </div>
+                    </div>
+                </div>
+
+                <!-- small footer / club info (optional, but stays inside) -->
+                <div style="margin-top: 6mm; text-align: center; font-size: 10.5pt; color: #6d7b89; border-top: 1px solid #e3dfd6; padding-top: 3mm; letter-spacing: 0.5px;">
+                    World University of Bangladesh · EEE Club · Official Certificate
+                </div>
+            </div> <!-- end cert-body -->
+        </div> <!-- end cert-content -->
+        <!-- no extra page, no stray "1" -->
+    </div> <!-- end certificate -->
+</body>
+</html>
