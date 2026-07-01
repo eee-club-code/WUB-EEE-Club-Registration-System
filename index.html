@@ -2633,7 +2633,7 @@
             });
 
             // ============================================
-            // CERTIFICATE MODAL - FIXED PDF GENERATION
+            // CERTIFICATE MODAL - FIXED PDF DOWNLOAD & PRINT
             // ============================================
             document.getElementById('certModalClose').addEventListener('click', function() {
                 document.getElementById('certModal').classList.remove('open');
@@ -2645,10 +2645,249 @@
                 }
             });
 
+            // PRINT FUNCTION - FIXED
             document.getElementById('printCertBtn').addEventListener('click', function() {
-                window.print();
+                // Get the certificate HTML
+                const certHTML = document.getElementById('certificateContainer').innerHTML;
+                
+                // Create a new window for printing
+                const printWindow = window.open('', '_blank', 'width=794,height=1123');
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>WUB EEE Club Certificate</title>
+                        <link rel="preconnect" href="https://fonts.googleapis.com" />
+                        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+                        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+                        <style>
+                            * { margin: 0; padding: 0; box-sizing: border-box; }
+                            body { 
+                                background: white; 
+                                display: flex; 
+                                justify-content: center; 
+                                align-items: center; 
+                                min-height: 100vh;
+                                margin: 0;
+                                padding: 0;
+                            }
+                            @page {
+                                size: A4 portrait;
+                                margin: 0;
+                            }
+                            .certificate-wrapper {
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                padding: 0;
+                                margin: 0;
+                                background: white;
+                                width: 100%;
+                                overflow: hidden;
+                            }
+                            .certificate {
+                                width: 210mm;
+                                height: 297mm;
+                                background: white;
+                                margin: 0 auto;
+                                padding: 20mm;
+                                box-sizing: border-box;
+                                position: relative;
+                                box-shadow: 0 0 20px rgba(0,0,0,0.15);
+                                display: flex;
+                                flex-direction: column;
+                                justify-content: space-between;
+                                page-break-after: avoid;
+                                page-break-before: avoid;
+                                page-break-inside: avoid;
+                                overflow: hidden;
+                            }
+                            @media print {
+                                .certificate {
+                                    box-shadow: none;
+                                    width: 100%;
+                                    height: 100vh;
+                                    padding: 20mm;
+                                    margin: 0;
+                                    page-break-after: avoid;
+                                    page-break-before: avoid;
+                                    page-break-inside: avoid;
+                                    overflow: hidden;
+                                }
+                                body { background: white; padding: 0; margin: 0; overflow: hidden; }
+                            }
+                            .certificate .border {
+                                position: absolute;
+                                top: 10mm;
+                                left: 10mm;
+                                right: 10mm;
+                                bottom: 10mm;
+                                border: 2px solid #000;
+                                pointer-events: none;
+                            }
+                            .certificate .header {
+                                text-align: center;
+                                margin-top: 0;
+                                position: relative;
+                                z-index: 1;
+                            }
+                            .certificate .title {
+                                font-family: 'Playfair Display', serif;
+                                font-size: 28px;
+                                font-weight: 700;
+                                letter-spacing: 3px;
+                                color: #0B3B7A;
+                            }
+                            .certificate .subtitle {
+                                font-family: 'Inter', sans-serif;
+                                font-size: 14px;
+                                margin-top: 4px;
+                                letter-spacing: 2px;
+                                color: #0B3B7A;
+                                border-top: 1px solid #D4AF37;
+                                border-bottom: 1px solid #D4AF37;
+                                display: inline-block;
+                                padding: 2px 20px;
+                            }
+                            .certificate .content {
+                                margin-top: 15px;
+                                text-align: center;
+                                flex: 1;
+                                display: flex;
+                                flex-direction: column;
+                                justify-content: center;
+                                position: relative;
+                                z-index: 1;
+                            }
+                            .certificate .content .label {
+                                font-family: 'Inter', sans-serif;
+                                font-size: 14px;
+                                color: #1e3f5e;
+                            }
+                            .certificate .content .name {
+                                font-family: 'Playfair Display', serif;
+                                font-size: 26px;
+                                font-weight: 700;
+                                color: #0B3B7A;
+                                margin: 8px 0;
+                                border-bottom: 2px dashed #D4AF37;
+                                display: inline-block;
+                                padding: 0 20px 4px 20px;
+                            }
+                            .certificate .content .student-id {
+                                font-family: 'Inter', sans-serif;
+                                font-size: 15px;
+                                font-weight: 500;
+                                color: #1e3f5e;
+                                margin-bottom: 10px;
+                            }
+                            .certificate .content .text {
+                                font-family: 'Inter', sans-serif;
+                                font-size: 14px;
+                                line-height: 1.8;
+                                color: #1a2d44;
+                                max-width: 80%;
+                                margin: 0 auto;
+                                text-align: justify;
+                            }
+                            .certificate .content .text strong {
+                                color: #0B3B7A;
+                                font-weight: 600;
+                            }
+                            .certificate .footer {
+                                position: relative;
+                                bottom: 0;
+                                left: 0;
+                                right: 0;
+                                display: flex;
+                                justify-content: space-between;
+                                text-align: center;
+                                padding-top: 10px;
+                                border-top: 1px solid rgba(0,0,0,0.08);
+                                z-index: 1;
+                            }
+                            .certificate .sign {
+                                width: 40%;
+                                border-top: 1.5px solid #0B3B7A;
+                                padding-top: 6px;
+                                font-size: 13px;
+                                font-family: 'Inter', sans-serif;
+                                color: #0B3B7A;
+                                font-weight: 600;
+                            }
+                            .certificate .sign .sub {
+                                font-weight: 400;
+                                font-size: 11px;
+                                color: #3f5a78;
+                            }
+                            .certificate .watermark {
+                                position: absolute;
+                                top: 50%;
+                                left: 50%;
+                                transform: translate(-50%, -50%) rotate(-6deg);
+                                opacity: 0.03;
+                                pointer-events: none;
+                                font-family: 'Playfair Display', serif;
+                                font-size: 120px;
+                                font-weight: 700;
+                                color: #0B3B7A;
+                                letter-spacing: 10px;
+                                white-space: nowrap;
+                                z-index: 0;
+                            }
+                            .certificate .watermark span {
+                                border: 2px solid rgba(11,59,122,0.1);
+                                padding: 0.1em 0.3em;
+                                border-radius: 50px;
+                                background: rgba(255,255,255,0.1);
+                            }
+                            .certificate .seal {
+                                position: absolute;
+                                top: 18mm;
+                                right: 18mm;
+                                width: 48px;
+                                height: 48px;
+                                border-radius: 50%;
+                                border: 2px solid #D4AF37;
+                                background: rgba(212,175,55,0.05);
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-family: 'Playfair Display', serif;
+                                font-weight: 700;
+                                font-size: 11px;
+                                color: #0B3B7A;
+                                text-align: center;
+                                line-height: 1.2;
+                                box-shadow: 0 0 0 1px #0B3B7A;
+                                z-index: 5;
+                                padding: 2px;
+                            }
+                            .certificate .seal span {
+                                display: block;
+                                transform: scale(0.9);
+                            }
+                            @media print {
+                                .certificate .seal { box-shadow: 0 0 0 1px #0B3B7A; }
+                                .certificate .watermark { opacity: 0.03; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ${certHTML}
+                        <script>
+                            window.onload = function() {
+                                window.print();
+                                window.close();
+                            };
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
             });
 
+            // DOWNLOAD PDF - FIXED
             document.getElementById('downloadCertBtn').addEventListener('click', function() {
                 const record = window._currentCertRecord;
                 if (!record) {
@@ -2668,10 +2907,27 @@
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
                 btn.disabled = true;
 
-                // Get the certificate element
-                const certificateElement = document.getElementById('certificateContainer');
+                // Get the certificate HTML
+                const certHTML = document.getElementById('certificateContainer').innerHTML;
+                
+                // Create a temporary container with ONLY the certificate
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = certHTML;
+                tempDiv.style.position = 'fixed';
+                tempDiv.style.top = '-9999px';
+                tempDiv.style.left = '-9999px';
+                tempDiv.style.width = '210mm';
+                tempDiv.style.height = '297mm';
+                tempDiv.style.background = 'white';
+                tempDiv.style.padding = '0';
+                tempDiv.style.margin = '0';
+                tempDiv.style.overflow = 'hidden';
+                document.body.appendChild(tempDiv);
 
-                // CRITICAL FIX: Use specific settings to force single page
+                // Get the certificate element from the temp div
+                const certElement = tempDiv.querySelector('.certificate-wrapper');
+                
+                // Generate PDF using html2pdf
                 const opt = {
                     margin: 0,
                     filename: `Certificate_${record.clubId}.pdf`,
@@ -2680,8 +2936,8 @@
                         scale: 2,
                         useCORS: true,
                         letterRendering: true,
-                        width: 794, // A4 width in pixels at 96dpi
-                        height: 1123, // A4 height in pixels at 96dpi
+                        width: 794,
+                        height: 1123,
                         scrollY: 0,
                         windowHeight: 1123
                     },
@@ -2690,37 +2946,19 @@
                         format: 'a4',
                         orientation: 'portrait'
                     },
-                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                    pagebreak: { mode: 'avoid-all' }
                 };
 
-                // Use a temporary container for PDF generation to avoid any extra elements
-                const tempContainer = document.createElement('div');
-                tempContainer.style.width = '210mm';
-                tempContainer.style.height = '297mm';
-                tempContainer.style.margin = '0';
-                tempContainer.style.padding = '0';
-                tempContainer.style.overflow = 'hidden';
-                tempContainer.style.position = 'fixed';
-                tempContainer.style.top = '-9999px';
-                tempContainer.style.left = '-9999px';
-                tempContainer.style.backgroundColor = 'white';
-                document.body.appendChild(tempContainer);
-
-                // Clone the certificate content
-                const certClone = certificateElement.cloneNode(true);
-                tempContainer.appendChild(certClone);
-
-                // Generate PDF from temp container
-                html2pdf().set(opt).from(tempContainer).save().then(function() {
+                html2pdf().set(opt).from(certElement).save().then(function() {
                     btn.innerHTML = originalText;
                     btn.disabled = false;
-                    document.body.removeChild(tempContainer);
+                    document.body.removeChild(tempDiv);
                     showToast('📄 PDF Certificate downloaded successfully!');
                 }).catch(function(error) {
                     console.error('PDF generation error:', error);
                     btn.innerHTML = originalText;
                     btn.disabled = false;
-                    document.body.removeChild(tempContainer);
+                    document.body.removeChild(tempDiv);
                     showToast('❌ Failed to generate PDF. Please try printing instead.', true);
                 });
             });
