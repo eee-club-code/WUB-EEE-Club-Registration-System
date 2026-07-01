@@ -2633,7 +2633,7 @@
             });
 
             // ============================================
-            // CERTIFICATE MODAL
+            // CERTIFICATE MODAL - FIXED PDF GENERATION
             // ============================================
             document.getElementById('certModalClose').addEventListener('click', function() {
                 document.getElementById('certModal').classList.remove('open');
@@ -2668,8 +2668,10 @@
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
                 btn.disabled = true;
 
+                // Get the certificate element
                 const certificateElement = document.getElementById('certificateContainer');
 
+                // CRITICAL FIX: Use specific settings to force single page
                 const opt = {
                     margin: 0,
                     filename: `Certificate_${record.clubId}.pdf`,
@@ -2678,25 +2680,47 @@
                         scale: 2,
                         useCORS: true,
                         letterRendering: true,
-                        width: 794,
-                        height: 1123
+                        width: 794, // A4 width in pixels at 96dpi
+                        height: 1123, // A4 height in pixels at 96dpi
+                        scrollY: 0,
+                        windowHeight: 1123
                     },
                     jsPDF: {
                         unit: 'mm',
                         format: 'a4',
                         orientation: 'portrait'
                     },
-                    pagebreak: { mode: 'avoid-all' }
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
                 };
 
-                html2pdf().set(opt).from(certificateElement).save().then(function() {
+                // Use a temporary container for PDF generation to avoid any extra elements
+                const tempContainer = document.createElement('div');
+                tempContainer.style.width = '210mm';
+                tempContainer.style.height = '297mm';
+                tempContainer.style.margin = '0';
+                tempContainer.style.padding = '0';
+                tempContainer.style.overflow = 'hidden';
+                tempContainer.style.position = 'fixed';
+                tempContainer.style.top = '-9999px';
+                tempContainer.style.left = '-9999px';
+                tempContainer.style.backgroundColor = 'white';
+                document.body.appendChild(tempContainer);
+
+                // Clone the certificate content
+                const certClone = certificateElement.cloneNode(true);
+                tempContainer.appendChild(certClone);
+
+                // Generate PDF from temp container
+                html2pdf().set(opt).from(tempContainer).save().then(function() {
                     btn.innerHTML = originalText;
                     btn.disabled = false;
+                    document.body.removeChild(tempContainer);
                     showToast('📄 PDF Certificate downloaded successfully!');
                 }).catch(function(error) {
                     console.error('PDF generation error:', error);
                     btn.innerHTML = originalText;
                     btn.disabled = false;
+                    document.body.removeChild(tempContainer);
                     showToast('❌ Failed to generate PDF. Please try printing instead.', true);
                 });
             });
