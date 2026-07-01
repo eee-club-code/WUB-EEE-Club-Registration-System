@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WUB EEE Club · Registration & Certificate</title>
+    <title>WUB EEE Club · Registration & Certificate System</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
@@ -971,7 +971,7 @@
         }
 
         /* ============================================
-           A4 CERTIFICATE - YOUR EXACT DESIGN
+           A4 CERTIFICATE - SINGLE PAGE
            ============================================ */
         @page {
             size: A4 portrait;
@@ -1010,6 +1010,8 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            page-break-after: avoid;
+            page-break-inside: avoid;
         }
 
         @media print {
@@ -1019,6 +1021,8 @@
                 height: 100vh;
                 padding: 20mm;
                 margin: 0;
+                page-break-after: avoid;
+                page-break-inside: avoid;
             }
         }
 
@@ -2180,162 +2184,6 @@
                 });
             }
 
-            // Generate QR for Certificate
-            function generateCertQR(record) {
-                const qrContainer = document.getElementById('certQR');
-                if (!qrContainer) return;
-                qrContainer.innerHTML = '';
-
-                const certs = getCertificates();
-                const cert = certs[record.clubId] || {};
-
-                const qrData = JSON.stringify({
-                    name: record.fullName,
-                    studentId: record.studentId,
-                    clubId: record.clubId,
-                    certificateNo: cert.certNumber || 'N/A',
-                    issuedDate: new Date().toLocaleDateString(),
-                    department: 'EEE',
-                    email: record.email,
-                    phone: record.phone || 'N/A',
-                    semester: record.semester || 'N/A',
-                    joinDate: new Date(record.joinDate).toLocaleDateString(),
-                    isPastStudent: record.isPastStudent || false,
-                    startYear: record.startYear || null,
-                    endYear: record.endYear || null,
-                    periodStart: cert.periodStart ? new Date(cert.periodStart).toLocaleDateString() : 'N/A',
-                    periodEnd: cert.periodEnd ? new Date(cert.periodEnd).toLocaleDateString() : 'N/A'
-                });
-
-                new QRCode(qrContainer, {
-                    text: qrData,
-                    width: 55,
-                    height: 55,
-                    colorDark: '#0b3b7a',
-                    colorLight: '#ffffff',
-                    correctLevel: QRCode.CorrectLevel.H
-                });
-            }
-
-            document.getElementById('downloadQRBtn').addEventListener('click', function() {
-                const qrContainer = document.getElementById('qrcode');
-                const canvas = qrContainer.querySelector('canvas');
-                if (!canvas) {
-                    showToast('❌ No QR code to download', true);
-                    return;
-                }
-
-                const link = document.createElement('a');
-                link.download = `WUB_EEE_QR_${document.getElementById('qrClubId').textContent}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                showToast('✅ QR Code downloaded successfully!');
-            });
-
-            document.getElementById('shareQRBtn').addEventListener('click', function() {
-                const qrContainer = document.getElementById('qrcode');
-                const canvas = qrContainer.querySelector('canvas');
-                if (!canvas) {
-                    showToast('❌ No QR code to share', true);
-                    return;
-                }
-
-                canvas.toBlob(function(blob) {
-                    const file = new File([blob], 'WUB_EEE_QR.png', { type: 'image/png' });
-                    if (navigator.share) {
-                        navigator.share({
-                            title: 'WUB EEE Club - My Membership QR Code',
-                            text: `WUB EEE Club Membership\nClub ID: ${document.getElementById('qrClubId').textContent}\nScan to verify my membership.`,
-                            files: [file]
-                        }).then(() => {
-                            showToast('✅ QR Code shared successfully!');
-                        }).catch(() => {
-                            showToast('Share cancelled or failed', true);
-                        });
-                    } else {
-                        const link = document.createElement('a');
-                        link.download = `WUB_EEE_QR_${document.getElementById('qrClubId').textContent}.png`;
-                        link.href = canvas.toDataURL('image/png');
-                        link.click();
-                        showToast('📱 QR Code downloaded. Share it manually.');
-                    }
-                });
-            });
-
-            // ============================================
-            // RESET FORM
-            // ============================================
-            document.getElementById('resetFormBtn').addEventListener('click', function() {
-                const form = document.getElementById('registrationForm');
-                if (form) form.reset();
-                document.querySelectorAll('#skillsGroup input[type="checkbox"]').forEach(cb => cb.checked = false);
-                document.getElementById('department').value = 'EEE';
-                document.getElementById('successBox').classList.remove('show');
-                document.getElementById('qrSection').style.display = 'none';
-                document.getElementById('pastStudentFields').classList.remove('show');
-                document.getElementById('isPastStudent').checked = false;
-                paymentCompleted = false;
-                verifiedTrxID = '';
-                document.getElementById('trxidInput').value = '';
-                document.getElementById('trxidInput').disabled = false;
-                const verifyBtn = document.getElementById('verifyTrxidBtn');
-                verifyBtn.disabled = false;
-                verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify';
-                verifyBtn.style.background = '#1b754b';
-                document.getElementById('submitBtn').disabled = true;
-                updatePaymentUI();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-
-            // ============================================
-            // DOWNLOAD SLIP
-            // ============================================
-            document.getElementById('downloadSlipBtn').addEventListener('click', function() {
-                const clubId = window._lastClubId;
-                const data = window._lastFormData;
-                if (!clubId || !data) {
-                    alert('No registration data to download. Please submit the form first.');
-                    return;
-                }
-                const lines = [
-                    '═══════════════════════════════════════════',
-                    '         WUB EEE CLUB REGISTRATION         ',
-                    '═══════════════════════════════════════════',
-                    '',
-                    `Club ID      : ${clubId}`,
-                    `Name         : ${data.fullName}`,
-                    `Student ID   : ${data.studentId}`,
-                    `Department   : EEE`,
-                    `Semester     : ${data.semester}`,
-                    `Email        : ${data.email}`,
-                    `Phone        : ${data.phone || '—'}`,
-                    `Gender       : ${data.gender}`,
-                    `Interest     : ${data.interest}`,
-                    `Skills       : ${data.skills.join(', ') || '—'}`,
-                    `Reason       : ${data.reason || '—'}`,
-                    `Payment      : ${data.paymentStatus || 'Paid'}`,
-                    `Method       : bKash (01754526593)`,
-                    `Amount       : 200 TK`,
-                    `TrxID        : ${data.trxid || '—'}`,
-                    `Join Date    : ${new Date(data.joinDate).toLocaleDateString()}`,
-                    data.isPastStudent ? `Past Student: ${data.startYear} - ${data.endYear}` : '',
-                    '',
-                    '───────────────────────────────────────────',
-                    'Thank you for joining WUB EEE Club!',
-                    'Confirmation email sent to: ' + data.email,
-                    'From: eee-club@eee.wub.edu.bd',
-                    '═══════════════════════════════════════════'
-                ].join('\n');
-                const blob = new Blob([lines], { type: 'text/plain' });
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = `WUB_EEE_Club_Slip_${clubId}.txt`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(a.href);
-            });
-
             // ============================================
             // CERTIFICATE FUNCTIONS
             // ============================================
@@ -2449,11 +2297,6 @@
                         day: 'numeric'
                     });
                 }
-
-                // Generate QR for certificate
-                setTimeout(() => {
-                    generateCertQR(record);
-                }, 100);
 
                 return `
                 <div class="certificate-wrapper">
