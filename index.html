@@ -330,24 +330,46 @@
             font-size: 1.3rem;
             color: #1b754b;
         }
-        .bkash-info {
-            font-size: 0.9rem;
+        .payment-method-group {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .payment-method-group label {
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #1f3a66;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+        .payment-method-group input[type="radio"] {
+            width: 1rem;
+            height: 1rem;
+            accent-color: #1b754b;
+            cursor: pointer;
+        }
+        .bkash-info, .nagad-info {
+            font-size: 0.85rem;
             background: #e8f0fe;
-            padding: 0.4rem 1rem;
+            padding: 0.3rem 1rem;
             border-radius: 30px;
             color: #0b2b5c;
             display: inline-flex;
             align-items: center;
             gap: 6px;
         }
-        .bkash-info i {
-            color: #d63b6b;
-        }
+        .bkash-info i { color: #d63b6b; }
+        .nagad-info i { color: #f5a623; }
         .payment-actions {
             display: flex;
             gap: 0.8rem;
             align-items: center;
             flex-wrap: wrap;
+            flex: 1;
+            justify-content: flex-end;
         }
         .payment-actions button {
             background: white;
@@ -362,6 +384,7 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            white-space: nowrap;
         }
         .payment-actions button:hover {
             background: #0b3b7a;
@@ -989,7 +1012,6 @@
             overflow: hidden;
         }
 
-        /* ===== A4 SHEET - FIXED ===== */
         .certificate {
             width: 210mm;
             height: 297mm;
@@ -1072,7 +1094,6 @@
             }
         }
 
-        /* ===== BORDER ===== */
         .certificate .border {
             position: absolute;
             top: 10mm;
@@ -1082,15 +1103,12 @@
             border: 2px solid #000;
             pointer-events: none;
         }
-
-        /* ===== HEADER ===== */
         .certificate .header {
             text-align: center;
             margin-top: 0;
             position: relative;
             z-index: 1;
         }
-
         .certificate .title {
             font-family: 'Playfair Display', serif;
             font-size: 28px;
@@ -1098,7 +1116,6 @@
             letter-spacing: 3px;
             color: #0B3B7A;
         }
-
         .certificate .subtitle {
             font-family: 'Inter', sans-serif;
             font-size: 14px;
@@ -1110,8 +1127,6 @@
             display: inline-block;
             padding: 2px 20px;
         }
-
-        /* ===== CONTENT ===== */
         .certificate .content {
             margin-top: 15px;
             text-align: center;
@@ -1122,13 +1137,11 @@
             position: relative;
             z-index: 1;
         }
-
         .certificate .content .label {
             font-family: 'Inter', sans-serif;
             font-size: 14px;
             color: #1e3f5e;
         }
-
         .certificate .content .name {
             font-family: 'Playfair Display', serif;
             font-size: 26px;
@@ -1139,7 +1152,6 @@
             display: inline-block;
             padding: 0 20px 4px 20px;
         }
-
         .certificate .content .student-id {
             font-family: 'Inter', sans-serif;
             font-size: 15px;
@@ -1147,7 +1159,6 @@
             color: #1e3f5e;
             margin-bottom: 10px;
         }
-
         .certificate .content .text {
             font-family: 'Inter', sans-serif;
             font-size: 14px;
@@ -1157,13 +1168,10 @@
             margin: 0 auto;
             text-align: justify;
         }
-
         .certificate .content .text strong {
             color: #0B3B7A;
             font-weight: 600;
         }
-
-        /* ===== FOOTER SIGNATURE ===== */
         .certificate .footer {
             position: relative;
             bottom: 0;
@@ -1176,7 +1184,6 @@
             border-top: 1px solid rgba(0, 0, 0, 0.08);
             z-index: 1;
         }
-
         .certificate .sign {
             width: 40%;
             border-top: 1.5px solid #0B3B7A;
@@ -1186,14 +1193,11 @@
             color: #0B3B7A;
             font-weight: 600;
         }
-
         .certificate .sign .sub {
             font-weight: 400;
             font-size: 11px;
             color: #3f5a78;
         }
-
-        /* ===== WATERMARK ===== */
         .certificate .watermark {
             position: absolute;
             top: 50%;
@@ -1209,15 +1213,12 @@
             white-space: nowrap;
             z-index: 0;
         }
-
         .certificate .watermark span {
             border: 2px solid rgba(11, 59, 122, 0.1);
             padding: 0.1em 0.3em;
             border-radius: 50px;
             background: rgba(255, 255, 255, 0.1);
         }
-
-        /* ===== SEAL ===== */
         .certificate .seal {
             position: absolute;
             top: 18mm;
@@ -1245,7 +1246,6 @@
             transform: scale(0.9);
         }
 
-        /* Responsive */
         @media screen and (max-width: 800px) {
             .certificate {
                 width: 100%;
@@ -1274,7 +1274,6 @@
                 font-size: 60px;
             }
         }
-
         @media screen and (max-width: 480px) {
             .certificate {
                 padding: 10mm;
@@ -1316,7 +1315,6 @@
                 bottom: 6mm;
             }
         }
-
         .no-print {
             display: block;
         }
@@ -1464,15 +1462,22 @@
                     </div>
                 </div>
 
+                <!-- PAYMENT SECTION with bKash & Nagad personal numbers -->
                 <div class="payment-section">
                     <div class="payment-label">
                         <i class="fas fa-credit-card"></i>
                         <span>Membership Fee: <strong style="color:#0b2b5c;">200 TK</strong></span>
-                        <span class="bkash-info"><i class="fas fa-mobile-alt"></i> bKash: 01754526593</span>
+                        <div class="payment-method-group">
+                            <label><input type="radio" name="paymentMethod" value="bKash" checked /> bKash</label>
+                            <label><input type="radio" name="paymentMethod" value="Nagad" /> Nagad</label>
+                        </div>
+                        <!-- Personal numbers displayed here -->
+                        <span class="bkash-info" id="bkashInfo"><i class="fas fa-mobile-alt"></i> bKash: 01754526593</span>
+                        <span class="nagad-info" id="nagadInfo" style="display:none;"><i class="fas fa-mobile-alt"></i> Nagad: 01754526594</span>
                     </div>
-                    <div class="payment-actions" style="flex:1; justify-content:flex-end;">
+                    <div class="payment-actions">
                         <div class="trxid-input">
-                            <input type="text" id="trxidInput" placeholder="Enter bKash TrxID" />
+                            <input type="text" id="trxidInput" placeholder="Enter TrxID" />
                             <button type="button" id="verifyTrxidBtn" style="padding:0.5rem 1.2rem; border-radius:40px; background:#1b754b; color:white; border:none; font-weight:600; cursor:pointer;">
                                 <i class="fas fa-check"></i> Verify
                             </button>
@@ -1645,9 +1650,6 @@
             const JSONBIN_API_KEY = '$2a$10$uxxlv8nJapUJj6YbaVCY4u1EBDwX6.jOssFoyi0I7e8CyDKeTIc5W';
             const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 
-            // ============================================
-            // CONSTANTS
-            // ============================================
             const STORAGE_KEY = 'wub_eee_registrations';
             const ID_KEY = 'wub_eee_last_id';
             const CERT_KEY = 'wub_eee_certificates';
@@ -1657,23 +1659,106 @@
 
             let isLoggedIn = false;
             let isSyncing = false;
+            let paymentCompleted = false;
+            let verifiedTrxID = '';
+            let selectedMethod = 'bKash';
 
             // ============================================
-            // PAST STUDENT TOGGLE
+            // DOM REFS
             // ============================================
-            document.getElementById('isPastStudent').addEventListener('change', function() {
-                const fields = document.getElementById('pastStudentFields');
-                if (this.checked) {
-                    fields.classList.add('show');
-                    document.getElementById('startYear').required = true;
-                    document.getElementById('endYear').required = true;
+            const trxidInput = document.getElementById('trxidInput');
+            const verifyBtn = document.getElementById('verifyTrxidBtn');
+            const paymentStatus = document.getElementById('paymentStatus');
+            const submitBtn = document.getElementById('submitBtn');
+            const resetPaymentBtn = document.getElementById('resetPaymentBtn');
+            const bkashInfo = document.getElementById('bkashInfo');
+            const nagadInfo = document.getElementById('nagadInfo');
+            const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
+
+            // ============================================
+            // PAYMENT METHOD TOGGLE
+            // ============================================
+            paymentMethodRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    selectedMethod = this.value;
+                    if (selectedMethod === 'bKash') {
+                        bkashInfo.style.display = 'inline-flex';
+                        nagadInfo.style.display = 'none';
+                        trxidInput.placeholder = 'Enter bKash TrxID';
+                    } else {
+                        bkashInfo.style.display = 'none';
+                        nagadInfo.style.display = 'inline-flex';
+                        trxidInput.placeholder = 'Enter Nagad TrxID';
+                    }
+                    // reset payment status when method changes
+                    paymentCompleted = false;
+                    verifiedTrxID = '';
+                    trxidInput.value = '';
+                    trxidInput.disabled = false;
+                    verifyBtn.disabled = false;
+                    verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify';
+                    verifyBtn.style.background = '#1b754b';
+                    submitBtn.disabled = true;
+                    updatePaymentUI();
+                });
+            });
+
+            // ============================================
+            // PAYMENT FUNCTIONS
+            // ============================================
+            function updatePaymentUI() {
+                if (paymentCompleted && verifiedTrxID) {
+                    paymentStatus.innerHTML =
+                        `<i class="fas fa-check-circle" style="color:#1b754b;"></i> Paid (${selectedMethod}: ${verifiedTrxID})`;
+                    paymentStatus.className = 'payment-status done';
+                    trxidInput.disabled = true;
+                    verifyBtn.disabled = true;
+                    verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verified';
+                    verifyBtn.style.background = '#1b754b';
+                    submitBtn.disabled = false;
                 } else {
-                    fields.classList.remove('show');
-                    document.getElementById('startYear').required = false;
-                    document.getElementById('endYear').required = false;
-                    document.getElementById('startYear').value = '';
-                    document.getElementById('endYear').value = '';
+                    paymentStatus.innerHTML = '<i class="fas fa-clock"></i> Pending';
+                    paymentStatus.className = 'payment-status';
+                    trxidInput.disabled = false;
+                    verifyBtn.disabled = false;
+                    verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify';
+                    verifyBtn.style.background = '#1b754b';
+                    submitBtn.disabled = true;
                 }
+            }
+
+            verifyBtn.addEventListener('click', function() {
+                const trxid = trxidInput.value.trim();
+                if (!trxid) {
+                    alert('Please enter a Transaction ID (TrxID).');
+                    return;
+                }
+                if (trxid.length < 4) {
+                    alert('Please enter a valid TrxID (at least 4 characters).');
+                    return;
+                }
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+                this.disabled = true;
+                setTimeout(() => {
+                    verifiedTrxID = trxid;
+                    paymentCompleted = true;
+                    updatePaymentUI();
+                    alert(`✅ ${selectedMethod} payment verified!\nTrxID: ${verifiedTrxID}\nAmount: 200 TK`);
+                    this.innerHTML = '<i class="fas fa-check"></i> Verified';
+                    this.style.background = '#1b754b';
+                }, 800);
+            });
+
+            resetPaymentBtn.addEventListener('click', function() {
+                paymentCompleted = false;
+                verifiedTrxID = '';
+                trxidInput.value = '';
+                trxidInput.disabled = false;
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify';
+                verifyBtn.style.background = '#1b754b';
+                submitBtn.disabled = true;
+                updatePaymentUI();
             });
 
             // ============================================
@@ -1682,7 +1767,6 @@
             function updateSyncStatus(status, message) {
                 const dot = document.getElementById('syncDot');
                 const text = document.getElementById('syncText');
-
                 dot.className = 'sync-dot';
                 if (status === 'online') {
                     dot.classList.add('online');
@@ -1699,21 +1783,12 @@
             async function syncDataToCloud(records, lastId) {
                 try {
                     updateSyncStatus('syncing', '⏳ Saving to cloud...');
-
-                    const data = {
-                        records: records,
-                        lastId: lastId || getLastSerial()
-                    };
-
+                    const data = { records: records, lastId: lastId || getLastSerial() };
                     const response = await fetch(JSONBIN_URL, {
                         method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Master-Key': JSONBIN_API_KEY
-                        },
+                        headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY },
                         body: JSON.stringify(data)
                     });
-
                     if (response.ok) {
                         updateSyncStatus('online', '✅ Data saved to cloud');
                         return true;
@@ -1732,14 +1807,10 @@
             async function fetchDataFromCloud() {
                 try {
                     updateSyncStatus('syncing', '⏳ Fetching from cloud...');
-
                     const response = await fetch(JSONBIN_URL, {
                         method: 'GET',
-                        headers: {
-                            'X-Master-Key': JSONBIN_API_KEY
-                        }
+                        headers: { 'X-Master-Key': JSONBIN_API_KEY }
                     });
-
                     if (response.ok) {
                         const data = await response.json();
                         updateSyncStatus('online', '✅ Data fetched from cloud');
@@ -1759,7 +1830,6 @@
             async function syncFromCloud() {
                 if (isSyncing) return;
                 isSyncing = true;
-
                 try {
                     const cloudData = await fetchDataFromCloud();
                     if (cloudData && cloudData.records) {
@@ -1767,11 +1837,9 @@
                         const cloudRecords = cloudData.records || [];
                         const mergedRecords = mergeRecords(localRecords, cloudRecords);
                         saveRegistrations(mergedRecords);
-
                         if (cloudData.lastId && cloudData.lastId > getLastSerial()) {
                             setLastSerial(cloudData.lastId);
                         }
-
                         renderAdminTable();
                         showToast('✅ Data synced from cloud successfully!');
                     } else if (cloudData && cloudData.records && cloudData.records.length === 0) {
@@ -1783,7 +1851,6 @@
                     console.error('Sync error:', error);
                     updateSyncStatus('offline', '⚠️ Cloud error - Using local data');
                 }
-
                 isSyncing = false;
             }
 
@@ -1831,7 +1898,7 @@
             }
 
             // ============================================
-            // LOGIN FUNCTIONS
+            // LOGIN
             // ============================================
             function checkLogin() {
                 const session = sessionStorage.getItem('wub_eee_admin_session');
@@ -1862,19 +1929,16 @@
                 const email = document.getElementById('loginEmail').value.trim();
                 const password = document.getElementById('loginPassword').value.trim();
                 const errorEl = document.getElementById('loginError');
-
                 if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
                     sessionStorage.setItem('wub_eee_admin_session', 'true');
                     isLoggedIn = true;
                     document.getElementById('loginOverlay').classList.remove('open');
                     document.getElementById('loginOverlay').classList.add('hidden');
                     errorEl.classList.remove('show');
-
                     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                     document.getElementById('adminTabBtn').classList.add('active');
                     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
                     document.getElementById('tab-admin').classList.add('active');
-
                     renderAdminTable();
                     showToast('✅ Welcome Admin!');
                     setTimeout(syncFromCloud, 500);
@@ -1884,24 +1948,15 @@
                 }
             });
 
-            document.getElementById('loginPassword').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') document.getElementById('loginBtn').click();
-            });
-            document.getElementById('loginEmail').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') document.getElementById('loginBtn').click();
-            });
-
             document.getElementById('logoutBtn').addEventListener('click', function() {
                 sessionStorage.removeItem('wub_eee_admin_session');
                 isLoggedIn = false;
                 document.getElementById('loginOverlay').classList.remove('hidden');
                 document.getElementById('loginOverlay').classList.add('open');
-
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 document.querySelector('[data-tab="register"]').classList.add('active');
                 document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
                 document.getElementById('tab-register').classList.add('active');
-
                 showToast('👋 Logged out successfully');
             });
 
@@ -1917,13 +1972,11 @@
             function showToast(message, isError = false) {
                 const existing = document.querySelector('.notification-toast');
                 if (existing) existing.remove();
-
                 const toast = document.createElement('div');
                 toast.className = 'notification-toast';
                 toast.style.background = isError ? '#b22234' : '#1b754b';
                 toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
                 document.body.appendChild(toast);
-
                 setTimeout(() => {
                     toast.classList.add('hidden');
                     setTimeout(() => toast.remove(), 500);
@@ -1934,7 +1987,6 @@
                 return new Promise((resolve) => {
                     setTimeout(() => {
                         console.log('📧 Confirmation email sent to:', record.email);
-                        console.log('📧 From: eee-club@eee.wub.edu.bd');
                         showToast(`✅ Confirmation email sent to ${record.email}`);
                         resolve(true);
                     }, 1000);
@@ -1942,71 +1994,21 @@
             }
 
             // ============================================
-            // PAYMENT FUNCTIONS
+            // PAST STUDENT TOGGLE
             // ============================================
-            let paymentCompleted = false;
-            let verifiedTrxID = '';
-
-            function updatePaymentUI() {
-                const statusEl = document.getElementById('paymentStatus');
-                const trxInput = document.getElementById('trxidInput');
-                const verifyBtn = document.getElementById('verifyTrxidBtn');
-                const submitBtn = document.getElementById('submitBtn');
-
-                if (paymentCompleted && verifiedTrxID) {
-                    statusEl.innerHTML =
-                        `<i class="fas fa-check-circle" style="color:#1b754b;"></i> Paid (TrxID: ${verifiedTrxID})`;
-                    statusEl.className = 'payment-status done';
-                    trxInput.disabled = true;
-                    verifyBtn.disabled = true;
-                    verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verified';
-                    verifyBtn.style.background = '#1b754b';
-                    submitBtn.disabled = false;
+            document.getElementById('isPastStudent').addEventListener('change', function() {
+                const fields = document.getElementById('pastStudentFields');
+                if (this.checked) {
+                    fields.classList.add('show');
+                    document.getElementById('startYear').required = true;
+                    document.getElementById('endYear').required = true;
                 } else {
-                    statusEl.innerHTML = '<i class="fas fa-clock"></i> Pending';
-                    statusEl.className = 'payment-status';
-                    trxInput.disabled = false;
-                    verifyBtn.disabled = false;
-                    verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify';
-                    verifyBtn.style.background = '#1b754b';
-                    submitBtn.disabled = true;
+                    fields.classList.remove('show');
+                    document.getElementById('startYear').required = false;
+                    document.getElementById('endYear').required = false;
+                    document.getElementById('startYear').value = '';
+                    document.getElementById('endYear').value = '';
                 }
-            }
-
-            document.getElementById('verifyTrxidBtn').addEventListener('click', function() {
-                const trxInput = document.getElementById('trxidInput');
-                const trxid = trxInput.value.trim();
-                if (!trxid) {
-                    alert('Please enter a bKash Transaction ID (TrxID).');
-                    return;
-                }
-                if (trxid.length < 4) {
-                    alert('Please enter a valid TrxID (at least 4 characters).');
-                    return;
-                }
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
-                this.disabled = true;
-                setTimeout(() => {
-                    verifiedTrxID = trxid;
-                    paymentCompleted = true;
-                    updatePaymentUI();
-                    alert(`✅ bKash payment verified!\nTrxID: ${verifiedTrxID}\nAmount: 200 TK`);
-                    this.innerHTML = '<i class="fas fa-check"></i> Verified';
-                    this.style.background = '#1b754b';
-                }, 800);
-            });
-
-            document.getElementById('resetPaymentBtn').addEventListener('click', function() {
-                paymentCompleted = false;
-                verifiedTrxID = '';
-                document.getElementById('trxidInput').value = '';
-                document.getElementById('trxidInput').disabled = false;
-                const verifyBtn = document.getElementById('verifyTrxidBtn');
-                verifyBtn.disabled = false;
-                verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify';
-                verifyBtn.style.background = '#1b754b';
-                document.getElementById('submitBtn').disabled = true;
-                updatePaymentUI();
             });
 
             // ============================================
@@ -2016,7 +2018,7 @@
                 e.preventDefault();
 
                 if (!paymentCompleted || !verifiedTrxID) {
-                    alert('⚠️ Please enter and verify your bKash TrxID first.');
+                    alert('⚠️ Please enter and verify your Transaction ID (TrxID).');
                     return;
                 }
 
@@ -2041,20 +2043,16 @@
                 if (isPastStudent) {
                     startYear = document.getElementById('startYear').value.trim();
                     endYear = document.getElementById('endYear').value.trim();
-
                     if (!startYear || !endYear) {
                         alert('⚠️ Please enter both Start Year and End Year for past student.');
                         return;
                     }
-
                     const startNum = parseInt(startYear);
                     const endNum = parseInt(endYear);
-
                     if (isNaN(startNum) || isNaN(endNum) || startNum > endNum) {
                         alert('⚠️ Please enter valid years (Start Year must be before End Year).');
                         return;
                     }
-
                     if (startNum >= 2024) {
                         alert('⚠️ For past students, Start Year must be before 2024.');
                         return;
@@ -2095,8 +2093,8 @@
                     interest,
                     reason,
                     clubId,
-                    paymentStatus: 'Paid (bKash)',
-                    paymentMethod: 'bKash',
+                    paymentStatus: `Paid (${selectedMethod})`,
+                    paymentMethod: selectedMethod,
                     paymentAmount: '200 TK',
                     trxid: verifiedTrxID,
                     joinDate: joinDate,
@@ -2133,18 +2131,17 @@
 
                 renderAdminTable();
                 document.getElementById('successBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
-                document.getElementById('submitBtn').disabled = true;
+                submitBtn.disabled = true;
 
                 showToast('🎉 Registration complete! Data saved to cloud.');
             });
 
             // ============================================
-            // QR CODE FUNCTIONS
+            // QR CODE
             // ============================================
             function generateQRCode(record) {
                 const qrContainer = document.getElementById('qrcode');
                 qrContainer.innerHTML = '';
-
                 const qrData = JSON.stringify({
                     clubId: record.clubId,
                     name: record.fullName,
@@ -2157,7 +2154,6 @@
                     startYear: record.startYear || null,
                     endYear: record.endYear || null
                 });
-
                 new QRCode(qrContainer, {
                     text: qrData,
                     width: 180,
@@ -2193,9 +2189,7 @@
 
             function getCertificateNumber(clubId) {
                 const certs = getCertificates();
-                if (certs[clubId]) {
-                    return certs[clubId].certNumber;
-                }
+                if (certs[clubId]) return certs[clubId].certNumber;
                 const existingCerts = Object.values(certs);
                 const maxNum = existingCerts.reduce((max, c) => {
                     const num = parseInt(c.certNumber.split('-')[1]);
@@ -2207,15 +2201,10 @@
 
             function generateCertificate(record) {
                 const certs = getCertificates();
-                if (certs[record.clubId]) {
-                    return certs[record.clubId];
-                }
-
+                if (certs[record.clubId]) return certs[record.clubId];
                 const certNumber = getCertificateNumber(record.clubId);
                 const now = new Date();
-
                 let startDate, endDate;
-
                 if (record.isPastStudent && record.startYear && record.endYear) {
                     startDate = new Date(parseInt(record.startYear), 0, 1);
                     endDate = new Date(parseInt(record.endYear), 11, 31);
@@ -2225,7 +2214,6 @@
                     endDate = new Date(joinDate);
                     endDate.setFullYear(endDate.getFullYear() + 2);
                 }
-
                 const certData = {
                     clubId: record.clubId,
                     certNumber: certNumber,
@@ -2240,7 +2228,6 @@
                     startYear: record.startYear || null,
                     endYear: record.endYear || null
                 };
-
                 certs[record.clubId] = certData;
                 saveCertificates(certs);
                 return certData;
@@ -2248,60 +2235,29 @@
 
             function renderCertificate(record) {
                 const cert = generateCertificate(record);
-
                 let startDateStr, endDateStr;
-
                 if (cert.periodStart && cert.periodEnd) {
                     const startDate = new Date(cert.periodStart);
                     const endDate = new Date(cert.periodEnd);
-
-                    startDateStr = startDate.toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                    endDateStr = endDate.toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
+                    startDateStr = startDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                    endDateStr = endDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
                 } else {
                     const now = new Date();
                     const twoYearsAgo = new Date(now);
                     twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
-
-                    startDateStr = twoYearsAgo.toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                    endDateStr = now.toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
+                    startDateStr = twoYearsAgo.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                    endDateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
                 }
-
                 return `
                 <div class="certificate-wrapper">
                   <div class="certificate" id="certificatePrint">
-
-                    <!-- Border -->
                     <div class="border"></div>
-
-                    <!-- Watermark -->
                     <div class="watermark"><span>WUB EEE</span></div>
-
-                    <!-- Seal -->
                     <div class="seal"><span>WUB<br>EEE</span></div>
-
-                    <!-- HEADER -->
                     <div class="header">
                       <div class="title">WUB EEE CLUB</div>
                       <div class="subtitle">CERTIFICATE OF MEMBERSHIP</div>
                     </div>
-
-                    <!-- CONTENT -->
                     <div class="content">
                       <div class="label">This is to certify that</div>
                       <div class="name">${escapeHtml(record.fullName)}</div>
@@ -2315,13 +2271,10 @@
                         We appreciate his/her dedication, enthusiasm, and contribution to the development of technical knowledge and teamwork within the club.
                       </div>
                     </div>
-
-                    <!-- FOOTER SIGNATURES -->
                     <div class="footer">
                       <div class="sign">President<br><span class="sub">WUB EEE Club</span></div>
                       <div class="sign">Advisor<br><span class="sub">WUB EEE Club</span></div>
                     </div>
-
                   </div>
                 </div>
               `;
@@ -2332,18 +2285,14 @@
             // ============================================
             function renderAdminTable() {
                 if (!isLoggedIn) return;
-
                 const records = getRegistrations();
                 const tbody = document.getElementById('adminTableBody');
                 if (!tbody) return;
-
                 if (records.length === 0) {
                     tbody.innerHTML = `<tr class="empty-row"><td colspan="8">No registered members yet.</td></tr>`;
                     return;
                 }
-
                 const certs = getCertificates();
-
                 tbody.innerHTML = records.map((r, idx) => {
                     const paid = r.paymentStatus && r.paymentStatus.includes('Paid');
                     const hasCert = !!certs[r.clubId];
@@ -2352,16 +2301,12 @@
                     const joinDate = new Date(r.joinDate).toLocaleDateString();
                     const pastInfo = r.isPastStudent && r.startYear && r.endYear ? `${r.startYear}-${r.endYear}` :
                         '';
-
                     let certStatus = '';
                     let certAction = '';
                     let actions = '';
-
-                    actions = `
-                  <button class="action-btn edit" onclick="editMember('${r.clubId}')"><i class="fas fa-edit"></i></button>
-                  <button class="action-btn delete" onclick="deleteMember('${r.clubId}')"><i class="fas fa-trash"></i></button>
-                `;
-
+                    actions =
+                        `<button class="action-btn edit" onclick="editMember('${r.clubId}')"><i class="fas fa-edit"></i></button>
+                               <button class="action-btn delete" onclick="deleteMember('${r.clubId}')"><i class="fas fa-trash"></i></button>`;
                     if (hasCert) {
                         certStatus = `<span class="badge-cert"><i class="fas fa-check-circle"></i> Issued</span>`;
                         certAction =
@@ -2381,7 +2326,6 @@
                         certStatus = `<span class="badge-no-cert"><i class="fas fa-hourglass-half"></i> ${yearsLeft} year(s)</span>`;
                         certAction = `<span style="font-size:0.7rem; color:#6b8aaa;">Not eligible</span>`;
                     }
-
                     return `<tr>
                   <td>${idx+1}</td>
                   <td><strong>${escapeHtml(r.fullName || '')}</strong></td>
@@ -2396,16 +2340,12 @@
             }
 
             // ============================================
-            // EDIT & DELETE FUNCTIONS
+            // EDIT & DELETE
             // ============================================
             window.editMember = function(clubId) {
                 const records = getRegistrations();
                 const record = records.find(r => r.clubId === clubId);
-                if (!record) {
-                    showToast('❌ Member not found', true);
-                    return;
-                }
-
+                if (!record) { showToast('❌ Member not found', true); return; }
                 document.getElementById('editClubId').value = clubId;
                 document.getElementById('editFullName').value = record.fullName || '';
                 document.getElementById('editStudentId').value = record.studentId || '';
@@ -2414,23 +2354,18 @@
                 document.getElementById('editSemester').value = record.semester || '3rd';
                 document.getElementById('editGender').value = record.gender || 'Male';
                 document.getElementById('editInterest').value = record.interest || 'Technical Workshop';
-
                 document.getElementById('editModal').classList.add('open');
             };
 
             document.getElementById('editModalClose').addEventListener('click', function() {
                 document.getElementById('editModal').classList.remove('open');
             });
-
             document.getElementById('editModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    this.classList.remove('open');
-                }
+                if (e.target === this) this.classList.remove('open');
             });
 
             document.getElementById('editForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-
                 const clubId = document.getElementById('editClubId').value;
                 const fullName = document.getElementById('editFullName').value.trim();
                 const studentId = document.getElementById('editStudentId').value.trim();
@@ -2439,19 +2374,13 @@
                 const semester = document.getElementById('editSemester').value;
                 const gender = document.getElementById('editGender').value;
                 const interest = document.getElementById('editInterest').value;
-
                 if (!fullName || !studentId || !email) {
                     showToast('⚠️ Please fill in all required fields.', true);
                     return;
                 }
-
                 const records = getRegistrations();
                 const index = records.findIndex(r => r.clubId === clubId);
-                if (index === -1) {
-                    showToast('❌ Member not found', true);
-                    return;
-                }
-
+                if (index === -1) { showToast('❌ Member not found', true); return; }
                 records[index].fullName = fullName;
                 records[index].studentId = studentId;
                 records[index].email = email;
@@ -2459,32 +2388,20 @@
                 records[index].semester = semester;
                 records[index].gender = gender;
                 records[index].interest = interest;
-
                 saveRegistrations(records);
                 renderAdminTable();
-
                 document.getElementById('editModal').classList.remove('open');
                 showToast('✅ Member updated successfully!');
             });
 
             window.deleteMember = function(clubId) {
-                if (!confirm('Are you sure you want to delete this member? This action cannot be undone.')) {
-                    return;
-                }
-
+                if (!confirm('Are you sure you want to delete this member? This action cannot be undone.')) return;
                 const records = getRegistrations();
                 const index = records.findIndex(r => r.clubId === clubId);
-                if (index === -1) {
-                    showToast('❌ Member not found', true);
-                    return;
-                }
-
+                if (index === -1) { showToast('❌ Member not found', true); return; }
                 const certs = getCertificates();
-                if (certs[clubId]) {
-                    delete certs[clubId];
-                    saveCertificates(certs);
-                }
-
+                if (certs[clubId]) { delete certs[clubId];
+                    saveCertificates(certs); }
                 records.splice(index, 1);
                 saveRegistrations(records);
                 renderAdminTable();
@@ -2492,22 +2409,14 @@
             };
 
             // ============================================
-            // CERTIFICATE GLOBAL FUNCTIONS
+            // CERTIFICATE GLOBAL
             // ============================================
             window.viewCertificate = function(clubId) {
                 const records = getRegistrations();
                 const record = records.find(r => r.clubId === clubId);
-                if (!record) {
-                    showToast('❌ Member not found', true);
-                    return;
-                }
-
+                if (!record) { showToast('❌ Member not found', true); return; }
                 const certs = getCertificates();
-                if (!certs[clubId]) {
-                    showToast('❌ No certificate found for this member', true);
-                    return;
-                }
-
+                if (!certs[clubId]) { showToast('❌ No certificate found for this member', true); return; }
                 document.getElementById('certificateContainer').innerHTML = renderCertificate(record);
                 document.getElementById('certModal').classList.add('open');
                 window._currentCertRecord = record;
@@ -2516,22 +2425,13 @@
             window.generateCertForMember = function(clubId) {
                 const records = getRegistrations();
                 const record = records.find(r => r.clubId === clubId);
-                if (!record) {
-                    showToast('❌ Member not found', true);
-                    return;
-                }
-
+                if (!record) { showToast('❌ Member not found', true); return; }
                 const certs = getCertificates();
-                if (certs[clubId]) {
-                    showToast('⚠️ Certificate already exists for this member');
-                    return;
-                }
-
+                if (certs[clubId]) { showToast('⚠️ Certificate already exists for this member'); return; }
                 if (!isEligibleForCertificate(record.joinDate)) {
                     showToast('⚠️ Member is not eligible yet (need 2 years)', true);
                     return;
                 }
-
                 generateCertificate(record);
                 renderAdminTable();
                 showToast(`✅ Certificate generated for ${record.fullName}`);
@@ -2541,22 +2441,13 @@
             window.generatePastCert = function(clubId) {
                 const records = getRegistrations();
                 const record = records.find(r => r.clubId === clubId);
-                if (!record) {
-                    showToast('❌ Member not found', true);
-                    return;
-                }
-
+                if (!record) { showToast('❌ Member not found', true); return; }
                 const certs = getCertificates();
-                if (certs[clubId]) {
-                    showToast('⚠️ Certificate already exists for this member');
-                    return;
-                }
-
+                if (certs[clubId]) { showToast('⚠️ Certificate already exists for this member'); return; }
                 if (!isPastMember(record.joinDate) && !record.isPastStudent) {
                     showToast('⚠️ Member is not a past member (need 2+ years)', true);
                     return;
                 }
-
                 generateCertificate(record);
                 renderAdminTable();
                 showToast(`✅ Certificate generated for past member ${record.fullName}`);
@@ -2567,51 +2458,34 @@
             // ADMIN BUTTONS
             // ============================================
             document.getElementById('refreshAdminBtn').addEventListener('click', function() {
-                if (!isLoggedIn) {
-                    showToast('⚠️ Please login first', true);
-                    return;
-                }
+                if (!isLoggedIn) { showToast('⚠️ Please login first', true); return; }
                 syncFromCloud();
             });
 
             document.getElementById('generatePastMembersBtn').addEventListener('click', function() {
                 const records = getRegistrations();
-                if (records.length === 0) {
-                    showToast('❌ No members to generate certificates for', true);
-                    return;
-                }
-
+                if (records.length === 0) { showToast('❌ No members to generate certificates for', true); return; }
                 let count = 0;
                 const certs = getCertificates();
-
                 records.forEach(r => {
                     if (!certs[r.clubId] && (isPastMember(r.joinDate) || r.isPastStudent)) {
                         generateCertificate(r);
                         count++;
                     }
                 });
-
                 renderAdminTable();
                 showToast(`✅ Generated ${count} certificate(s) for past members`);
             });
 
             document.getElementById('forceGenerateBtn').addEventListener('click', function() {
                 const records = getRegistrations();
-                if (records.length === 0) {
-                    showToast('❌ No members to generate certificates for', true);
-                    return;
-                }
-
+                if (records.length === 0) { showToast('❌ No members to generate certificates for', true); return; }
                 let count = 0;
                 const certs = getCertificates();
-
                 records.forEach(r => {
-                    if (!certs[r.clubId]) {
-                        generateCertificate(r);
-                        count++;
-                    }
+                    if (!certs[r.clubId]) { generateCertificate(r);
+                        count++; }
                 });
-
                 renderAdminTable();
                 showToast(`✅ Force generated ${count} certificate(s) for all members`);
             });
@@ -2620,37 +2494,28 @@
                 const records = getRegistrations();
                 let count = 0;
                 const certs = getCertificates();
-
                 records.forEach(r => {
                     if (!certs[r.clubId] && isEligibleForCertificate(r.joinDate)) {
                         generateCertificate(r);
                         count++;
                     }
                 });
-
                 renderAdminTable();
                 showToast(`✅ Generated ${count} certificate(s) for eligible members`);
             });
 
             // ============================================
-            // CERTIFICATE MODAL - FIXED PDF DOWNLOAD & PRINT
+            // CERTIFICATE MODAL - PDF & PRINT
             // ============================================
             document.getElementById('certModalClose').addEventListener('click', function() {
                 document.getElementById('certModal').classList.remove('open');
             });
-
             document.getElementById('certModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    this.classList.remove('open');
-                }
+                if (e.target === this) this.classList.remove('open');
             });
 
-            // PRINT FUNCTION - FIXED
             document.getElementById('printCertBtn').addEventListener('click', function() {
-                // Get the certificate HTML
                 const certHTML = document.getElementById('certificateContainer').innerHTML;
-                
-                // Create a new window for printing
                 const printWindow = window.open('', '_blank', 'width=794,height=1123');
                 printWindow.document.write(`
                     <!DOCTYPE html>
@@ -2662,224 +2527,35 @@
                         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
                         <style>
                             * { margin: 0; padding: 0; box-sizing: border-box; }
-                            body { 
-                                background: white; 
-                                display: flex; 
-                                justify-content: center; 
-                                align-items: center; 
-                                min-height: 100vh;
-                                margin: 0;
-                                padding: 0;
-                            }
-                            @page {
-                                size: A4 portrait;
-                                margin: 0;
-                            }
-                            .certificate-wrapper {
-                                display: flex;
-                                justify-content: center;
-                                align-items: center;
-                                padding: 0;
-                                margin: 0;
-                                background: white;
-                                width: 100%;
-                                overflow: hidden;
-                            }
-                            .certificate {
-                                width: 210mm;
-                                height: 297mm;
-                                background: white;
-                                margin: 0 auto;
-                                padding: 20mm;
-                                box-sizing: border-box;
-                                position: relative;
-                                box-shadow: 0 0 20px rgba(0,0,0,0.15);
-                                display: flex;
-                                flex-direction: column;
-                                justify-content: space-between;
-                                page-break-after: avoid;
-                                page-break-before: avoid;
-                                page-break-inside: avoid;
-                                overflow: hidden;
-                            }
-                            @media print {
-                                .certificate {
-                                    box-shadow: none;
-                                    width: 100%;
-                                    height: 100vh;
-                                    padding: 20mm;
-                                    margin: 0;
-                                    page-break-after: avoid;
-                                    page-break-before: avoid;
-                                    page-break-inside: avoid;
-                                    overflow: hidden;
-                                }
-                                body { background: white; padding: 0; margin: 0; overflow: hidden; }
-                            }
-                            .certificate .border {
-                                position: absolute;
-                                top: 10mm;
-                                left: 10mm;
-                                right: 10mm;
-                                bottom: 10mm;
-                                border: 2px solid #000;
-                                pointer-events: none;
-                            }
-                            .certificate .header {
-                                text-align: center;
-                                margin-top: 0;
-                                position: relative;
-                                z-index: 1;
-                            }
-                            .certificate .title {
-                                font-family: 'Playfair Display', serif;
-                                font-size: 28px;
-                                font-weight: 700;
-                                letter-spacing: 3px;
-                                color: #0B3B7A;
-                            }
-                            .certificate .subtitle {
-                                font-family: 'Inter', sans-serif;
-                                font-size: 14px;
-                                margin-top: 4px;
-                                letter-spacing: 2px;
-                                color: #0B3B7A;
-                                border-top: 1px solid #D4AF37;
-                                border-bottom: 1px solid #D4AF37;
-                                display: inline-block;
-                                padding: 2px 20px;
-                            }
-                            .certificate .content {
-                                margin-top: 15px;
-                                text-align: center;
-                                flex: 1;
-                                display: flex;
-                                flex-direction: column;
-                                justify-content: center;
-                                position: relative;
-                                z-index: 1;
-                            }
-                            .certificate .content .label {
-                                font-family: 'Inter', sans-serif;
-                                font-size: 14px;
-                                color: #1e3f5e;
-                            }
-                            .certificate .content .name {
-                                font-family: 'Playfair Display', serif;
-                                font-size: 26px;
-                                font-weight: 700;
-                                color: #0B3B7A;
-                                margin: 8px 0;
-                                border-bottom: 2px dashed #D4AF37;
-                                display: inline-block;
-                                padding: 0 20px 4px 20px;
-                            }
-                            .certificate .content .student-id {
-                                font-family: 'Inter', sans-serif;
-                                font-size: 15px;
-                                font-weight: 500;
-                                color: #1e3f5e;
-                                margin-bottom: 10px;
-                            }
-                            .certificate .content .text {
-                                font-family: 'Inter', sans-serif;
-                                font-size: 14px;
-                                line-height: 1.8;
-                                color: #1a2d44;
-                                max-width: 80%;
-                                margin: 0 auto;
-                                text-align: justify;
-                            }
-                            .certificate .content .text strong {
-                                color: #0B3B7A;
-                                font-weight: 600;
-                            }
-                            .certificate .footer {
-                                position: relative;
-                                bottom: 0;
-                                left: 0;
-                                right: 0;
-                                display: flex;
-                                justify-content: space-between;
-                                text-align: center;
-                                padding-top: 10px;
-                                border-top: 1px solid rgba(0,0,0,0.08);
-                                z-index: 1;
-                            }
-                            .certificate .sign {
-                                width: 40%;
-                                border-top: 1.5px solid #0B3B7A;
-                                padding-top: 6px;
-                                font-size: 13px;
-                                font-family: 'Inter', sans-serif;
-                                color: #0B3B7A;
-                                font-weight: 600;
-                            }
-                            .certificate .sign .sub {
-                                font-weight: 400;
-                                font-size: 11px;
-                                color: #3f5a78;
-                            }
-                            .certificate .watermark {
-                                position: absolute;
-                                top: 50%;
-                                left: 50%;
-                                transform: translate(-50%, -50%) rotate(-6deg);
-                                opacity: 0.03;
-                                pointer-events: none;
-                                font-family: 'Playfair Display', serif;
-                                font-size: 120px;
-                                font-weight: 700;
-                                color: #0B3B7A;
-                                letter-spacing: 10px;
-                                white-space: nowrap;
-                                z-index: 0;
-                            }
-                            .certificate .watermark span {
-                                border: 2px solid rgba(11,59,122,0.1);
-                                padding: 0.1em 0.3em;
-                                border-radius: 50px;
-                                background: rgba(255,255,255,0.1);
-                            }
-                            .certificate .seal {
-                                position: absolute;
-                                top: 18mm;
-                                right: 18mm;
-                                width: 48px;
-                                height: 48px;
-                                border-radius: 50%;
-                                border: 2px solid #D4AF37;
-                                background: rgba(212,175,55,0.05);
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                font-family: 'Playfair Display', serif;
-                                font-weight: 700;
-                                font-size: 11px;
-                                color: #0B3B7A;
-                                text-align: center;
-                                line-height: 1.2;
-                                box-shadow: 0 0 0 1px #0B3B7A;
-                                z-index: 5;
-                                padding: 2px;
-                            }
-                            .certificate .seal span {
-                                display: block;
-                                transform: scale(0.9);
-                            }
-                            @media print {
-                                .certificate .seal { box-shadow: 0 0 0 1px #0B3B7A; }
-                                .certificate .watermark { opacity: 0.03; }
-                            }
+                            body { background: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 0; }
+                            @page { size: A4 portrait; margin: 0; }
+                            .certificate-wrapper { display: flex; justify-content: center; align-items: center; padding: 0; margin: 0; background: white; width: 100%; overflow: hidden; }
+                            .certificate { width: 210mm; height: 297mm; background: white; margin: 0 auto; padding: 20mm; box-sizing: border-box; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.15); display: flex; flex-direction: column; justify-content: space-between; page-break-after: avoid; page-break-before: avoid; page-break-inside: avoid; overflow: hidden; }
+                            @media print { .certificate { box-shadow: none; width: 100%; height: 100vh; padding: 20mm; margin: 0; page-break-after: avoid; page-break-before: avoid; page-break-inside: avoid; overflow: hidden; } body { background: white; padding: 0; margin: 0; overflow: hidden; } }
+                            .certificate .border { position: absolute; top: 10mm; left: 10mm; right: 10mm; bottom: 10mm; border: 2px solid #000; pointer-events: none; }
+                            .certificate .header { text-align: center; margin-top: 0; position: relative; z-index: 1; }
+                            .certificate .title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; letter-spacing: 3px; color: #0B3B7A; }
+                            .certificate .subtitle { font-family: 'Inter', sans-serif; font-size: 14px; margin-top: 4px; letter-spacing: 2px; color: #0B3B7A; border-top: 1px solid #D4AF37; border-bottom: 1px solid #D4AF37; display: inline-block; padding: 2px 20px; }
+                            .certificate .content { margin-top: 15px; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 1; }
+                            .certificate .content .label { font-family: 'Inter', sans-serif; font-size: 14px; color: #1e3f5e; }
+                            .certificate .content .name { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #0B3B7A; margin: 8px 0; border-bottom: 2px dashed #D4AF37; display: inline-block; padding: 0 20px 4px 20px; }
+                            .certificate .content .student-id { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 500; color: #1e3f5e; margin-bottom: 10px; }
+                            .certificate .content .text { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.8; color: #1a2d44; max-width: 80%; margin: 0 auto; text-align: justify; }
+                            .certificate .content .text strong { color: #0B3B7A; font-weight: 600; }
+                            .certificate .footer { position: relative; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-between; text-align: center; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.08); z-index: 1; }
+                            .certificate .sign { width: 40%; border-top: 1.5px solid #0B3B7A; padding-top: 6px; font-size: 13px; font-family: 'Inter', sans-serif; color: #0B3B7A; font-weight: 600; }
+                            .certificate .sign .sub { font-weight: 400; font-size: 11px; color: #3f5a78; }
+                            .certificate .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-6deg); opacity: 0.03; pointer-events: none; font-family: 'Playfair Display', serif; font-size: 120px; font-weight: 700; color: #0B3B7A; letter-spacing: 10px; white-space: nowrap; z-index: 0; }
+                            .certificate .watermark span { border: 2px solid rgba(11,59,122,0.1); padding: 0.1em 0.3em; border-radius: 50px; background: rgba(255,255,255,0.1); }
+                            .certificate .seal { position: absolute; top: 18mm; right: 18mm; width: 48px; height: 48px; border-radius: 50%; border: 2px solid #D4AF37; background: rgba(212,175,55,0.05); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 11px; color: #0B3B7A; text-align: center; line-height: 1.2; box-shadow: 0 0 0 1px #0B3B7A; z-index: 5; padding: 2px; }
+                            .certificate .seal span { display: block; transform: scale(0.9); }
+                            @media print { .certificate .seal { box-shadow: 0 0 0 1px #0B3B7A; } .certificate .watermark { opacity: 0.03; } }
                         </style>
                     </head>
                     <body>
                         ${certHTML}
                         <script>
-                            window.onload = function() {
-                                window.print();
-                                window.close();
-                            };
+                            window.onload = function() { window.print(); window.close(); };
                         <\/script>
                     </body>
                     </html>
@@ -2887,30 +2563,17 @@
                 printWindow.document.close();
             });
 
-            // DOWNLOAD PDF - FIXED
             document.getElementById('downloadCertBtn').addEventListener('click', function() {
                 const record = window._currentCertRecord;
-                if (!record) {
-                    showToast('❌ No certificate to download', true);
-                    return;
-                }
-
+                if (!record) { showToast('❌ No certificate to download', true); return; }
                 const certs = getCertificates();
                 const cert = certs[record.clubId];
-                if (!cert) {
-                    showToast('❌ Certificate not found', true);
-                    return;
-                }
-
+                if (!cert) { showToast('❌ Certificate not found', true); return; }
                 const btn = this;
                 const originalText = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
                 btn.disabled = true;
-
-                // Get the certificate HTML
                 const certHTML = document.getElementById('certificateContainer').innerHTML;
-                
-                // Create a temporary container with ONLY the certificate
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = certHTML;
                 tempDiv.style.position = 'fixed';
@@ -2923,32 +2586,16 @@
                 tempDiv.style.margin = '0';
                 tempDiv.style.overflow = 'hidden';
                 document.body.appendChild(tempDiv);
-
-                // Get the certificate element from the temp div
                 const certElement = tempDiv.querySelector('.certificate-wrapper');
-                
-                // Generate PDF using html2pdf
                 const opt = {
                     margin: 0,
                     filename: `Certificate_${record.clubId}.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: {
-                        scale: 2,
-                        useCORS: true,
-                        letterRendering: true,
-                        width: 794,
-                        height: 1123,
-                        scrollY: 0,
-                        windowHeight: 1123
-                    },
-                    jsPDF: {
-                        unit: 'mm',
-                        format: 'a4',
-                        orientation: 'portrait'
-                    },
+                    html2canvas: { scale: 2, useCORS: true, letterRendering: true, width: 794, height: 1123,
+                        scrollY: 0, windowHeight: 1123 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                     pagebreak: { mode: 'avoid-all' }
                 };
-
                 html2pdf().set(opt).from(certElement).save().then(function() {
                     btn.innerHTML = originalText;
                     btn.disabled = false;
@@ -2974,12 +2621,10 @@
                         document.getElementById('loginError').classList.remove('show');
                         return;
                     }
-
                     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
                     document.getElementById('tab-' + this.dataset.tab).classList.add('active');
-
                     if (this.dataset.tab === 'admin' && isLoggedIn) {
                         renderAdminTable();
                         setTimeout(syncFromCloud, 300);
@@ -2992,19 +2637,15 @@
             // ============================================
             document.getElementById('department').value = 'EEE';
             checkLogin();
-
             setTimeout(syncFromCloud, 1000);
 
             console.log('🏫 WUB EEE Club Registration System loaded successfully!');
             console.log('📧 Admin: eee-club@eee.wub.edu.bd');
             console.log('🔑 Password: Eee123@580Eee');
             console.log('📜 Certificate: A4 with your exact design');
-            console.log('📐 Design: Border, WUB EEE CLUB header, Certificate of Membership');
-            console.log('📱 QR Code on certificate with member information');
-            console.log('📝 NB: Auto-generated, no signature needed');
+            console.log('💳 Payment: bKash (01754526593) & Nagad (01754526594)');
             console.log('☁️ Cloud sync enabled with JSONBin.io');
             console.log('✏️ Edit & Delete options available in Admin Panel');
-            console.log('📄 Download PDF & Print Certificate (A4) options available');
         })();
     </script>
 </body>
