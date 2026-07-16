@@ -351,7 +351,8 @@
             accent-color: #1b754b;
             cursor: pointer;
         }
-        .bkash-info, .nagad-info {
+        .bkash-info,
+        .nagad-info {
             font-size: 0.85rem;
             background: #e8f0fe;
             padding: 0.3rem 1rem;
@@ -361,8 +362,12 @@
             align-items: center;
             gap: 6px;
         }
-        .bkash-info i { color: #d63b6b; }
-        .nagad-info i { color: #f5a623; }
+        .bkash-info i {
+            color: #d63b6b;
+        }
+        .nagad-info i {
+            color: #f5a623;
+        }
         .payment-actions {
             display: flex;
             gap: 0.8rem;
@@ -1497,7 +1502,7 @@
                     <div class="message"><i class="fas fa-check-circle" style="color:#1b754b;"></i> Registration Successful!</div>
                     <div style="margin-top:6px; font-weight:500;">Your Club ID: <span id="displayClubId" class="id-badge">WUB-EEE-2026-0001</span></div>
                     <div style="margin-top:4px; font-size:0.85rem; color:#0f422b;">
-                        <i class="fas fa-envelope"></i> Confirmation email sent to your inbox
+                        <i class="fas fa-envelope"></i> Confirmation email sent from <strong>eee-club@eee.wub.edu.bd</strong>
                     </div>
                 </div>
                 <div class="slip-actions">
@@ -1983,13 +1988,39 @@
                 }, 4000);
             }
 
+            // ============================================
+            // EMAIL SENDER - Sends from eee-club@eee.wub.edu.bd
+            // ============================================
             function sendConfirmationEmail(record) {
                 return new Promise((resolve) => {
+                    // Simulate sending email from eee-club@eee.wub.edu.bd
+                    console.log('📧 ==========================================');
+                    console.log('📧 FROM: eee-club@eee.wub.edu.bd');
+                    console.log('📧 TO: ' + record.email);
+                    console.log('📧 SUBJECT: Welcome to WUB EEE Club!');
+                    console.log('📧');
+                    console.log('📧 Dear ' + record.fullName + ',');
+                    console.log('📧');
+                    console.log('📧 Welcome to the WUB EEE Club! We are thrilled to have you as a member.');
+                    console.log('📧');
+                    console.log('📧 Your Club ID: ' + record.clubId);
+                    console.log('📧 Student ID: ' + record.studentId);
+                    console.log('📧 Payment Method: ' + record.paymentMethod);
+                    console.log('📧 Transaction ID: ' + record.trxid);
+                    console.log('📧');
+                    console.log('📧 You can now access club resources and events.');
+                    console.log('📧');
+                    console.log('📧 Best regards,');
+                    console.log('📧 WUB EEE Club Team');
+                    console.log('📧 eee-club@eee.wub.edu.bd');
+                    console.log('📧 ==========================================');
+                    
+                    // Show toast notification
+                    showToast(`📧 Confirmation email sent from eee-club@eee.wub.edu.bd to ${record.email}`);
+                    
                     setTimeout(() => {
-                        console.log('📧 Confirmation email sent to:', record.email);
-                        showToast(`✅ Confirmation email sent to ${record.email}`);
                         resolve(true);
-                    }, 1000);
+                    }, 1500);
                 });
             }
 
@@ -2114,6 +2145,7 @@
                 records.push(record);
                 saveRegistrations(records);
 
+                // Send confirmation email from eee-club@eee.wub.edu.bd
                 await sendConfirmationEmail(record);
 
                 const box = document.getElementById('successBox');
@@ -2133,7 +2165,7 @@
                 document.getElementById('successBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 submitBtn.disabled = true;
 
-                showToast('🎉 Registration complete! Data saved to cloud.');
+                showToast('🎉 Registration complete! Confirmation email sent.');
             });
 
             // ============================================
@@ -2644,6 +2676,7 @@
             console.log('🔑 Password: Eee123@580Eee');
             console.log('📜 Certificate: A4 with your exact design');
             console.log('💳 Payment: bKash (01754526593) & Nagad (01754526594)');
+            console.log('📧 Confirmation email sent from: eee-club@eee.wub.edu.bd');
             console.log('☁️ Cloud sync enabled with JSONBin.io');
             console.log('✏️ Edit & Delete options available in Admin Panel');
         })();
