@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+    </script>
     <style>
         /* ============================================
            MAIN SYSTEM STYLES
@@ -1688,6 +1691,18 @@
     <script>
         (function() {
             // ============================================
+            // EmailJS Configuration - YOUR CREDENTIALS
+            // ============================================
+            const EMAILJS_PUBLIC_KEY = 'mZR55c2c8zMmSqBLL';
+            const EMAILJS_SERVICE_ID = 'service_3ectzds';
+            const EMAILJS_TEMPLATE_ID = 'template_f00pkj';
+
+            // Initialize EmailJS
+            emailjs.init({
+                publicKey: EMAILJS_PUBLIC_KEY,
+            });
+
+            // ============================================
             // JSONBin.io CONFIGURATION
             // ============================================
             const JSONBIN_BIN_ID = '6a3a40f6f5f4af5e2921c0d2';
@@ -2027,58 +2042,44 @@
             }
 
             // ============================================
-            // EMAIL SENDER - ACTUAL EMAIL SENDING
+            // EMAIL SENDER - Using EmailJS
             // ============================================
-            function sendConfirmationEmail(record) {
-                return new Promise((resolve) => {
-                    // Build email content
-                    const subject = encodeURIComponent('Welcome to WUB EEE Club!');
-                    const body = encodeURIComponent(
-                        `Dear ${record.fullName},\n\n` +
-                        `Welcome to the WUB EEE Club! We are thrilled to have you as a member.\n\n` +
-                        `Your registration has been successfully completed.\n\n` +
-                        `📋 Registration Details:\n` +
-                        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-                        `Club ID: ${record.clubId}\n` +
-                        `Student ID: ${record.studentId}\n` +
-                        `Full Name: ${record.fullName}\n` +
-                        `Email: ${record.email}\n` +
-                        `Phone: ${record.phone || 'N/A'}\n` +
-                        `Semester: ${record.semester}\n` +
-                        `Department: EEE\n` +
-                        `Payment Method: ${record.paymentMethod}\n` +
-                        `Transaction ID: ${record.trxid}\n` +
-                        `Payment Amount: 200 TK\n` +
-                        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
-                        `You can now access club resources, events, and activities.\n` +
-                        `Your Club ID is: ${record.clubId}\n\n` +
-                        `Best regards,\n` +
-                        `WUB EEE Club Team\n` +
-                        `eee-club@eee.wub.edu.bd\n` +
-                        `World University of Bangladesh`
+            async function sendConfirmationEmail(record) {
+                try {
+                    showToast('📧 Sending confirmation email from eee-club@eee.wub.edu.bd...');
+
+                    const templateParams = {
+                        to_email: record.email,
+                        to_name: record.fullName,
+                        club_id: record.clubId,
+                        student_id: record.studentId,
+                        semester: record.semester,
+                        payment_method: record.paymentMethod,
+                        trxid: record.trxid,
+                        join_date: new Date(record.joinDate).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        })
+                    };
+
+                    console.log('📧 Sending email with params:', templateParams);
+
+                    const response = await emailjs.send(
+                        EMAILJS_SERVICE_ID,
+                        EMAILJS_TEMPLATE_ID,
+                        templateParams
                     );
 
-                    // Open default email client with pre-filled from, to, subject, body
-                    const mailtoLink = `mailto:${record.email}?subject=${subject}&body=${body}`;
-                    
-                    // Log to console for debugging
-                    console.log('📧 ==========================================');
-                    console.log('📧 FROM: eee-club@eee.wub.edu.bd');
-                    console.log('📧 TO: ' + record.email);
-                    console.log('📧 SUBJECT: Welcome to WUB EEE Club!');
-                    console.log('📧 BODY:');
-                    console.log(body);
-                    console.log('📧 ==========================================');
-                    
-                    // Open mail client
-                    window.open(mailtoLink, '_blank');
-                    
-                    showToast(`📧 Opening email client to send confirmation to ${record.email}`);
-                    
-                    setTimeout(() => {
-                        resolve(true);
-                    }, 1500);
-                });
+                    console.log('📧 Email sent successfully!', response);
+                    showToast(`✅ Confirmation email sent to ${record.email} from eee-club@eee.wub.edu.bd`);
+                    return true;
+
+                } catch (error) {
+                    console.error('❌ Email sending failed:', error);
+                    showToast(`⚠️ Could not send email. Please try again. Error: ${error.text || error.message}`, true);
+                    return false;
+                }
             }
 
             // ============================================
@@ -2154,7 +2155,6 @@
                     </div>
                 `;
 
-                // Create a temporary div for printing
                 const printWindow = window.open('', '_blank', 'width=600,height=800');
                 printWindow.document.write(`
                     <!DOCTYPE html>
@@ -2363,7 +2363,7 @@
                 saveRegistrations(records);
 
                 // Send confirmation email
-                await sendConfirmationEmail(record);
+                const emailSent = await sendConfirmationEmail(record);
 
                 const box = document.getElementById('successBox');
                 const span = document.getElementById('displayClubId');
@@ -2382,7 +2382,11 @@
                 document.getElementById('successBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 submitBtn.disabled = true;
 
-                showToast('🎉 Registration complete! Check your email for confirmation.');
+                if (emailSent) {
+                    showToast('🎉 Registration complete! Confirmation email sent from eee-club@eee.wub.edu.bd');
+                } else {
+                    showToast('⚠️ Registration saved but email could not be sent. Please contact support.', true);
+                }
             });
 
             // ============================================
@@ -2929,9 +2933,11 @@
             console.log('📧 Admin: eee-club@eee.wub.edu.bd');
             console.log('🔑 Password: Eee123@580Eee');
             console.log('💳 Payment: bKash (01754526593) & Nagad (01754526594)');
-            console.log('📧 Confirmation email opens your default mail client');
-            console.log('📄 Download Slip: Prints a registration receipt');
-            console.log('☁️ Cloud sync enabled with JSONBin.io');
+            console.log('📧 EmailJS configured with:');
+            console.log('   Public Key: mZR55c2c8zMmSqBLL');
+            console.log('   Service ID: service_3ectzds');
+            console.log('   Template ID: template_f00pkj');
+            console.log('✅ System ready to send confirmation emails!');
         })();
     </script>
 </body>
