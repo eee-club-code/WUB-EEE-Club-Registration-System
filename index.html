@@ -669,12 +669,12 @@
         .admin-actions .btn-purple:hover {
             background: #7b1fa2;
         }
-        .admin-actions .btn-verify {
-            background: #0d7a3b;
+        .admin-actions .btn-fix {
+            background: #d63b6b;
             color: white;
         }
-        .admin-actions .btn-verify:hover {
-            background: #0f8f47;
+        .admin-actions .btn-fix:hover {
+            background: #b82a55;
         }
 
         .admin-table-wrap {
@@ -836,17 +836,6 @@
         .action-btn.resend:hover {
             background: #1d5b9e;
         }
-        .action-btn.verified-badge {
-            background: #0d7a3b;
-            color: white;
-            padding: 0.2rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            cursor: default;
-            white-space: nowrap;
-            border: none;
-        }
 
         .notification-toast {
             position: fixed;
@@ -975,7 +964,7 @@
             background: white;
             padding: 2rem;
             border-radius: 2rem;
-            max-width: 500px;
+            max-width: 550px;
             width: 95%;
             max-height: 90vh;
             overflow-y: auto;
@@ -1007,6 +996,10 @@
             font-size: 0.85rem;
             color: #1f3a66;
         }
+        .edit-modal label .club-id-label {
+            color: #0b3b7a;
+            font-weight: 700;
+        }
         .edit-modal input,
         .edit-modal select {
             width: 100%;
@@ -1022,6 +1015,13 @@
             border-color: #2b6bb0;
             box-shadow: 0 0 0 4px rgba(43, 107, 176, 0.08);
         }
+        .edit-modal input[readonly] {
+            background: #eef3fa;
+            color: #1f3f66;
+            font-weight: 600;
+            border-color: #cbd8ea;
+            cursor: not-allowed;
+        }
         .edit-modal .btn-save {
             width: 100%;
             padding: 0.8rem;
@@ -1036,6 +1036,22 @@
         }
         .edit-modal .btn-save:hover {
             background: #1f8a5a;
+        }
+        .edit-modal .btn-save:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .edit-modal .edit-info {
+            background: #e8f0fe;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            color: #0b2b5c;
+        }
+        .edit-modal .edit-info i {
+            color: #0b3b7a;
+            margin-right: 6px;
         }
 
         @keyframes slideUp {
@@ -1639,6 +1655,7 @@
                 <button class="btn-success" id="generateAllCertsBtn"><i class="fas fa-certificate"></i> Generate Eligible</button>
                 <button class="btn-purple" id="generatePastMembersBtn"><i class="fas fa-history"></i> Generate for Past Members</button>
                 <button class="btn-warning" id="forceGenerateBtn"><i class="fas fa-bolt"></i> Force Generate (Test)</button>
+                <button class="btn-fix" id="fixDuplicateIdsBtn"><i class="fas fa-hammer"></i> Fix Duplicate IDs</button>
                 <button class="btn-danger" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
 
@@ -1667,27 +1684,37 @@
     <div class="edit-modal" id="editModal">
         <div class="edit-modal-content">
             <button class="edit-modal-close" id="editModalClose">&times;</button>
-            <h3 style="color:#0b2b5c; margin-bottom:1rem;"><i class="fas fa-edit"></i> Edit Member</h3>
+            <h3 style="color:#0b2b5c; margin-bottom:1rem;"><i class="fas fa-edit"></i> Edit Member Information</h3>
+            <div class="edit-info">
+                <i class="fas fa-info-circle"></i> 
+                <strong>Club ID:</strong> <span id="editClubIdDisplay" style="color:#0b3b7a; font-weight:700;">-</span>
+                <span style="margin-left:1rem;"><i class="fas fa-user"></i> Member ID: <span id="editMemberIdDisplay">-</span></span>
+                <br><small style="color:#6b8aaa;">The Club ID is unique and cannot be changed.</small>
+            </div>
             <form id="editForm">
                 <input type="hidden" id="editClubId" />
                 <div class="form-group">
-                    <label>Full Name</label>
+                    <label><i class="fas fa-id-card"></i> Club ID</label>
+                    <input type="text" id="editClubIdReadonly" readonly />
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Full Name <span style="color:#b22234;">*</span></label>
                     <input type="text" id="editFullName" required />
                 </div>
                 <div class="form-group">
-                    <label>Student ID</label>
+                    <label><i class="fas fa-id-card"></i> Student ID <span style="color:#b22234;">*</span></label>
                     <input type="text" id="editStudentId" required />
                 </div>
                 <div class="form-group">
-                    <label>Email</label>
+                    <label><i class="fas fa-envelope"></i> Email <span style="color:#b22234;">*</span></label>
                     <input type="email" id="editEmail" required />
                 </div>
                 <div class="form-group">
-                    <label>Phone</label>
+                    <label><i class="fas fa-phone-alt"></i> Phone</label>
                     <input type="text" id="editPhone" />
                 </div>
                 <div class="form-group">
-                    <label>Semester</label>
+                    <label><i class="fas fa-calendar-alt"></i> Semester</label>
                     <select id="editSemester">
                         <option value="1st">1st</option>
                         <option value="2nd">2nd</option>
@@ -1700,7 +1727,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Gender</label>
+                    <label><i class="fas fa-venus-mars"></i> Gender</label>
                     <select id="editGender">
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
@@ -1708,7 +1735,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Interest Area</label>
+                    <label><i class="fas fa-tag"></i> Interest Area</label>
                     <select id="editInterest">
                         <option value="Technical Workshop">Technical Workshop</option>
                         <option value="Competition Team">Competition Team</option>
@@ -1716,7 +1743,14 @@
                         <option value="Event Management">Event Management</option>
                     </select>
                 </div>
-                <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Changes</button>
+                <div class="form-group" style="margin-top:0.5rem;">
+                    <label style="font-size:0.8rem; color:#6b8aaa;">
+                        <i class="fas fa-envelope"></i> 
+                        <input type="checkbox" id="editSendEmail" checked /> 
+                        Send update notification email to student
+                    </label>
+                </div>
+                <button type="submit" class="btn-save" id="editSaveBtn"><i class="fas fa-save"></i> Save Changes & Send Update</button>
             </form>
         </div>
     </div>
@@ -1740,11 +1774,12 @@
     <script>
         (function() {
             // ============================================
-            // EmailJS Configuration - YOUR CREDENTIALS
+            // EmailJS Configuration
             // ============================================
             const EMAILJS_PUBLIC_KEY = 'mZR55c2c8zMmSqBLL';
             const EMAILJS_SERVICE_ID = 'service_3ectzds';
             const EMAILJS_TEMPLATE_ID = 'template_f00pkjl';
+            const EMAILJS_UPDATE_TEMPLATE_ID = 'template_update'; // You'll need to create this template
 
             // Initialize EmailJS
             emailjs.init({
@@ -2052,6 +2087,155 @@
             }
 
             // ============================================
+            // FIX DUPLICATE IDs FUNCTION
+            // ============================================
+            window.fixDuplicateIds = function() {
+                const records = getRegistrations();
+                if (records.length === 0) {
+                    showToast('❌ No members found to fix.', true);
+                    return;
+                }
+
+                // Find duplicates
+                const idMap = {};
+                const duplicates = [];
+                records.forEach((r, idx) => {
+                    if (idMap[r.clubId]) {
+                        duplicates.push({ index: idx, clubId: r.clubId, name: r.fullName });
+                    } else {
+                        idMap[r.clubId] = true;
+                    }
+                });
+
+                if (duplicates.length === 0) {
+                    showToast('✅ No duplicate Club IDs found! All IDs are unique.');
+                    return;
+                }
+
+                if (!confirm(`Found ${duplicates.length} duplicate Club IDs.\n\nClick OK to generate new unique IDs for all members with duplicate IDs.`)) {
+                    return;
+                }
+
+                // Get current max serial
+                let maxSerial = getLastSerial();
+                
+                // Generate new IDs for duplicates
+                let fixedCount = 0;
+                const updatedRecords = records.map((r) => {
+                    // Check if this Club ID has duplicates
+                    const duplicateCount = records.filter(rec => rec.clubId === r.clubId).length;
+                    if (duplicateCount > 1) {
+                        // Find the first occurrence of this Club ID
+                        const firstIndex = records.findIndex(rec => rec.clubId === r.clubId);
+                        if (firstIndex !== -1 && records.indexOf(r) !== firstIndex) {
+                            // This is a duplicate - assign new ID
+                            maxSerial++;
+                            const newClubId = generateClubId(maxSerial);
+                            // Also update certificate if exists
+                            const certs = getCertificates();
+                            if (certs[r.clubId]) {
+                                const certData = certs[r.clubId];
+                                delete certs[r.clubId];
+                                certData.clubId = newClubId;
+                                certData.certNumber = `WUB-EEE-CERT-${String(maxSerial).padStart(4, '0')}`;
+                                certs[newClubId] = certData;
+                                saveCertificates(certs);
+                            }
+                            r.clubId = newClubId;
+                            fixedCount++;
+                            console.log(`Fixed: ${r.fullName} got new ID: ${newClubId}`);
+                        }
+                    }
+                    return r;
+                });
+
+                setLastSerial(maxSerial);
+                saveRegistrations(updatedRecords);
+                renderAdminTable();
+                showToast(`✅ Fixed ${fixedCount} duplicate Club IDs! All members now have unique IDs.`);
+            };
+
+            // ============================================
+            // SEND UPDATE EMAIL FUNCTION
+            // ============================================
+            async function sendUpdateEmail(record, oldData) {
+                try {
+                    showToast('📧 Sending update notification email...');
+
+                    // Generate list of changes
+                    const changes = [];
+                    if (oldData.fullName !== record.fullName) changes.push(`Name: ${oldData.fullName} → ${record.fullName}`);
+                    if (oldData.studentId !== record.studentId) changes.push(`Student ID: ${oldData.studentId} → ${record.studentId}`);
+                    if (oldData.email !== record.email) changes.push(`Email: ${oldData.email} → ${record.email}`);
+                    if (oldData.phone !== record.phone) changes.push(`Phone: ${oldData.phone || 'N/A'} → ${record.phone || 'N/A'}`);
+                    if (oldData.semester !== record.semester) changes.push(`Semester: ${oldData.semester} → ${record.semester}`);
+                    if (oldData.gender !== record.gender) changes.push(`Gender: ${oldData.gender} → ${record.gender}`);
+                    if (oldData.interest !== record.interest) changes.push(`Interest: ${oldData.interest} → ${record.interest}`);
+
+                    const changesText = changes.length > 0 ? changes.join('\n') : 'No changes were made.';
+
+                    const templateParams = {
+                        to_email: record.email,
+                        to_name: record.fullName,
+                        club_id: record.clubId,
+                        student_id: record.studentId,
+                        changes: changesText,
+                        update_date: new Date().toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })
+                    };
+
+                    console.log('📧 Sending update email with params:', templateParams);
+
+                    // Try to send with update template, fallback to main template if not exists
+                    try {
+                        const response = await emailjs.send(
+                            EMAILJS_SERVICE_ID,
+                            'template_update', // You need to create this template in EmailJS
+                            templateParams
+                        );
+                        console.log('📧 Update email sent successfully!', response);
+                        showToast(`✅ Update notification sent to ${record.email}`);
+                        return true;
+                    } catch (updateError) {
+                        // Fallback: Use the main template but with update info
+                        console.log('Update template not found, using main template with update info');
+                        const fallbackParams = {
+                            to_email: record.email,
+                            to_name: record.fullName,
+                            club_id: record.clubId,
+                            student_id: record.studentId,
+                            semester: record.semester,
+                            payment_method: record.paymentMethod,
+                            trxid: record.trxid || 'N/A',
+                            join_date: new Date(record.joinDate).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            })
+                        };
+                        const response = await emailjs.send(
+                            EMAILJS_SERVICE_ID,
+                            EMAILJS_TEMPLATE_ID,
+                            fallbackParams
+                        );
+                        console.log('📧 Email sent with updated info!', response);
+                        showToast(`✅ Update notification sent to ${record.email}`);
+                        return true;
+                    }
+
+                } catch (error) {
+                    console.error('❌ Update email sending failed:', error);
+                    showToast(`⚠️ Could not send update email. Error: ${error.text || error.message}`, true);
+                    return false;
+                }
+            }
+
+            // ============================================
             // LOGIN
             // ============================================
             function checkLogin() {
@@ -2114,6 +2298,15 @@
                 showToast('👋 Logged out successfully');
             });
 
+            // Fix Duplicate IDs button
+            document.getElementById('fixDuplicateIdsBtn').addEventListener('click', function() {
+                if (!isLoggedIn) {
+                    showToast('⚠️ Please login first', true);
+                    return;
+                }
+                window.fixDuplicateIds();
+            });
+
             // ============================================
             // TOAST & UTILITY
             // ============================================
@@ -2138,7 +2331,7 @@
             }
 
             // ============================================
-            // EMAIL SENDER - Using EmailJS
+            // EMAIL SENDER - Confirmation Email
             // ============================================
             async function sendConfirmationEmail(record) {
                 try {
@@ -2469,7 +2662,6 @@
                 window._lastClubId = clubId;
                 window._lastFormData = record;
 
-                // Show QR code but email will be sent after admin verification
                 generateQRCode(record);
                 document.getElementById('qrClubId').textContent = clubId;
                 document.getElementById('qrJoinDate').textContent = new Date(record.joinDate).toLocaleDateString();
@@ -2498,17 +2690,14 @@
                     return;
                 }
 
-                // Confirm verification
                 if (!confirm(`Verify membership for ${records[index].fullName} (${records[index].clubId})?\nThis will send a confirmation email with their Club ID.`)) {
                     return;
                 }
 
-                // Mark as verified
                 records[index].isVerified = true;
                 records[index].verifiedDate = new Date().toISOString();
                 saveRegistrations(records);
 
-                // Send confirmation email
                 const emailSent = await sendConfirmationEmail(records[index]);
                 records[index].emailSent = emailSent;
                 saveRegistrations(records);
@@ -2734,7 +2923,7 @@
             }
 
             // ============================================
-            // ADMIN TABLE - Updated with fixed verification display
+            // ADMIN TABLE
             // ============================================
             function renderAdminTable() {
                 if (!isLoggedIn) return;
@@ -2757,21 +2946,17 @@
                     
                     let actions = '';
                     
-                    // Edit and Delete buttons
                     actions = `
                         <button class="action-btn edit" onclick="editMember('${r.clubId}')"><i class="fas fa-edit"></i></button>
                         <button class="action-btn delete" onclick="deleteMember('${r.clubId}')"><i class="fas fa-trash"></i></button>
                     `;
                     
-                    // Verification status display (FIXED: shows badge instead of TrxID)
                     let verificationDisplay = '';
                     if (isVerified) {
                         verificationDisplay = `<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified${emailSent ? ' ✓' : ''}</span>`;
-                        // Add Resend Email button for verified members
                         actions += `<button class="action-btn resend" onclick="resendEmail('${r.clubId}')" title="Resend confirmation email"><i class="fas fa-envelope"></i> Resend</button>`;
                     } else {
                         verificationDisplay = `<span class="badge-unverified"><i class="fas fa-clock"></i> Pending</span>`;
-                        // Add Verify button if not verified
                         actions += `<button class="action-btn verify" onclick="verifyMember('${r.clubId}')"><i class="fas fa-check-circle"></i> Verify</button>`;
                     }
 
@@ -2812,13 +2997,23 @@
             }
 
             // ============================================
-            // EDIT & DELETE
+            // EDIT & DELETE - FIXED with Club ID and Email
             // ============================================
             window.editMember = function(clubId) {
                 const records = getRegistrations();
                 const record = records.find(r => r.clubId === clubId);
-                if (!record) { showToast('❌ Member not found', true); return; }
+                if (!record) { 
+                    showToast('❌ Member not found. Club ID: ' + clubId, true); 
+                    return; 
+                }
+                
+                // Store original data for change detection
+                window._editOriginalData = { ...record };
+                
                 document.getElementById('editClubId').value = clubId;
+                document.getElementById('editClubIdDisplay').textContent = clubId;
+                document.getElementById('editClubIdReadonly').value = clubId;
+                document.getElementById('editMemberIdDisplay').textContent = record.studentId || 'N/A';
                 document.getElementById('editFullName').value = record.fullName || '';
                 document.getElementById('editStudentId').value = record.studentId || '';
                 document.getElementById('editEmail').value = record.email || '';
@@ -2826,44 +3021,109 @@
                 document.getElementById('editSemester').value = record.semester || '3rd';
                 document.getElementById('editGender').value = record.gender || 'Male';
                 document.getElementById('editInterest').value = record.interest || 'Technical Workshop';
+                document.getElementById('editSendEmail').checked = true;
                 document.getElementById('editModal').classList.add('open');
+                
+                console.log('📝 Editing member:', record.fullName, 'Club ID:', clubId);
             };
 
             document.getElementById('editModalClose').addEventListener('click', function() {
                 document.getElementById('editModal').classList.remove('open');
+                window._editOriginalData = null;
             });
             document.getElementById('editModal').addEventListener('click', function(e) {
-                if (e.target === this) this.classList.remove('open');
+                if (e.target === this) {
+                    this.classList.remove('open');
+                    window._editOriginalData = null;
+                }
             });
 
-            document.getElementById('editForm').addEventListener('submit', function(e) {
+            document.getElementById('editForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
-                const clubId = document.getElementById('editClubId').value;
-                const fullName = document.getElementById('editFullName').value.trim();
-                const studentId = document.getElementById('editStudentId').value.trim();
-                const email = document.getElementById('editEmail').value.trim();
-                const phone = document.getElementById('editPhone').value.trim();
-                const semester = document.getElementById('editSemester').value;
-                const gender = document.getElementById('editGender').value;
-                const interest = document.getElementById('editInterest').value;
-                if (!fullName || !studentId || !email) {
-                    showToast('⚠️ Please fill in all required fields.', true);
-                    return;
+                const btn = document.getElementById('editSaveBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+                try {
+                    const clubId = document.getElementById('editClubId').value;
+                    const fullName = document.getElementById('editFullName').value.trim();
+                    const studentId = document.getElementById('editStudentId').value.trim();
+                    const email = document.getElementById('editEmail').value.trim();
+                    const phone = document.getElementById('editPhone').value.trim();
+                    const semester = document.getElementById('editSemester').value;
+                    const gender = document.getElementById('editGender').value;
+                    const interest = document.getElementById('editInterest').value;
+                    const sendEmail = document.getElementById('editSendEmail').checked;
+
+                    if (!fullName || !studentId || !email) {
+                        showToast('⚠️ Please fill in all required fields.', true);
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-save"></i> Save Changes & Send Update';
+                        return;
+                    }
+
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(email)) {
+                        showToast('⚠️ Please enter a valid email address.', true);
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-save"></i> Save Changes & Send Update';
+                        return;
+                    }
+
+                    const records = getRegistrations();
+                    const index = records.findIndex(r => r.clubId === clubId);
+                    if (index === -1) { 
+                        showToast('❌ Member not found.', true);
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-save"></i> Save Changes & Send Update';
+                        return; 
+                    }
+
+                    // Check if student ID is being changed and is unique
+                    const existingStudentId = records.some((r, i) => 
+                        i !== index && r.studentId === studentId
+                    );
+                    if (existingStudentId) {
+                        showToast('⚠️ This Student ID is already used by another member.', true);
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-save"></i> Save Changes & Send Update';
+                        return;
+                    }
+
+                    const oldData = { ...records[index] };
+                    
+                    // Update record
+                    records[index].fullName = fullName;
+                    records[index].studentId = studentId;
+                    records[index].email = email;
+                    records[index].phone = phone;
+                    records[index].semester = semester;
+                    records[index].gender = gender;
+                    records[index].interest = interest;
+
+                    saveRegistrations(records);
+                    renderAdminTable();
+
+                    // Send update email if checked
+                    if (sendEmail) {
+                        const emailSent = await sendUpdateEmail(records[index], oldData);
+                        if (emailSent) {
+                            records[index].emailSent = true;
+                            saveRegistrations(records);
+                        }
+                    }
+
+                    document.getElementById('editModal').classList.remove('open');
+                    window._editOriginalData = null;
+                    showToast(`✅ Member updated successfully!${sendEmail ? ' Email notification sent.' : ''}`);
+                    
+                } catch (error) {
+                    console.error('Edit error:', error);
+                    showToast('❌ Error updating member: ' + error.message, true);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-save"></i> Save Changes & Send Update';
                 }
-                const records = getRegistrations();
-                const index = records.findIndex(r => r.clubId === clubId);
-                if (index === -1) { showToast('❌ Member not found', true); return; }
-                records[index].fullName = fullName;
-                records[index].studentId = studentId;
-                records[index].email = email;
-                records[index].phone = phone;
-                records[index].semester = semester;
-                records[index].gender = gender;
-                records[index].interest = interest;
-                saveRegistrations(records);
-                renderAdminTable();
-                document.getElementById('editModal').classList.remove('open');
-                showToast('✅ Member updated successfully!');
             });
 
             window.deleteMember = function(clubId) {
@@ -3115,14 +3375,17 @@
             console.log('📧 Admin: eee-club@eee.wub.edu.bd');
             console.log('🔑 Password: Eee123@580Eee');
             console.log('💳 Payment: bKash (01754526593) & Nagad (01754526594)');
-            console.log('📌 TrxID Formats:');
-            console.log('   bKash: Starts with letters (e.g., DGJ7IJCMAV)');
-            console.log('   Nagad: Starts with numbers (e.g., 75P2QZJ4)');
+            console.log('📌 Features:');
+            console.log('   ✅ Edit Member with Club ID display');
+            console.log('   ✅ Update notification email');
+            console.log('   ✅ Fix Duplicate IDs tool');
+            console.log('   ✅ TRXID validation');
+            console.log('   ✅ Admin verification workflow');
             console.log('📧 EmailJS configured with:');
             console.log('   Public Key: mZR55c2c8zMmSqBLL');
             console.log('   Service ID: service_3ectzds');
-            console.log('   Template ID: template_f00pkj');
-            console.log('✅ System ready with admin verification workflow!');
+            console.log('   Template ID: template_f00pkjl');
+            console.log('✅ System ready!');
         })();
     </script>
 </body>
