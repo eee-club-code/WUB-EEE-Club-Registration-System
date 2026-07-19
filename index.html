@@ -669,6 +669,13 @@
         .admin-actions .btn-purple:hover {
             background: #7b1fa2;
         }
+        .admin-actions .btn-verify {
+            background: #0d7a3b;
+            color: white;
+        }
+        .admin-actions .btn-verify:hover {
+            background: #0f8f47;
+        }
 
         .admin-table-wrap {
             overflow-x: auto;
@@ -676,7 +683,7 @@
         }
         table {
             width: 100%;
-            min-width: 780px;
+            min-width: 850px;
             border-collapse: collapse;
             font-size: 0.85rem;
             background: #fafdff;
@@ -711,6 +718,22 @@
             font-weight: 600;
         }
         .badge-pending {
+            background: #b8860b;
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-verified {
+            background: #0d7a3b;
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-unverified {
             background: #b8860b;
             color: white;
             padding: 0.2rem 0.8rem;
@@ -798,6 +821,31 @@
         }
         .action-btn.delete:hover {
             background: #8b1a2b;
+        }
+        .action-btn.verify {
+            background: #0d7a3b;
+            color: white;
+        }
+        .action-btn.verify:hover {
+            background: #0f8f47;
+        }
+        .action-btn.resend {
+            background: #2b6bb0;
+            color: white;
+        }
+        .action-btn.resend:hover {
+            background: #1d5b9e;
+        }
+        .action-btn.verified-badge {
+            background: #0d7a3b;
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: default;
+            white-space: nowrap;
+            border: none;
         }
 
         .notification-toast {
@@ -1583,7 +1631,7 @@
             <div style="text-align:center; padding:2rem; background:#f8faff; border-radius:20px; margin-bottom:1.5rem;">
                 <i class="fas fa-shield-alt" style="font-size:2.5rem; color:#0b3b7a;"></i>
                 <h3 style="color:#0b2b5c; margin-top:0.5rem;">Admin Panel</h3>
-                <p style="color:#6b8aaa;">Manage members, generate certificates, and view all registrations</p>
+                <p style="color:#6b8aaa;">Manage members, verify registrations, generate certificates</p>
             </div>
 
             <div class="admin-actions">
@@ -1603,6 +1651,7 @@
                             <th>Student ID</th>
                             <th>Club ID</th>
                             <th>Payment</th>
+                            <th>Verified</th>
                             <th>Join Date</th>
                             <th>Certificate</th>
                             <th>Actions</th>
@@ -1735,6 +1784,36 @@
             const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
 
             // ============================================
+            // TRXID VALIDATION FUNCTIONS
+            // ============================================
+            function isValidBkashTrxid(trxid) {
+                return /^[A-Z]{3,4}[A-Z0-9]{5,10}$/i.test(trxid);
+            }
+
+            function isValidNagadTrxid(trxid) {
+                return /^[0-9]{2,4}[A-Z0-9]{4,10}$/i.test(trxid);
+            }
+
+            function validateTrxid(trxid, method) {
+                trxid = trxid.trim();
+                if (!trxid || trxid.length < 4) {
+                    return { valid: false, message: 'Please enter a valid Transaction ID (minimum 4 characters).' };
+                }
+                if (method === 'bKash') {
+                    if (!isValidBkashTrxid(trxid)) {
+                        return { valid: false, message: 'Invalid bKash TrxID format. It should start with letters (e.g., DGJ7IJCMAV).' };
+                    }
+                    return { valid: true, message: 'Valid bKash TrxID format.' };
+                } else if (method === 'Nagad') {
+                    if (!isValidNagadTrxid(trxid)) {
+                        return { valid: false, message: 'Invalid Nagad TrxID format. It should start with numbers (e.g., 75P2QZJ4).' };
+                    }
+                    return { valid: true, message: 'Valid Nagad TrxID format.' };
+                }
+                return { valid: false, message: 'Unknown payment method.' };
+            }
+
+            // ============================================
             // PAYMENT METHOD TOGGLE
             // ============================================
             paymentMethodRadios.forEach(radio => {
@@ -1743,11 +1822,11 @@
                     if (selectedMethod === 'bKash') {
                         bkashInfo.style.display = 'inline-flex';
                         nagadInfo.style.display = 'none';
-                        trxidInput.placeholder = 'Enter bKash TrxID';
+                        trxidInput.placeholder = 'Enter bKash TrxID (e.g., DGJ7IJCMAV)';
                     } else {
                         bkashInfo.style.display = 'none';
                         nagadInfo.style.display = 'inline-flex';
-                        trxidInput.placeholder = 'Enter Nagad TrxID';
+                        trxidInput.placeholder = 'Enter Nagad TrxID (e.g., 75P2QZJ4)';
                     }
                     paymentCompleted = false;
                     verifiedTrxID = '';
@@ -1788,16 +1867,33 @@
             verifyBtn.addEventListener('click', function() {
                 const trxid = trxidInput.value.trim();
                 if (!trxid) {
-                    alert('Please enter a Transaction ID (TrxID).');
+                    alert('⚠️ Please enter a Transaction ID (TrxID).');
                     return;
                 }
-                if (trxid.length < 4) {
-                    alert('Please enter a valid TrxID (at least 4 characters).');
+
+                const validation = validateTrxid(trxid, selectedMethod);
+                if (!validation.valid) {
+                    alert(`⚠️ ${validation.message}`);
                     return;
                 }
+
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
                 this.disabled = true;
+
                 setTimeout(() => {
+                    if (selectedMethod === 'bKash' && !isValidBkashTrxid(trxid)) {
+                        this.innerHTML = '<i class="fas fa-check"></i> Verify';
+                        this.disabled = false;
+                        alert('⚠️ Invalid bKash TrxID format. It should start with letters (e.g., DGJ7IJCMAV).');
+                        return;
+                    }
+                    if (selectedMethod === 'Nagad' && !isValidNagadTrxid(trxid)) {
+                        this.innerHTML = '<i class="fas fa-check"></i> Verify';
+                        this.disabled = false;
+                        alert('⚠️ Invalid Nagad TrxID format. It should start with numbers (e.g., 75P2QZJ4).');
+                        return;
+                    }
+
                     verifiedTrxID = trxid;
                     paymentCompleted = true;
                     updatePaymentUI();
@@ -2349,7 +2445,10 @@
                     timestamp: new Date().toISOString(),
                     isPastStudent: isPastStudent,
                     startYear: startYear,
-                    endYear: endYear
+                    endYear: endYear,
+                    isVerified: false,
+                    verifiedDate: null,
+                    emailSent: false
                 };
 
                 const records = getRegistrations();
@@ -2362,9 +2461,6 @@
                 records.push(record);
                 saveRegistrations(records);
 
-                // Send confirmation email
-                const emailSent = await sendConfirmationEmail(record);
-
                 const box = document.getElementById('successBox');
                 const span = document.getElementById('displayClubId');
                 if (span) span.textContent = clubId;
@@ -2373,6 +2469,7 @@
                 window._lastClubId = clubId;
                 window._lastFormData = record;
 
+                // Show QR code but email will be sent after admin verification
                 generateQRCode(record);
                 document.getElementById('qrClubId').textContent = clubId;
                 document.getElementById('qrJoinDate').textContent = new Date(record.joinDate).toLocaleDateString();
@@ -2382,12 +2479,78 @@
                 document.getElementById('successBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 submitBtn.disabled = true;
 
-                if (emailSent) {
-                    showToast('🎉 Registration complete! Confirmation email sent from eee-club@eee.wub.edu.bd');
-                } else {
-                    showToast('⚠️ Registration saved but email could not be sent. Please contact support.', true);
-                }
+                showToast('🎉 Registration saved! Waiting for admin verification and email confirmation.');
             });
+
+            // ============================================
+            // ADMIN VERIFICATION FUNCTION
+            // ============================================
+            window.verifyMember = async function(clubId) {
+                const records = getRegistrations();
+                const index = records.findIndex(r => r.clubId === clubId);
+                if (index === -1) {
+                    showToast('❌ Member not found', true);
+                    return;
+                }
+
+                if (records[index].isVerified) {
+                    showToast('⚠️ This member is already verified', true);
+                    return;
+                }
+
+                // Confirm verification
+                if (!confirm(`Verify membership for ${records[index].fullName} (${records[index].clubId})?\nThis will send a confirmation email with their Club ID.`)) {
+                    return;
+                }
+
+                // Mark as verified
+                records[index].isVerified = true;
+                records[index].verifiedDate = new Date().toISOString();
+                saveRegistrations(records);
+
+                // Send confirmation email
+                const emailSent = await sendConfirmationEmail(records[index]);
+                records[index].emailSent = emailSent;
+                saveRegistrations(records);
+
+                renderAdminTable();
+                if (emailSent) {
+                    showToast(`✅ Member verified and confirmation email sent to ${records[index].email}`);
+                } else {
+                    showToast(`⚠️ Member verified but email could not be sent. Please try resending.`, true);
+                }
+            };
+
+            // ============================================
+            // RESEND EMAIL FUNCTION
+            // ============================================
+            window.resendEmail = async function(clubId) {
+                const records = getRegistrations();
+                const record = records.find(r => r.clubId === clubId);
+                if (!record) {
+                    showToast('❌ Member not found', true);
+                    return;
+                }
+
+                if (!record.isVerified) {
+                    showToast('⚠️ Please verify the member first before sending email.', true);
+                    return;
+                }
+
+                if (!confirm(`Resend confirmation email to ${record.fullName} (${record.email})?`)) {
+                    return;
+                }
+
+                const emailSent = await sendConfirmationEmail(record);
+                if (emailSent) {
+                    record.emailSent = true;
+                    saveRegistrations(records);
+                    renderAdminTable();
+                    showToast(`✅ Confirmation email resent to ${record.email}`);
+                } else {
+                    showToast(`⚠️ Failed to send email. Please try again.`, true);
+                }
+            };
 
             // ============================================
             // DOWNLOAD SLIP BUTTON
@@ -2571,7 +2734,7 @@
             }
 
             // ============================================
-            // ADMIN TABLE
+            // ADMIN TABLE - Updated with fixed verification display
             // ============================================
             function renderAdminTable() {
                 if (!isLoggedIn) return;
@@ -2579,7 +2742,7 @@
                 const tbody = document.getElementById('adminTableBody');
                 if (!tbody) return;
                 if (records.length === 0) {
-                    tbody.innerHTML = `<tr class="empty-row"><td colspan="8">No registered members yet.</td></tr>`;
+                    tbody.innerHTML = `<tr class="empty-row"><td colspan="9">No registered members yet.</td></tr>`;
                     return;
                 }
                 const certs = getCertificates();
@@ -2589,14 +2752,31 @@
                     const isEligible = isEligibleForCertificate(r.joinDate);
                     const isPast = isPastMember(r.joinDate) || r.isPastStudent;
                     const joinDate = new Date(r.joinDate).toLocaleDateString();
-                    const pastInfo = r.isPastStudent && r.startYear && r.endYear ? `${r.startYear}-${r.endYear}` :
-                        '';
+                    const isVerified = r.isVerified || false;
+                    const emailSent = r.emailSent || false;
+                    
+                    let actions = '';
+                    
+                    // Edit and Delete buttons
+                    actions = `
+                        <button class="action-btn edit" onclick="editMember('${r.clubId}')"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn delete" onclick="deleteMember('${r.clubId}')"><i class="fas fa-trash"></i></button>
+                    `;
+                    
+                    // Verification status display (FIXED: shows badge instead of TrxID)
+                    let verificationDisplay = '';
+                    if (isVerified) {
+                        verificationDisplay = `<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified${emailSent ? ' ✓' : ''}</span>`;
+                        // Add Resend Email button for verified members
+                        actions += `<button class="action-btn resend" onclick="resendEmail('${r.clubId}')" title="Resend confirmation email"><i class="fas fa-envelope"></i> Resend</button>`;
+                    } else {
+                        verificationDisplay = `<span class="badge-unverified"><i class="fas fa-clock"></i> Pending</span>`;
+                        // Add Verify button if not verified
+                        actions += `<button class="action-btn verify" onclick="verifyMember('${r.clubId}')"><i class="fas fa-check-circle"></i> Verify</button>`;
+                    }
+
                     let certStatus = '';
                     let certAction = '';
-                    let actions = '';
-                    actions =
-                        `<button class="action-btn edit" onclick="editMember('${r.clubId}')"><i class="fas fa-edit"></i></button>
-                               <button class="action-btn delete" onclick="deleteMember('${r.clubId}')"><i class="fas fa-trash"></i></button>`;
                     if (hasCert) {
                         certStatus = `<span class="badge-cert"><i class="fas fa-check-circle"></i> Issued</span>`;
                         certAction =
@@ -2607,7 +2787,7 @@
                             `<button class="cert-btn generate" onclick="generateCertForMember('${r.clubId}')"><i class="fas fa-certificate"></i> Generate</button>`;
                     } else if (isPast) {
                         certStatus =
-                            `<span class="badge-past"><i class="fas fa-history"></i> Past Member ${pastInfo ? '('.concat(pastInfo, ')') : ''}</span>`;
+                            `<span class="badge-past"><i class="fas fa-history"></i> Past Member</span>`;
                         certAction =
                             `<button class="cert-btn past" onclick="generatePastCert('${r.clubId}')"><i class="fas fa-certificate"></i> Generate Past</button>`;
                     } else {
@@ -2616,12 +2796,14 @@
                         certStatus = `<span class="badge-no-cert"><i class="fas fa-hourglass-half"></i> ${yearsLeft} year(s)</span>`;
                         certAction = `<span style="font-size:0.7rem; color:#6b8aaa;">Not eligible</span>`;
                     }
+
                     return `<tr>
                   <td>${idx+1}</td>
                   <td><strong>${escapeHtml(r.fullName || '')}</strong></td>
                   <td>${escapeHtml(r.studentId || '')}</td>
                   <td><code style="background:#e8f0fe; padding:2px 8px; border-radius:12px; font-weight:600;">${escapeHtml(r.clubId || '')}</code></td>
                   <td><span class="${paid ? 'badge-paid' : 'badge-pending'}">${paid ? '✅ Paid' : '⏳ Pending'}</span></td>
+                  <td>${verificationDisplay}</td>
                   <td style="font-size:0.8rem;">${joinDate}</td>
                   <td>${certStatus} ${certAction ? '<br>' + certAction : ''}</td>
                   <td>${actions}</td>
@@ -2933,11 +3115,14 @@
             console.log('📧 Admin: eee-club@eee.wub.edu.bd');
             console.log('🔑 Password: Eee123@580Eee');
             console.log('💳 Payment: bKash (01754526593) & Nagad (01754526594)');
+            console.log('📌 TrxID Formats:');
+            console.log('   bKash: Starts with letters (e.g., DGJ7IJCMAV)');
+            console.log('   Nagad: Starts with numbers (e.g., 75P2QZJ4)');
             console.log('📧 EmailJS configured with:');
             console.log('   Public Key: mZR55c2c8zMmSqBLL');
             console.log('   Service ID: service_3ectzds');
             console.log('   Template ID: template_f00pkj');
-            console.log('✅ System ready to send confirmation emails!');
+            console.log('✅ System ready with admin verification workflow!');
         })();
     </script>
 </body>
