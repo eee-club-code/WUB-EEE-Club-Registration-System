@@ -35,7 +35,7 @@
         }
         .container {
             width: 100%;
-            max-width: 960px;
+            max-width: 1050px;
             background: white;
             border-radius: 2rem;
             box-shadow: 0 25px 50px -8px rgba(0, 20, 60, 0.15);
@@ -683,7 +683,7 @@
         }
         table {
             width: 100%;
-            min-width: 850px;
+            min-width: 950px;
             border-collapse: collapse;
             font-size: 0.85rem;
             background: #fafdff;
@@ -765,6 +765,26 @@
             font-size: 0.7rem;
             font-weight: 600;
         }
+        .payment-info {
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+        .payment-info .trxid {
+            background: #eef3fa;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: #0b2b5c;
+            display: inline-block;
+            margin-top: 2px;
+        }
+        .payment-info .method {
+            font-weight: 500;
+            font-size: 0.7rem;
+            color: #3c6e9c;
+        }
+
         .cert-btn {
             padding: 0.2rem 0.8rem;
             border: none;
@@ -1584,7 +1604,7 @@
                             <label><input type="radio" name="paymentMethod" value="Nagad" /> Nagad</label>
                         </div>
                         <span class="bkash-info" id="bkashInfo"><i class="fas fa-mobile-alt"></i> bKash: 01754526593</span>
-                        <span class="nagad-info" id="nagadInfo" style="display:none;"><i class="fas fa-mobile-alt"></i> Nagad: 01754526593</span>
+                        <span class="nagad-info" id="nagadInfo" style="display:none;"><i class="fas fa-mobile-alt"></i> Nagad: 01754526594</span>
                     </div>
                     <div class="payment-actions">
                         <div class="trxid-input">
@@ -1667,7 +1687,7 @@
                             <th>Name</th>
                             <th>Student ID</th>
                             <th>Club ID</th>
-                            <th>Payment</th>
+                            <th>Payment (TRXID)</th>
                             <th>Verified</th>
                             <th>Join Date</th>
                             <th>Certificate</th>
@@ -1779,7 +1799,6 @@
             const EMAILJS_PUBLIC_KEY = 'mZR55c2c8zMmSqBLL';
             const EMAILJS_SERVICE_ID = 'service_3ectzds';
             const EMAILJS_TEMPLATE_ID = 'template_f00pkjl';
-            const EMAILJS_UPDATE_TEMPLATE_ID = 'template_update'; // You'll need to create this template
 
             // Initialize EmailJS
             emailjs.init({
@@ -2096,7 +2115,6 @@
                     return;
                 }
 
-                // Find duplicates
                 const idMap = {};
                 const duplicates = [];
                 records.forEach((r, idx) => {
@@ -2116,22 +2134,15 @@
                     return;
                 }
 
-                // Get current max serial
                 let maxSerial = getLastSerial();
-                
-                // Generate new IDs for duplicates
                 let fixedCount = 0;
                 const updatedRecords = records.map((r) => {
-                    // Check if this Club ID has duplicates
                     const duplicateCount = records.filter(rec => rec.clubId === r.clubId).length;
                     if (duplicateCount > 1) {
-                        // Find the first occurrence of this Club ID
                         const firstIndex = records.findIndex(rec => rec.clubId === r.clubId);
                         if (firstIndex !== -1 && records.indexOf(r) !== firstIndex) {
-                            // This is a duplicate - assign new ID
                             maxSerial++;
                             const newClubId = generateClubId(maxSerial);
-                            // Also update certificate if exists
                             const certs = getCertificates();
                             if (certs[r.clubId]) {
                                 const certData = certs[r.clubId];
@@ -2143,7 +2154,6 @@
                             }
                             r.clubId = newClubId;
                             fixedCount++;
-                            console.log(`Fixed: ${r.fullName} got new ID: ${newClubId}`);
                         }
                     }
                     return r;
@@ -2162,7 +2172,6 @@
                 try {
                     showToast('📧 Sending update notification email...');
 
-                    // Generate list of changes
                     const changes = [];
                     if (oldData.fullName !== record.fullName) changes.push(`Name: ${oldData.fullName} → ${record.fullName}`);
                     if (oldData.studentId !== record.studentId) changes.push(`Student ID: ${oldData.studentId} → ${record.studentId}`);
@@ -2189,48 +2198,19 @@
                         })
                     };
 
-                    console.log('📧 Sending update email with params:', templateParams);
-
-                    // Try to send with update template, fallback to main template if not exists
-                    try {
-                        const response = await emailjs.send(
-                            EMAILJS_SERVICE_ID,
-                            'template_update', // You need to create this template in EmailJS
-                            templateParams
-                        );
-                        console.log('📧 Update email sent successfully!', response);
-                        showToast(`✅ Update notification sent to ${record.email}`);
-                        return true;
-                    } catch (updateError) {
-                        // Fallback: Use the main template but with update info
-                        console.log('Update template not found, using main template with update info');
-                        const fallbackParams = {
-                            to_email: record.email,
-                            to_name: record.fullName,
-                            club_id: record.clubId,
-                            student_id: record.studentId,
-                            semester: record.semester,
-                            payment_method: record.paymentMethod,
-                            trxid: record.trxid || 'N/A',
-                            join_date: new Date(record.joinDate).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                            })
-                        };
-                        const response = await emailjs.send(
-                            EMAILJS_SERVICE_ID,
-                            EMAILJS_TEMPLATE_ID,
-                            fallbackParams
-                        );
-                        console.log('📧 Email sent with updated info!', response);
-                        showToast(`✅ Update notification sent to ${record.email}`);
-                        return true;
-                    }
+                    // Use the main template with update info
+                    const response = await emailjs.send(
+                        EMAILJS_SERVICE_ID,
+                        EMAILJS_TEMPLATE_ID,
+                        templateParams
+                    );
+                    console.log('📧 Update email sent successfully!', response);
+                    showToast(`✅ Update notification sent to ${record.email}`);
+                    return true;
 
                 } catch (error) {
                     console.error('❌ Update email sending failed:', error);
-                    showToast(`⚠️ Could not send update email. Error: ${error.text || error.message}`, true);
+                    showToast(`⚠️ Could not send update email. Please try again.`, true);
                     return false;
                 }
             }
@@ -2923,7 +2903,7 @@
             }
 
             // ============================================
-            // ADMIN TABLE
+            // ADMIN TABLE - UPDATED with TRXID in Payment Column
             // ============================================
             function renderAdminTable() {
                 if (!isLoggedIn) return;
@@ -2945,7 +2925,6 @@
                     const emailSent = r.emailSent || false;
                     
                     let actions = '';
-                    
                     actions = `
                         <button class="action-btn edit" onclick="editMember('${r.clubId}')"><i class="fas fa-edit"></i></button>
                         <button class="action-btn delete" onclick="deleteMember('${r.clubId}')"><i class="fas fa-trash"></i></button>
@@ -2959,6 +2938,15 @@
                         verificationDisplay = `<span class="badge-unverified"><i class="fas fa-clock"></i> Pending</span>`;
                         actions += `<button class="action-btn verify" onclick="verifyMember('${r.clubId}')"><i class="fas fa-check-circle"></i> Verify</button>`;
                     }
+
+                    // Payment column with TRXID
+                    const paymentDisplay = paid ? 
+                        `<span class="badge-paid">✅ Paid</span>
+                         <div class="payment-info">
+                             <span class="method">${r.paymentMethod || 'bKash'}</span>
+                             <span class="trxid">${r.trxid || 'N/A'}</span>
+                         </div>` : 
+                        `<span class="badge-pending">⏳ Pending</span>`;
 
                     let certStatus = '';
                     let certAction = '';
@@ -2986,8 +2974,8 @@
                   <td>${idx+1}</td>
                   <td><strong>${escapeHtml(r.fullName || '')}</strong></td>
                   <td>${escapeHtml(r.studentId || '')}</td>
-                  <td><code style="background:#e8f0fe; padding:2px 8px; border-radius:12px; font-weight:600;">${escapeHtml(r.clubId || '')}</code></td>
-                  <td><span class="${paid ? 'badge-paid' : 'badge-pending'}">${paid ? '✅ Paid' : '⏳ Pending'}</span></td>
+                  <td><code style="background:#e8f0fe; padding:2px 8px; border-radius:12px; font-weight:600; font-size:0.7rem;">${escapeHtml(r.clubId || '')}</code></td>
+                  <td>${paymentDisplay}</td>
                   <td>${verificationDisplay}</td>
                   <td style="font-size:0.8rem;">${joinDate}</td>
                   <td>${certStatus} ${certAction ? '<br>' + certAction : ''}</td>
@@ -2997,7 +2985,7 @@
             }
 
             // ============================================
-            // EDIT & DELETE - FIXED with Club ID and Email
+            // EDIT & DELETE
             // ============================================
             window.editMember = function(clubId) {
                 const records = getRegistrations();
@@ -3007,7 +2995,6 @@
                     return; 
                 }
                 
-                // Store original data for change detection
                 window._editOriginalData = { ...record };
                 
                 document.getElementById('editClubId').value = clubId;
@@ -3079,7 +3066,6 @@
                         return; 
                     }
 
-                    // Check if student ID is being changed and is unique
                     const existingStudentId = records.some((r, i) => 
                         i !== index && r.studentId === studentId
                     );
@@ -3092,7 +3078,6 @@
 
                     const oldData = { ...records[index] };
                     
-                    // Update record
                     records[index].fullName = fullName;
                     records[index].studentId = studentId;
                     records[index].email = email;
@@ -3104,7 +3089,6 @@
                     saveRegistrations(records);
                     renderAdminTable();
 
-                    // Send update email if checked
                     if (sendEmail) {
                         const emailSent = await sendUpdateEmail(records[index], oldData);
                         if (emailSent) {
@@ -3381,6 +3365,7 @@
             console.log('   ✅ Fix Duplicate IDs tool');
             console.log('   ✅ TRXID validation');
             console.log('   ✅ Admin verification workflow');
+            console.log('   ✅ TRXID shown in Payment column');
             console.log('📧 EmailJS configured with:');
             console.log('   Public Key: mZR55c2c8zMmSqBLL');
             console.log('   Service ID: service_3ectzds');
