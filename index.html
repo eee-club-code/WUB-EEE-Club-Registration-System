@@ -2299,7 +2299,7 @@
             // ============================================
             async function sendUnverifyEmail(record, reason) {
                 try {
-                    showToast('📧 Sending unverification email...');
+                    showToast('📧 Sending unverification email to ' + record.email + '...');
 
                     const templateParams = {
                         to_email: record.email,
@@ -2331,7 +2331,16 @@
 
                 } catch (error) {
                     console.error('❌ Unverify email sending failed:', error);
-                    showToast(`⚠️ Could not send unverification email. Please try again.`, true);
+                    console.error('Error details:', error.text || error.message);
+                    
+                    // Show more detailed error
+                    let errorMsg = 'Could not send unverification email. ';
+                    if (error.text) {
+                        errorMsg += 'Error: ' + error.text;
+                    } else if (error.message) {
+                        errorMsg += 'Error: ' + error.message;
+                    }
+                    showToast(`⚠️ ${errorMsg}`, true);
                     return false;
                 }
             }
@@ -2518,7 +2527,7 @@
                 setTimeout(() => {
                     toast.classList.add('hidden');
                     setTimeout(() => toast.remove(), 500);
-                }, 4000);
+                }, 5000);
             }
 
             // ============================================
@@ -2896,7 +2905,7 @@
             };
 
             // ============================================
-            // UNVERIFY FUNCTION
+            // UNVERIFY FUNCTION - FIXED: Email sends properly
             // ============================================
             window.unverifyMember = function(clubId) {
                 const records = getRegistrations();
@@ -2906,16 +2915,13 @@
                     return;
                 }
 
-                // Only allow unverify for PENDING or VERIFIED members
-                // For Verified members, unverify should be available
-                // For Pending members, unverify should also be available
-                // For already unverified members, don't show unverify
-
+                // Check if already unverified
                 if (record.isVerified === false && record.unverifyReason) {
                     showToast('⚠️ This member is already unverified', true);
                     return;
                 }
 
+                // Open the unverify modal
                 document.getElementById('unverifyClubId').value = clubId;
                 document.getElementById('unverifyMemberName').value = record.fullName || 'Unknown';
                 document.getElementById('unverifyClubIdDisplay').value = clubId;
@@ -2933,6 +2939,9 @@
                 }
             });
 
+            // ============================================
+            // UNVERIFY FORM SUBMIT - FIXED: Email sends properly
+            // ============================================
             document.getElementById('unverifyForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 const btn = document.getElementById('unverifyBtn');
@@ -2960,20 +2969,36 @@
                         return;
                     }
 
-                    records[index].isVerified = false;
-                    records[index].verifiedDate = null;
-                    records[index].emailSent = false;
-                    records[index].unverifyReason = reason;
-                    records[index].unverifyDate = new Date().toISOString();
+                    const record = records[index];
+                    
+                    // Unverify the member
+                    record.isVerified = false;
+                    record.verifiedDate = null;
+                    record.emailSent = false;
+                    record.unverifyReason = reason;
+                    record.unverifyDate = new Date().toISOString();
                     saveRegistrations(records);
 
+                    // Send unverify email if checked
+                    let emailSent = false;
                     if (sendEmail) {
-                        await sendUnverifyEmail(records[index], reason);
+                        emailSent = await sendUnverifyEmail(record, reason);
+                        if (emailSent) {
+                            record.emailSent = false; // Unverified, so emailSent is false
+                            saveRegistrations(records);
+                        }
                     }
 
                     document.getElementById('unverifyModal').classList.remove('open');
                     renderAdminTable();
-                    showToast(`✅ Member unverified successfully!${sendEmail ? ' Email notification sent.' : ''}`);
+                    
+                    if (sendEmail && emailSent) {
+                        showToast(`✅ Member unverified successfully! Email notification sent.`);
+                    } else if (sendEmail && !emailSent) {
+                        showToast(`⚠️ Member unverified but email could not be sent. Please check EmailJS configuration.`, true);
+                    } else {
+                        showToast(`✅ Member unverified successfully!`);
+                    }
 
                 } catch (error) {
                     console.error('Unverify error:', error);
@@ -3166,7 +3191,7 @@
             }
 
             // ============================================
-            // ADMIN TABLE - FIXED: Correct button logic
+            // ADMIN TABLE
             // ============================================
             function renderAdminTable() {
                 if (!isLoggedIn) return;
@@ -3198,20 +3223,13 @@
                     
                     let verificationDisplay = '';
                     
-                    // ============================================
-                    // CORRECT BUTTON LOGIC:
-                    // PENDING: Show Verify + Unverify
-                    // VERIFIED: Show Resend + Unverify
-                    // UNVERIFIED: Show Verify only
-                    // ============================================
-                    
                     if (isVerified) {
                         // VERIFIED: Show Resend and Unverify
                         verificationDisplay = `<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified${emailSent ? ' ✓' : ''}</span>`;
                         actions += `<button class="action-btn resend" onclick="resendEmail('${r.clubId}')" title="Resend confirmation email"><i class="fas fa-envelope"></i> Resend</button>`;
                         actions += `<button class="action-btn unverify" onclick="unverifyMember('${r.clubId}')" title="Unverify this member"><i class="fas fa-user-slash"></i> Unverify</button>`;
                     } else if (unverifyReason) {
-                        // UNVERIFIED (has reason): Show Verify only
+                        // UNVERIFIED: Show Verify only
                         verificationDisplay = `<span class="badge-unverified-reason" title="${escapeHtml(unverifyReason)}"><i class="fas fa-exclamation-triangle"></i> Unverified</span>`;
                         actions += `<button class="action-btn verify" onclick="verifyMember('${r.clubId}')" title="Verify this member"><i class="fas fa-check-circle"></i> Verify</button>`;
                     } else {
@@ -3267,7 +3285,7 @@
             }
 
             // ============================================
-            // EDIT & DELETE - FIXED: Permanently delete all data
+            // EDIT & DELETE
             // ============================================
             window.editMember = function(clubId) {
                 const records = getRegistrations();
@@ -3407,7 +3425,6 @@
                     return;
                 }
 
-                // Double confirm for safety
                 if (!confirm(`⚠️ FINAL CONFIRMATION\n\nType "DELETE" in the prompt below to permanently remove this member.`)) {
                     return;
                 }
@@ -3419,14 +3436,12 @@
                 }
 
                 try {
-                    // Remove from registrations
                     const index = records.findIndex(r => r.clubId === clubId);
                     if (index === -1) {
                         showToast('❌ Member not found', true);
                         return;
                     }
                     
-                    // Remove certificate if exists
                     const certs = getCertificates();
                     if (certs[clubId]) {
                         delete certs[clubId];
@@ -3434,14 +3449,11 @@
                         console.log(`🗑️ Certificate removed for ${clubId}`);
                     }
                     
-                    // Remove the member
                     records.splice(index, 1);
                     saveRegistrations(records);
                     
-                    // Update the UI
                     renderAdminTable();
                     
-                    // Check if this was the last member being viewed
                     if (window._currentCertRecord && window._currentCertRecord.clubId === clubId) {
                         document.getElementById('certModal').classList.remove('open');
                         window._currentCertRecord = null;
