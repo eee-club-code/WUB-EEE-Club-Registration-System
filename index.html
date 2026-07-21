@@ -2322,7 +2322,7 @@
 
                     const response = await emailjs.send(
                         EMAILJS_SERVICE_ID,
-                        TEMPLATE_UNVERIFIED,  // Using the unverified template
+                        TEMPLATE_UNVERIFIED,
                         templateParams
                     );
                     console.log('📧 Unverify email sent successfully!', response);
@@ -2363,7 +2363,7 @@
 
                     const response = await emailjs.send(
                         EMAILJS_SERVICE_ID,
-                        TEMPLATE_VERIFIED,  // Using the verified template
+                        TEMPLATE_VERIFIED,
                         templateParams
                     );
 
@@ -2413,7 +2413,7 @@
 
                     const response = await emailjs.send(
                         EMAILJS_SERVICE_ID,
-                        TEMPLATE_VERIFIED,  // Using the verified template for updates
+                        TEMPLATE_VERIFIED,
                         templateParams
                     );
                     console.log('📧 Update email sent successfully!', response);
@@ -2827,7 +2827,7 @@
             });
 
             // ============================================
-            // ADMIN VERIFICATION FUNCTION - Uses template_f00pkjl
+            // ADMIN VERIFICATION FUNCTION
             // ============================================
             window.verifyMember = async function(clubId) {
                 const records = getRegistrations();
@@ -2865,7 +2865,7 @@
             };
 
             // ============================================
-            // RESEND EMAIL FUNCTION - Uses template_f00pkjl
+            // RESEND EMAIL FUNCTION
             // ============================================
             window.resendEmail = async function(clubId) {
                 const records = getRegistrations();
@@ -2896,7 +2896,7 @@
             };
 
             // ============================================
-            // UNVERIFY FUNCTION - Uses template_hzraam8
+            // UNVERIFY FUNCTION
             // ============================================
             window.unverifyMember = function(clubId) {
                 const records = getRegistrations();
@@ -2906,7 +2906,12 @@
                     return;
                 }
 
-                if (!record.isVerified) {
+                // Only allow unverify for PENDING or VERIFIED members
+                // For Verified members, unverify should be available
+                // For Pending members, unverify should also be available
+                // For already unverified members, don't show unverify
+
+                if (record.isVerified === false && record.unverifyReason) {
                     showToast('⚠️ This member is already unverified', true);
                     return;
                 }
@@ -2955,7 +2960,6 @@
                         return;
                     }
 
-                    // Unverify the member
                     records[index].isVerified = false;
                     records[index].verifiedDate = null;
                     records[index].emailSent = false;
@@ -2963,7 +2967,6 @@
                     records[index].unverifyDate = new Date().toISOString();
                     saveRegistrations(records);
 
-                    // Send unverify email if checked
                     if (sendEmail) {
                         await sendUnverifyEmail(records[index], reason);
                     }
@@ -3163,7 +3166,7 @@
             }
 
             // ============================================
-            // ADMIN TABLE
+            // ADMIN TABLE - FIXED: Correct button logic
             // ============================================
             function renderAdminTable() {
                 if (!isLoggedIn) return;
@@ -3183,28 +3186,42 @@
                     const joinDate = new Date(r.joinDate).toLocaleDateString();
                     const isVerified = r.isVerified || false;
                     const emailSent = r.emailSent || false;
+                    const unverifyReason = r.unverifyReason || '';
                     
                     let actions = '';
+                    
+                    // Edit and Delete buttons (always visible)
                     actions = `
-                        <button class="action-btn edit" onclick="editMember('${r.clubId}')"><i class="fas fa-edit"></i></button>
-                        <button class="action-btn delete" onclick="deleteMember('${r.clubId}')"><i class="fas fa-trash"></i></button>
+                        <button class="action-btn edit" onclick="editMember('${r.clubId}')" title="Edit Member"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn delete" onclick="deleteMember('${r.clubId}')" title="Delete Member Permanently"><i class="fas fa-trash"></i></button>
                     `;
                     
                     let verificationDisplay = '';
+                    
+                    // ============================================
+                    // CORRECT BUTTON LOGIC:
+                    // PENDING: Show Verify + Unverify
+                    // VERIFIED: Show Resend + Unverify
+                    // UNVERIFIED: Show Verify only
+                    // ============================================
+                    
                     if (isVerified) {
+                        // VERIFIED: Show Resend and Unverify
                         verificationDisplay = `<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified${emailSent ? ' ✓' : ''}</span>`;
                         actions += `<button class="action-btn resend" onclick="resendEmail('${r.clubId}')" title="Resend confirmation email"><i class="fas fa-envelope"></i> Resend</button>`;
                         actions += `<button class="action-btn unverify" onclick="unverifyMember('${r.clubId}')" title="Unverify this member"><i class="fas fa-user-slash"></i> Unverify</button>`;
+                    } else if (unverifyReason) {
+                        // UNVERIFIED (has reason): Show Verify only
+                        verificationDisplay = `<span class="badge-unverified-reason" title="${escapeHtml(unverifyReason)}"><i class="fas fa-exclamation-triangle"></i> Unverified</span>`;
+                        actions += `<button class="action-btn verify" onclick="verifyMember('${r.clubId}')" title="Verify this member"><i class="fas fa-check-circle"></i> Verify</button>`;
                     } else {
-                        const unverifyReason = r.unverifyReason || '';
-                        if (unverifyReason) {
-                            verificationDisplay = `<span class="badge-unverified-reason" title="${escapeHtml(unverifyReason)}"><i class="fas fa-exclamation-triangle"></i> Unverified</span>`;
-                        } else {
-                            verificationDisplay = `<span class="badge-unverified"><i class="fas fa-clock"></i> Pending</span>`;
-                        }
-                        actions += `<button class="action-btn verify" onclick="verifyMember('${r.clubId}')"><i class="fas fa-check-circle"></i> Verify</button>`;
+                        // PENDING: Show Verify + Unverify
+                        verificationDisplay = `<span class="badge-unverified"><i class="fas fa-clock"></i> Pending</span>`;
+                        actions += `<button class="action-btn verify" onclick="verifyMember('${r.clubId}')" title="Verify this member"><i class="fas fa-check-circle"></i> Verify</button>`;
+                        actions += `<button class="action-btn unverify" onclick="unverifyMember('${r.clubId}')" title="Unverify this member"><i class="fas fa-user-slash"></i> Unverify</button>`;
                     }
 
+                    // Payment column with TRXID
                     const paymentDisplay = paid ? 
                         `<span class="badge-paid">✅ Paid</span>
                          <div class="payment-info">
@@ -3250,7 +3267,7 @@
             }
 
             // ============================================
-            // EDIT & DELETE
+            // EDIT & DELETE - FIXED: Permanently delete all data
             // ============================================
             window.editMember = function(clubId) {
                 const records = getRegistrations();
@@ -3375,18 +3392,69 @@
                 }
             });
 
+            // ============================================
+            // DELETE MEMBER - PERMANENTLY DELETE ALL DATA
+            // ============================================
             window.deleteMember = function(clubId) {
-                if (!confirm('Are you sure you want to delete this member? This action cannot be undone.')) return;
                 const records = getRegistrations();
-                const index = records.findIndex(r => r.clubId === clubId);
-                if (index === -1) { showToast('❌ Member not found', true); return; }
-                const certs = getCertificates();
-                if (certs[clubId]) { delete certs[clubId];
-                    saveCertificates(certs); }
-                records.splice(index, 1);
-                saveRegistrations(records);
-                renderAdminTable();
-                showToast('🗑️ Member deleted successfully!');
+                const record = records.find(r => r.clubId === clubId);
+                if (!record) {
+                    showToast('❌ Member not found', true);
+                    return;
+                }
+
+                if (!confirm(`⚠️ PERMANENT DELETE\n\nAre you sure you want to permanently delete ${record.fullName}?\n\nThis will permanently remove:\n• All member information\n• Club ID: ${clubId}\n• Certificate (if any)\n• QR Code data\n\nThis action CANNOT be undone!`)) {
+                    return;
+                }
+
+                // Double confirm for safety
+                if (!confirm(`⚠️ FINAL CONFIRMATION\n\nType "DELETE" in the prompt below to permanently remove this member.`)) {
+                    return;
+                }
+
+                const confirmation = prompt(`Type "DELETE" to permanently remove ${record.fullName}:`);
+                if (confirmation !== 'DELETE') {
+                    showToast('❌ Deletion cancelled. Confirmation text did not match.', true);
+                    return;
+                }
+
+                try {
+                    // Remove from registrations
+                    const index = records.findIndex(r => r.clubId === clubId);
+                    if (index === -1) {
+                        showToast('❌ Member not found', true);
+                        return;
+                    }
+                    
+                    // Remove certificate if exists
+                    const certs = getCertificates();
+                    if (certs[clubId]) {
+                        delete certs[clubId];
+                        saveCertificates(certs);
+                        console.log(`🗑️ Certificate removed for ${clubId}`);
+                    }
+                    
+                    // Remove the member
+                    records.splice(index, 1);
+                    saveRegistrations(records);
+                    
+                    // Update the UI
+                    renderAdminTable();
+                    
+                    // Check if this was the last member being viewed
+                    if (window._currentCertRecord && window._currentCertRecord.clubId === clubId) {
+                        document.getElementById('certModal').classList.remove('open');
+                        window._currentCertRecord = null;
+                    }
+                    
+                    showToast(`🗑️ ${record.fullName} has been permanently deleted from the system.`);
+                    
+                    console.log(`🗑️ Member permanently deleted: ${record.fullName} (${clubId})`);
+                    
+                } catch (error) {
+                    console.error('Delete error:', error);
+                    showToast('❌ Error deleting member: ' + error.message, true);
+                }
             };
 
             // ============================================
@@ -3627,14 +3695,10 @@
             console.log('📧 EmailJS Templates:');
             console.log('   ✅ Verified/Confirmation: template_f00pkjl');
             console.log('   ❌ Unverified: template_hzraam8');
-            console.log('📌 Features:');
-            console.log('   ✅ Edit Member with Club ID display');
-            console.log('   ✅ Update notification email');
-            console.log('   ✅ Fix Duplicate IDs tool');
-            console.log('   ✅ TRXID validation');
-            console.log('   ✅ Admin verification workflow');
-            console.log('   ✅ TRXID shown in Payment column');
-            console.log('   ✅ Unverify Member with reason & email');
+            console.log('📌 Button Logic:');
+            console.log('   🔵 PENDING: Verify + Unverify');
+            console.log('   🟢 VERIFIED: Resend + Unverify');
+            console.log('   🔴 UNVERIFIED: Verify only');
             console.log('✅ System ready!');
         })();
     </script>
