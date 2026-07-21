@@ -457,14 +457,6 @@
         .trxid-hint.success {
             color: #1b754b;
         }
-        .trxid-input .trxid-char-count {
-            font-size: 0.7rem;
-            color: #6b8aaa;
-            padding: 0.2rem 0.5rem;
-            background: #eef3fa;
-            border-radius: 12px;
-            white-space: nowrap;
-        }
 
         .past-student-toggle {
             display: flex;
@@ -1959,9 +1951,9 @@
             const EMAILJS_PUBLIC_KEY = 'mZR55c2c8zMmSqBLL';
             const EMAILJS_SERVICE_ID = 'service_3ectzds';
             
-            // Template IDs
-            const TEMPLATE_VERIFIED = 'template_f00pkjl';    // Verified/Confirmation Email
-            const TEMPLATE_UNVERIFIED = 'template_hzraam8';  // Unverified Email
+            // Template IDs (from your EmailJS dashboard)
+            const TEMPLATE_VERIFIED = 'template_f00pkjl';    // Wub_confirmation
+            const TEMPLATE_UNVERIFIED = 'template_hzraam8';  // Unverified
 
             // Initialize EmailJS
             emailjs.init({
@@ -2005,14 +1997,10 @@
             // TRXID VALIDATION FUNCTIONS - STRICT RULES
             // ============================================
             function isValidBkashTrxid(trxid) {
-                // bKash: Must start with "DG" and be exactly 10 characters
-                // Example: DGH5GB82G7
                 return /^DG[A-Z0-9]{8}$/.test(trxid);
             }
 
             function isValidNagadTrxid(trxid) {
-                // Nagad: Must start with "75" and be exactly 8 characters
-                // Example: 75OPUQ5X
                 return /^75[A-Z0-9]{6}$/.test(trxid);
             }
 
@@ -2027,8 +2015,7 @@
                     if (!isValidBkashTrxid(trxid)) {
                         return { 
                             valid: false, 
-                            message: 'Invalid bKash TrxID. Must start with "DG" and be exactly 10 characters (e.g., DGH5GB82G7)',
-                            format: 'DGXXXXXXXX (10 characters)'
+                            message: 'Invalid bKash TrxID. Must start with "DG" and be exactly 10 characters (e.g., DGH5GB82G7)'
                         };
                     }
                     return { valid: true, message: '✅ Valid bKash TrxID format.' };
@@ -2036,8 +2023,7 @@
                     if (!isValidNagadTrxid(trxid)) {
                         return { 
                             valid: false, 
-                            message: 'Invalid Nagad TrxID. Must start with "75" and be exactly 8 characters (e.g., 75OPUQ5X)',
-                            format: '75XXXXXX (8 characters)'
+                            message: 'Invalid Nagad TrxID. Must start with "75" and be exactly 8 characters (e.g., 75OPUQ5X)'
                         };
                     }
                     return { valid: true, message: '✅ Valid Nagad TrxID format.' };
@@ -2052,7 +2038,6 @@
                 const value = this.value.trim().toUpperCase();
                 this.value = value;
                 
-                // Clear previous validation
                 this.classList.remove('valid', 'invalid');
                 
                 if (value.length === 0) {
@@ -2061,7 +2046,6 @@
                     return;
                 }
                 
-                // Check format based on selected method
                 const method = selectedMethod;
                 const validation = validateTrxid(value, method);
                 
@@ -2151,7 +2135,6 @@
                 this.disabled = true;
 
                 setTimeout(() => {
-                    // Double-check validation
                     if (selectedMethod === 'bKash' && !isValidBkashTrxid(trxid)) {
                         this.innerHTML = '<i class="fas fa-check"></i> Verify';
                         this.disabled = false;
@@ -2392,6 +2375,7 @@
                 try {
                     showToast('📧 Sending unverification email to ' + record.email + '...');
 
+                    // Prepare template parameters matching your EmailJS template
                     const templateParams = {
                         to_email: record.email,
                         to_name: record.fullName,
@@ -2411,6 +2395,7 @@
                     console.log('📧 Sending unverify email with template:', TEMPLATE_UNVERIFIED);
                     console.log('📧 Params:', templateParams);
 
+                    // Send with the unverified template
                     const response = await emailjs.send(
                         EMAILJS_SERVICE_ID,
                         TEMPLATE_UNVERIFIED,
@@ -2423,14 +2408,7 @@
                 } catch (error) {
                     console.error('❌ Unverify email sending failed:', error);
                     console.error('Error details:', error.text || error.message);
-                    
-                    let errorMsg = 'Could not send unverification email. ';
-                    if (error.text) {
-                        errorMsg += 'Error: ' + error.text;
-                    } else if (error.message) {
-                        errorMsg += 'Error: ' + error.message;
-                    }
-                    showToast(`⚠️ ${errorMsg}`, true);
+                    showToast(`⚠️ Could not send unverification email. Error: ${error.text || error.message}`, true);
                     return false;
                 }
             }
@@ -3056,6 +3034,7 @@
 
                     const record = records[index];
                     
+                    // Unverify the member
                     record.isVerified = false;
                     record.verifiedDate = null;
                     record.emailSent = false;
@@ -3063,6 +3042,7 @@
                     record.unverifyDate = new Date().toISOString();
                     saveRegistrations(records);
 
+                    // Send unverify email if checked
                     let emailSent = false;
                     if (sendEmail) {
                         emailSent = await sendUnverifyEmail(record, reason);
@@ -3781,13 +3761,13 @@
             console.log('🏫 WUB EEE Club Registration System loaded successfully!');
             console.log('📧 Admin: eee-club@eee.wub.edu.bd');
             console.log('🔑 Password: Eee123@580Eee');
-            console.log('💳 Payment: bKash (01754526593) & Nagad (01754526593)');
+            console.log('💳 Payment: bKash (01754526593) & Nagad (01754526594)');
             console.log('📌 TRXID Formats:');
             console.log('   💚 bKash: Must start with "DG" and be exactly 10 characters (e.g., DGH5GB82G7)');
             console.log('   💙 Nagad: Must start with "75" and be exactly 8 characters (e.g., 75OPUQ5X)');
             console.log('📧 EmailJS Templates:');
-            console.log('   ✅ Verified/Confirmation: template_f00pkjl');
-            console.log('   ❌ Unverified: template_hzraam8');
+            console.log('   ✅ Verified/Confirmation: template_f00pkjl (Wub_confirmation)');
+            console.log('   ❌ Unverified: template_hzraam8 (Unverified)');
             console.log('📌 Button Logic:');
             console.log('   🔵 PENDING: Verify + Unverify');
             console.log('   🟢 VERIFIED: Resend + Unverify');
