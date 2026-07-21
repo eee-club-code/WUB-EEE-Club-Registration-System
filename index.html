@@ -429,10 +429,41 @@
         }
         .trxid-input input {
             width: 100%;
-            max-width: 180px;
+            max-width: 220px;
             padding: 0.5rem 0.8rem;
             border-radius: 30px;
             font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .trxid-input input.invalid {
+            border-color: #b22234;
+            background: #fff5f5;
+        }
+        .trxid-input input.valid {
+            border-color: #1b754b;
+            background: #f5fff8;
+        }
+        .trxid-hint {
+            font-size: 0.7rem;
+            color: #6b8aaa;
+            margin-top: 2px;
+            display: block;
+            min-height: 18px;
+        }
+        .trxid-hint.error {
+            color: #b22234;
+        }
+        .trxid-hint.success {
+            color: #1b754b;
+        }
+        .trxid-input .trxid-char-count {
+            font-size: 0.7rem;
+            color: #6b8aaa;
+            padding: 0.2rem 0.5rem;
+            background: #eef3fa;
+            border-radius: 12px;
+            white-space: nowrap;
         }
 
         .past-student-toggle {
@@ -1702,7 +1733,10 @@
                     </div>
                     <div class="payment-actions">
                         <div class="trxid-input">
-                            <input type="text" id="trxidInput" placeholder="Enter TrxID" />
+                            <div style="display:flex; flex-direction:column; gap:2px;">
+                                <input type="text" id="trxidInput" placeholder="Enter TrxID" maxlength="10" />
+                                <span class="trxid-hint" id="trxidHint">Enter your transaction ID</span>
+                            </div>
                             <button type="button" id="verifyTrxidBtn" style="padding:0.5rem 1.2rem; border-radius:40px; background:#1b754b; color:white; border:none; font-weight:600; cursor:pointer;">
                                 <i class="fas fa-check"></i> Verify
                             </button>
@@ -1958,6 +1992,7 @@
             // DOM REFS
             // ============================================
             const trxidInput = document.getElementById('trxidInput');
+            const trxidHint = document.getElementById('trxidHint');
             const verifyBtn = document.getElementById('verifyTrxidBtn');
             const paymentStatus = document.getElementById('paymentStatus');
             const submitBtn = document.getElementById('submitBtn');
@@ -1967,34 +2002,79 @@
             const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
 
             // ============================================
-            // TRXID VALIDATION FUNCTIONS
+            // TRXID VALIDATION FUNCTIONS - STRICT RULES
             // ============================================
             function isValidBkashTrxid(trxid) {
-                return /^[A-Z]{3,4}[A-Z0-9]{5,10}$/i.test(trxid);
+                // bKash: Must start with "DG" and be exactly 10 characters
+                // Example: DGH5GB82G7
+                return /^DG[A-Z0-9]{8}$/.test(trxid);
             }
 
             function isValidNagadTrxid(trxid) {
-                return /^[0-9]{2,4}[A-Z0-9]{4,10}$/i.test(trxid);
+                // Nagad: Must start with "75" and be exactly 8 characters
+                // Example: 75OPUQ5X
+                return /^75[A-Z0-9]{6}$/.test(trxid);
             }
 
             function validateTrxid(trxid, method) {
-                trxid = trxid.trim();
-                if (!trxid || trxid.length < 4) {
-                    return { valid: false, message: 'Please enter a valid Transaction ID (minimum 4 characters).' };
+                trxid = trxid.trim().toUpperCase();
+                
+                if (!trxid) {
+                    return { valid: false, message: 'Please enter a Transaction ID.' };
                 }
+                
                 if (method === 'bKash') {
                     if (!isValidBkashTrxid(trxid)) {
-                        return { valid: false, message: 'Invalid bKash TrxID format. It should start with letters (e.g., DGJ7IJCMAV).' };
+                        return { 
+                            valid: false, 
+                            message: 'Invalid bKash TrxID. Must start with "DG" and be exactly 10 characters (e.g., DGH5GB82G7)',
+                            format: 'DGXXXXXXXX (10 characters)'
+                        };
                     }
-                    return { valid: true, message: 'Valid bKash TrxID format.' };
+                    return { valid: true, message: '✅ Valid bKash TrxID format.' };
                 } else if (method === 'Nagad') {
                     if (!isValidNagadTrxid(trxid)) {
-                        return { valid: false, message: 'Invalid Nagad TrxID format. It should start with numbers (e.g., 75P2QZJ4).' };
+                        return { 
+                            valid: false, 
+                            message: 'Invalid Nagad TrxID. Must start with "75" and be exactly 8 characters (e.g., 75OPUQ5X)',
+                            format: '75XXXXXX (8 characters)'
+                        };
                     }
-                    return { valid: true, message: 'Valid Nagad TrxID format.' };
+                    return { valid: true, message: '✅ Valid Nagad TrxID format.' };
                 }
                 return { valid: false, message: 'Unknown payment method.' };
             }
+
+            // ============================================
+            // TRXID INPUT REAL-TIME VALIDATION
+            // ============================================
+            trxidInput.addEventListener('input', function() {
+                const value = this.value.trim().toUpperCase();
+                this.value = value;
+                
+                // Clear previous validation
+                this.classList.remove('valid', 'invalid');
+                
+                if (value.length === 0) {
+                    trxidHint.textContent = 'Enter your transaction ID';
+                    trxidHint.className = 'trxid-hint';
+                    return;
+                }
+                
+                // Check format based on selected method
+                const method = selectedMethod;
+                const validation = validateTrxid(value, method);
+                
+                if (validation.valid) {
+                    this.classList.add('valid');
+                    trxidHint.textContent = validation.message;
+                    trxidHint.className = 'trxid-hint success';
+                } else {
+                    this.classList.add('invalid');
+                    trxidHint.textContent = validation.message;
+                    trxidHint.className = 'trxid-hint error';
+                }
+            });
 
             // ============================================
             // PAYMENT METHOD TOGGLE
@@ -2005,15 +2085,22 @@
                     if (selectedMethod === 'bKash') {
                         bkashInfo.style.display = 'inline-flex';
                         nagadInfo.style.display = 'none';
-                        trxidInput.placeholder = 'Enter bKash TrxID (e.g., DGJ7IJCMAV)';
+                        trxidInput.placeholder = 'Enter bKash TrxID (DGXXXXXXXX)';
+                        trxidInput.maxLength = 10;
+                        trxidHint.textContent = 'Must start with "DG" and be 10 characters';
+                        trxidHint.className = 'trxid-hint';
                     } else {
                         bkashInfo.style.display = 'none';
                         nagadInfo.style.display = 'inline-flex';
-                        trxidInput.placeholder = 'Enter Nagad TrxID (e.g., 75P2QZJ4)';
+                        trxidInput.placeholder = 'Enter Nagad TrxID (75XXXXXX)';
+                        trxidInput.maxLength = 8;
+                        trxidHint.textContent = 'Must start with "75" and be 8 characters';
+                        trxidHint.className = 'trxid-hint';
                     }
+                    trxidInput.value = '';
+                    trxidInput.classList.remove('valid', 'invalid');
                     paymentCompleted = false;
                     verifiedTrxID = '';
-                    trxidInput.value = '';
                     trxidInput.disabled = false;
                     verifyBtn.disabled = false;
                     verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify';
@@ -2048,7 +2135,7 @@
             }
 
             verifyBtn.addEventListener('click', function() {
-                const trxid = trxidInput.value.trim();
+                const trxid = trxidInput.value.trim().toUpperCase();
                 if (!trxid) {
                     alert('⚠️ Please enter a Transaction ID (TrxID).');
                     return;
@@ -2064,16 +2151,17 @@
                 this.disabled = true;
 
                 setTimeout(() => {
+                    // Double-check validation
                     if (selectedMethod === 'bKash' && !isValidBkashTrxid(trxid)) {
                         this.innerHTML = '<i class="fas fa-check"></i> Verify';
                         this.disabled = false;
-                        alert('⚠️ Invalid bKash TrxID format. It should start with letters (e.g., DGJ7IJCMAV).');
+                        alert('⚠️ Invalid bKash TrxID. Must start with "DG" and be exactly 10 characters.');
                         return;
                     }
                     if (selectedMethod === 'Nagad' && !isValidNagadTrxid(trxid)) {
                         this.innerHTML = '<i class="fas fa-check"></i> Verify';
                         this.disabled = false;
-                        alert('⚠️ Invalid Nagad TrxID format. It should start with numbers (e.g., 75P2QZJ4).');
+                        alert('⚠️ Invalid Nagad TrxID. Must start with "75" and be exactly 8 characters.');
                         return;
                     }
 
@@ -2090,12 +2178,15 @@
                 paymentCompleted = false;
                 verifiedTrxID = '';
                 trxidInput.value = '';
+                trxidInput.classList.remove('valid', 'invalid');
                 trxidInput.disabled = false;
                 verifyBtn.disabled = false;
                 verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify';
                 verifyBtn.style.background = '#1b754b';
                 submitBtn.disabled = true;
                 updatePaymentUI();
+                trxidHint.textContent = 'Enter your transaction ID';
+                trxidHint.className = 'trxid-hint';
             });
 
             // ============================================
@@ -2333,7 +2424,6 @@
                     console.error('❌ Unverify email sending failed:', error);
                     console.error('Error details:', error.text || error.message);
                     
-                    // Show more detailed error
                     let errorMsg = 'Could not send unverification email. ';
                     if (error.text) {
                         errorMsg += 'Error: ' + error.text;
@@ -2905,7 +2995,7 @@
             };
 
             // ============================================
-            // UNVERIFY FUNCTION - FIXED: Email sends properly
+            // UNVERIFY FUNCTION
             // ============================================
             window.unverifyMember = function(clubId) {
                 const records = getRegistrations();
@@ -2915,13 +3005,11 @@
                     return;
                 }
 
-                // Check if already unverified
                 if (record.isVerified === false && record.unverifyReason) {
                     showToast('⚠️ This member is already unverified', true);
                     return;
                 }
 
-                // Open the unverify modal
                 document.getElementById('unverifyClubId').value = clubId;
                 document.getElementById('unverifyMemberName').value = record.fullName || 'Unknown';
                 document.getElementById('unverifyClubIdDisplay').value = clubId;
@@ -2939,9 +3027,6 @@
                 }
             });
 
-            // ============================================
-            // UNVERIFY FORM SUBMIT - FIXED: Email sends properly
-            // ============================================
             document.getElementById('unverifyForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 const btn = document.getElementById('unverifyBtn');
@@ -2971,7 +3056,6 @@
 
                     const record = records[index];
                     
-                    // Unverify the member
                     record.isVerified = false;
                     record.verifiedDate = null;
                     record.emailSent = false;
@@ -2979,12 +3063,11 @@
                     record.unverifyDate = new Date().toISOString();
                     saveRegistrations(records);
 
-                    // Send unverify email if checked
                     let emailSent = false;
                     if (sendEmail) {
                         emailSent = await sendUnverifyEmail(record, reason);
                         if (emailSent) {
-                            record.emailSent = false; // Unverified, so emailSent is false
+                            record.emailSent = false;
                             saveRegistrations(records);
                         }
                     }
@@ -3029,6 +3112,7 @@
                 document.getElementById('qrSection').style.display = 'none';
                 document.getElementById('registrationForm').reset();
                 document.getElementById('trxidInput').value = '';
+                document.getElementById('trxidInput').classList.remove('valid', 'invalid');
                 document.getElementById('trxidInput').disabled = false;
                 document.getElementById('verifyTrxidBtn').disabled = false;
                 document.getElementById('verifyTrxidBtn').innerHTML = '<i class="fas fa-check"></i> Verify';
@@ -3043,6 +3127,8 @@
                 document.getElementById('pastStudentFields').classList.remove('show');
                 window._lastFormData = null;
                 window._lastClubId = null;
+                trxidHint.textContent = 'Enter your transaction ID';
+                trxidHint.className = 'trxid-hint';
                 showToast('🔄 Form reset. You can register a new member.');
             });
 
@@ -3215,7 +3301,6 @@
                     
                     let actions = '';
                     
-                    // Edit and Delete buttons (always visible)
                     actions = `
                         <button class="action-btn edit" onclick="editMember('${r.clubId}')" title="Edit Member"><i class="fas fa-edit"></i></button>
                         <button class="action-btn delete" onclick="deleteMember('${r.clubId}')" title="Delete Member Permanently"><i class="fas fa-trash"></i></button>
@@ -3224,22 +3309,18 @@
                     let verificationDisplay = '';
                     
                     if (isVerified) {
-                        // VERIFIED: Show Resend and Unverify
                         verificationDisplay = `<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified${emailSent ? ' ✓' : ''}</span>`;
                         actions += `<button class="action-btn resend" onclick="resendEmail('${r.clubId}')" title="Resend confirmation email"><i class="fas fa-envelope"></i> Resend</button>`;
                         actions += `<button class="action-btn unverify" onclick="unverifyMember('${r.clubId}')" title="Unverify this member"><i class="fas fa-user-slash"></i> Unverify</button>`;
                     } else if (unverifyReason) {
-                        // UNVERIFIED: Show Verify only
                         verificationDisplay = `<span class="badge-unverified-reason" title="${escapeHtml(unverifyReason)}"><i class="fas fa-exclamation-triangle"></i> Unverified</span>`;
                         actions += `<button class="action-btn verify" onclick="verifyMember('${r.clubId}')" title="Verify this member"><i class="fas fa-check-circle"></i> Verify</button>`;
                     } else {
-                        // PENDING: Show Verify + Unverify
                         verificationDisplay = `<span class="badge-unverified"><i class="fas fa-clock"></i> Pending</span>`;
                         actions += `<button class="action-btn verify" onclick="verifyMember('${r.clubId}')" title="Verify this member"><i class="fas fa-check-circle"></i> Verify</button>`;
                         actions += `<button class="action-btn unverify" onclick="unverifyMember('${r.clubId}')" title="Unverify this member"><i class="fas fa-user-slash"></i> Unverify</button>`;
                     }
 
-                    // Payment column with TRXID
                     const paymentDisplay = paid ? 
                         `<span class="badge-paid">✅ Paid</span>
                          <div class="payment-info">
@@ -3410,9 +3491,6 @@
                 }
             });
 
-            // ============================================
-            // DELETE MEMBER - PERMANENTLY DELETE ALL DATA
-            // ============================================
             window.deleteMember = function(clubId) {
                 const records = getRegistrations();
                 const record = records.find(r => r.clubId === clubId);
@@ -3703,7 +3781,10 @@
             console.log('🏫 WUB EEE Club Registration System loaded successfully!');
             console.log('📧 Admin: eee-club@eee.wub.edu.bd');
             console.log('🔑 Password: Eee123@580Eee');
-            console.log('💳 Payment: bKash (01754526593) & Nagad (01754526594)');
+            console.log('💳 Payment: bKash (01754526593) & Nagad (01754526593)');
+            console.log('📌 TRXID Formats:');
+            console.log('   💚 bKash: Must start with "DG" and be exactly 10 characters (e.g., DGH5GB82G7)');
+            console.log('   💙 Nagad: Must start with "75" and be exactly 8 characters (e.g., 75OPUQ5X)');
             console.log('📧 EmailJS Templates:');
             console.log('   ✅ Verified/Confirmation: template_f00pkjl');
             console.log('   ❌ Unverified: template_hzraam8');
