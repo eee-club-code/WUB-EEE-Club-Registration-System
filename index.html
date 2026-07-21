@@ -741,6 +741,14 @@
             font-size: 0.75rem;
             font-weight: 600;
         }
+        .badge-unverified-reason {
+            background: #b22234;
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
         .badge-cert {
             background: #0b3b7a;
             color: white;
@@ -848,6 +856,13 @@
         }
         .action-btn.verify:hover {
             background: #0f8f47;
+        }
+        .action-btn.unverify {
+            background: #b22234;
+            color: white;
+        }
+        .action-btn.unverify:hover {
+            background: #c62828;
         }
         .action-btn.resend {
             background: #2b6bb0;
@@ -1016,10 +1031,6 @@
             font-size: 0.85rem;
             color: #1f3a66;
         }
-        .edit-modal label .club-id-label {
-            color: #0b3b7a;
-            font-weight: 700;
-        }
         .edit-modal input,
         .edit-modal select {
             width: 100%;
@@ -1072,6 +1083,89 @@
         .edit-modal .edit-info i {
             color: #0b3b7a;
             margin-right: 6px;
+        }
+
+        .unverify-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .unverify-modal.open {
+            display: flex;
+        }
+        .unverify-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 2rem;
+            max-width: 450px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .unverify-modal-close {
+            position: sticky;
+            top: 0;
+            float: right;
+            background: #b22234;
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.2s;
+            z-index: 10;
+        }
+        .unverify-modal-close:hover {
+            background: #c62828;
+        }
+        .unverify-modal .form-group {
+            margin-bottom: 1rem;
+        }
+        .unverify-modal label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1f3a66;
+        }
+        .unverify-modal textarea {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1.5px solid #dde6f2;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
+            min-height: 80px;
+            resize: vertical;
+            font-family: 'Inter', sans-serif;
+        }
+        .unverify-modal textarea:focus {
+            outline: none;
+            border-color: #2b6bb0;
+            box-shadow: 0 0 0 4px rgba(43, 107, 176, 0.08);
+        }
+        .unverify-modal .btn-unverify {
+            width: 100%;
+            padding: 0.8rem;
+            background: #b22234;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .unverify-modal .btn-unverify:hover {
+            background: #c62828;
         }
 
         @keyframes slideUp {
@@ -1594,7 +1688,7 @@
                     </div>
                 </div>
 
-                <!-- PAYMENT SECTION with bKash & Nagad personal numbers -->
+                <!-- PAYMENT SECTION -->
                 <div class="payment-section">
                     <div class="payment-label">
                         <i class="fas fa-credit-card"></i>
@@ -1604,7 +1698,7 @@
                             <label><input type="radio" name="paymentMethod" value="Nagad" /> Nagad</label>
                         </div>
                         <span class="bkash-info" id="bkashInfo"><i class="fas fa-mobile-alt"></i> bKash: 01754526593</span>
-                        <span class="nagad-info" id="nagadInfo" style="display:none;"><i class="fas fa-mobile-alt"></i> Nagad: 01754526593</span>
+                        <span class="nagad-info" id="nagadInfo" style="display:none;"><i class="fas fa-mobile-alt"></i> Nagad: 01754526594</span>
                     </div>
                     <div class="payment-actions">
                         <div class="trxid-input">
@@ -1775,6 +1869,38 @@
         </div>
     </div>
 
+    <!-- Unverify Modal -->
+    <div class="unverify-modal" id="unverifyModal">
+        <div class="unverify-modal-content">
+            <button class="unverify-modal-close" id="unverifyModalClose">&times;</button>
+            <h3 style="color:#b22234; margin-bottom:1rem;"><i class="fas fa-user-slash"></i> Unverify Member</h3>
+            <p style="color:#6b8aaa; margin-bottom:1rem;">Enter the reason for unverifying this member. An email will be sent to the student.</p>
+            <form id="unverifyForm">
+                <input type="hidden" id="unverifyClubId" />
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Member</label>
+                    <input type="text" id="unverifyMemberName" readonly style="background:#eef3fa; font-weight:600;" />
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-id-card"></i> Club ID</label>
+                    <input type="text" id="unverifyClubIdDisplay" readonly style="background:#eef3fa; font-weight:600;" />
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-exclamation-triangle"></i> Reason for Unverification <span style="color:#b22234;">*</span></label>
+                    <textarea id="unverifyReason" placeholder="e.g., Transaction ID mismatch, Payment verification failed, Incorrect information provided..." required></textarea>
+                </div>
+                <div class="form-group" style="margin-top:0.5rem;">
+                    <label style="font-size:0.8rem; color:#6b8aaa;">
+                        <i class="fas fa-envelope"></i> 
+                        <input type="checkbox" id="unverifySendEmail" checked /> 
+                        Send unverification notification email to student
+                    </label>
+                </div>
+                <button type="submit" class="btn-unverify" id="unverifyBtn"><i class="fas fa-user-slash"></i> Unverify Member & Send Email</button>
+            </form>
+        </div>
+    </div>
+
     <!-- Certificate Modal -->
     <div class="cert-modal" id="certModal">
         <div class="cert-modal-content">
@@ -1798,7 +1924,10 @@
             // ============================================
             const EMAILJS_PUBLIC_KEY = 'mZR55c2c8zMmSqBLL';
             const EMAILJS_SERVICE_ID = 'service_3ectzds';
-            const EMAILJS_TEMPLATE_ID = 'template_f00pkjl';
+            
+            // Template IDs
+            const TEMPLATE_VERIFIED = 'template_f00pkjl';    // Verified/Confirmation Email
+            const TEMPLATE_UNVERIFIED = 'template_hzraam8';  // Unverified Email
 
             // Initialize EmailJS
             emailjs.init({
@@ -2166,7 +2295,91 @@
             };
 
             // ============================================
-            // SEND UPDATE EMAIL FUNCTION
+            // SEND UNVERIFY EMAIL - Uses template_hzraam8
+            // ============================================
+            async function sendUnverifyEmail(record, reason) {
+                try {
+                    showToast('📧 Sending unverification email...');
+
+                    const templateParams = {
+                        to_email: record.email,
+                        to_name: record.fullName,
+                        club_id: record.clubId,
+                        student_id: record.studentId,
+                        reason: reason,
+                        unverify_date: new Date().toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }),
+                        trxid: record.trxid || 'N/A'
+                    };
+
+                    console.log('📧 Sending unverify email with template:', TEMPLATE_UNVERIFIED);
+                    console.log('📧 Params:', templateParams);
+
+                    const response = await emailjs.send(
+                        EMAILJS_SERVICE_ID,
+                        TEMPLATE_UNVERIFIED,  // Using the unverified template
+                        templateParams
+                    );
+                    console.log('📧 Unverify email sent successfully!', response);
+                    showToast(`✅ Unverification email sent to ${record.email}`);
+                    return true;
+
+                } catch (error) {
+                    console.error('❌ Unverify email sending failed:', error);
+                    showToast(`⚠️ Could not send unverification email. Please try again.`, true);
+                    return false;
+                }
+            }
+
+            // ============================================
+            // SEND VERIFIED/CONFIRMATION EMAIL - Uses template_f00pkjl
+            // ============================================
+            async function sendConfirmationEmail(record) {
+                try {
+                    showToast('📧 Sending confirmation email from eee-club@eee.wub.edu.bd...');
+
+                    const templateParams = {
+                        to_email: record.email,
+                        to_name: record.fullName,
+                        club_id: record.clubId,
+                        student_id: record.studentId,
+                        semester: record.semester,
+                        payment_method: record.paymentMethod,
+                        trxid: record.trxid,
+                        join_date: new Date(record.joinDate).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        })
+                    };
+
+                    console.log('📧 Sending confirmation email with template:', TEMPLATE_VERIFIED);
+                    console.log('📧 Params:', templateParams);
+
+                    const response = await emailjs.send(
+                        EMAILJS_SERVICE_ID,
+                        TEMPLATE_VERIFIED,  // Using the verified template
+                        templateParams
+                    );
+
+                    console.log('📧 Confirmation email sent successfully!', response);
+                    showToast(`✅ Confirmation email sent to ${record.email} from eee-club@eee.wub.edu.bd`);
+                    return true;
+
+                } catch (error) {
+                    console.error('❌ Confirmation email sending failed:', error);
+                    showToast(`⚠️ Could not send email. Please try again. Error: ${error.text || error.message}`, true);
+                    return false;
+                }
+            }
+
+            // ============================================
+            // SEND UPDATE EMAIL - Uses template_f00pkjl
             // ============================================
             async function sendUpdateEmail(record, oldData) {
                 try {
@@ -2198,10 +2411,9 @@
                         })
                     };
 
-                    // Use the main template with update info
                     const response = await emailjs.send(
                         EMAILJS_SERVICE_ID,
-                        EMAILJS_TEMPLATE_ID,
+                        TEMPLATE_VERIFIED,  // Using the verified template for updates
                         templateParams
                     );
                     console.log('📧 Update email sent successfully!', response);
@@ -2278,7 +2490,6 @@
                 showToast('👋 Logged out successfully');
             });
 
-            // Fix Duplicate IDs button
             document.getElementById('fixDuplicateIdsBtn').addEventListener('click', function() {
                 if (!isLoggedIn) {
                     showToast('⚠️ Please login first', true);
@@ -2308,47 +2519,6 @@
                     toast.classList.add('hidden');
                     setTimeout(() => toast.remove(), 500);
                 }, 4000);
-            }
-
-            // ============================================
-            // EMAIL SENDER - Confirmation Email
-            // ============================================
-            async function sendConfirmationEmail(record) {
-                try {
-                    showToast('📧 Sending confirmation email from eee-club@eee.wub.edu.bd...');
-
-                    const templateParams = {
-                        to_email: record.email,
-                        to_name: record.fullName,
-                        club_id: record.clubId,
-                        student_id: record.studentId,
-                        semester: record.semester,
-                        payment_method: record.paymentMethod,
-                        trxid: record.trxid,
-                        join_date: new Date(record.joinDate).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        })
-                    };
-
-                    console.log('📧 Sending email with params:', templateParams);
-
-                    const response = await emailjs.send(
-                        EMAILJS_SERVICE_ID,
-                        EMAILJS_TEMPLATE_ID,
-                        templateParams
-                    );
-
-                    console.log('📧 Email sent successfully!', response);
-                    showToast(`✅ Confirmation email sent to ${record.email} from eee-club@eee.wub.edu.bd`);
-                    return true;
-
-                } catch (error) {
-                    console.error('❌ Email sending failed:', error);
-                    showToast(`⚠️ Could not send email. Please try again. Error: ${error.text || error.message}`, true);
-                    return false;
-                }
             }
 
             // ============================================
@@ -2621,7 +2791,9 @@
                     endYear: endYear,
                     isVerified: false,
                     verifiedDate: null,
-                    emailSent: false
+                    emailSent: false,
+                    unverifyReason: null,
+                    unverifyDate: null
                 };
 
                 const records = getRegistrations();
@@ -2655,7 +2827,7 @@
             });
 
             // ============================================
-            // ADMIN VERIFICATION FUNCTION
+            // ADMIN VERIFICATION FUNCTION - Uses template_f00pkjl
             // ============================================
             window.verifyMember = async function(clubId) {
                 const records = getRegistrations();
@@ -2676,6 +2848,8 @@
 
                 records[index].isVerified = true;
                 records[index].verifiedDate = new Date().toISOString();
+                records[index].unverifyReason = null;
+                records[index].unverifyDate = null;
                 saveRegistrations(records);
 
                 const emailSent = await sendConfirmationEmail(records[index]);
@@ -2691,7 +2865,7 @@
             };
 
             // ============================================
-            // RESEND EMAIL FUNCTION
+            // RESEND EMAIL FUNCTION - Uses template_f00pkjl
             // ============================================
             window.resendEmail = async function(clubId) {
                 const records = getRegistrations();
@@ -2720,6 +2894,92 @@
                     showToast(`⚠️ Failed to send email. Please try again.`, true);
                 }
             };
+
+            // ============================================
+            // UNVERIFY FUNCTION - Uses template_hzraam8
+            // ============================================
+            window.unverifyMember = function(clubId) {
+                const records = getRegistrations();
+                const record = records.find(r => r.clubId === clubId);
+                if (!record) {
+                    showToast('❌ Member not found', true);
+                    return;
+                }
+
+                if (!record.isVerified) {
+                    showToast('⚠️ This member is already unverified', true);
+                    return;
+                }
+
+                document.getElementById('unverifyClubId').value = clubId;
+                document.getElementById('unverifyMemberName').value = record.fullName || 'Unknown';
+                document.getElementById('unverifyClubIdDisplay').value = clubId;
+                document.getElementById('unverifyReason').value = '';
+                document.getElementById('unverifySendEmail').checked = true;
+                document.getElementById('unverifyModal').classList.add('open');
+            };
+
+            document.getElementById('unverifyModalClose').addEventListener('click', function() {
+                document.getElementById('unverifyModal').classList.remove('open');
+            });
+            document.getElementById('unverifyModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('open');
+                }
+            });
+
+            document.getElementById('unverifyForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const btn = document.getElementById('unverifyBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+                try {
+                    const clubId = document.getElementById('unverifyClubId').value;
+                    const reason = document.getElementById('unverifyReason').value.trim();
+                    const sendEmail = document.getElementById('unverifySendEmail').checked;
+
+                    if (!reason) {
+                        showToast('⚠️ Please enter a reason for unverification.', true);
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-user-slash"></i> Unverify Member & Send Email';
+                        return;
+                    }
+
+                    const records = getRegistrations();
+                    const index = records.findIndex(r => r.clubId === clubId);
+                    if (index === -1) {
+                        showToast('❌ Member not found', true);
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-user-slash"></i> Unverify Member & Send Email';
+                        return;
+                    }
+
+                    // Unverify the member
+                    records[index].isVerified = false;
+                    records[index].verifiedDate = null;
+                    records[index].emailSent = false;
+                    records[index].unverifyReason = reason;
+                    records[index].unverifyDate = new Date().toISOString();
+                    saveRegistrations(records);
+
+                    // Send unverify email if checked
+                    if (sendEmail) {
+                        await sendUnverifyEmail(records[index], reason);
+                    }
+
+                    document.getElementById('unverifyModal').classList.remove('open');
+                    renderAdminTable();
+                    showToast(`✅ Member unverified successfully!${sendEmail ? ' Email notification sent.' : ''}`);
+
+                } catch (error) {
+                    console.error('Unverify error:', error);
+                    showToast('❌ Error unverifying member: ' + error.message, true);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-user-slash"></i> Unverify Member & Send Email';
+                }
+            });
 
             // ============================================
             // DOWNLOAD SLIP BUTTON
@@ -2903,7 +3163,7 @@
             }
 
             // ============================================
-            // ADMIN TABLE - UPDATED with TRXID in Payment Column
+            // ADMIN TABLE
             // ============================================
             function renderAdminTable() {
                 if (!isLoggedIn) return;
@@ -2934,12 +3194,17 @@
                     if (isVerified) {
                         verificationDisplay = `<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified${emailSent ? ' ✓' : ''}</span>`;
                         actions += `<button class="action-btn resend" onclick="resendEmail('${r.clubId}')" title="Resend confirmation email"><i class="fas fa-envelope"></i> Resend</button>`;
+                        actions += `<button class="action-btn unverify" onclick="unverifyMember('${r.clubId}')" title="Unverify this member"><i class="fas fa-user-slash"></i> Unverify</button>`;
                     } else {
-                        verificationDisplay = `<span class="badge-unverified"><i class="fas fa-clock"></i> Pending</span>`;
+                        const unverifyReason = r.unverifyReason || '';
+                        if (unverifyReason) {
+                            verificationDisplay = `<span class="badge-unverified-reason" title="${escapeHtml(unverifyReason)}"><i class="fas fa-exclamation-triangle"></i> Unverified</span>`;
+                        } else {
+                            verificationDisplay = `<span class="badge-unverified"><i class="fas fa-clock"></i> Pending</span>`;
+                        }
                         actions += `<button class="action-btn verify" onclick="verifyMember('${r.clubId}')"><i class="fas fa-check-circle"></i> Verify</button>`;
                     }
 
-                    // Payment column with TRXID
                     const paymentDisplay = paid ? 
                         `<span class="badge-paid">✅ Paid</span>
                          <div class="payment-info">
@@ -3359,6 +3624,9 @@
             console.log('📧 Admin: eee-club@eee.wub.edu.bd');
             console.log('🔑 Password: Eee123@580Eee');
             console.log('💳 Payment: bKash (01754526593) & Nagad (01754526594)');
+            console.log('📧 EmailJS Templates:');
+            console.log('   ✅ Verified/Confirmation: template_f00pkjl');
+            console.log('   ❌ Unverified: template_hzraam8');
             console.log('📌 Features:');
             console.log('   ✅ Edit Member with Club ID display');
             console.log('   ✅ Update notification email');
@@ -3366,10 +3634,7 @@
             console.log('   ✅ TRXID validation');
             console.log('   ✅ Admin verification workflow');
             console.log('   ✅ TRXID shown in Payment column');
-            console.log('📧 EmailJS configured with:');
-            console.log('   Public Key: mZR55c2c8zMmSqBLL');
-            console.log('   Service ID: service_3ectzds');
-            console.log('   Template ID: template_f00pkjl');
+            console.log('   ✅ Unverify Member with reason & email');
             console.log('✅ System ready!');
         })();
     </script>
