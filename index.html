@@ -699,6 +699,13 @@
         .admin-actions .btn-fix:hover {
             background: #b82a55;
         }
+        .admin-actions .btn-test-email {
+            background: #f5a623;
+            color: white;
+        }
+        .admin-actions .btn-test-email:hover {
+            background: #d48a1a;
+        }
 
         .admin-table-wrap {
             overflow-x: auto;
@@ -1796,6 +1803,7 @@
                 <button class="btn-purple" id="generatePastMembersBtn"><i class="fas fa-history"></i> Generate for Past Members</button>
                 <button class="btn-warning" id="forceGenerateBtn"><i class="fas fa-bolt"></i> Force Generate (Test)</button>
                 <button class="btn-fix" id="fixDuplicateIdsBtn"><i class="fas fa-hammer"></i> Fix Duplicate IDs</button>
+                <button class="btn-test-email" id="testEmailBtn"><i class="fas fa-envelope"></i> Test Email</button>
                 <button class="btn-danger" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
 
@@ -2369,13 +2377,74 @@
             };
 
             // ============================================
+            // TEST EMAIL FUNCTION
+            // ============================================
+            async function testEmail() {
+                const testEmailAddress = prompt('Enter your email address to test the Unverified email:', 'your-email@example.com');
+                if (!testEmailAddress) return;
+
+                const btn = document.getElementById('testEmailBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+                try {
+                    const templateParams = {
+                        to_email: testEmailAddress,
+                        to_name: 'Test User',
+                        club_id: 'WUB-EEE-2026-TEST',
+                        student_id: 'TEST-001',
+                        reason: 'This is a test email to verify EmailJS configuration.',
+                        unverify_date: new Date().toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }),
+                        trxid: 'TEST-TRX-001'
+                    };
+
+                    console.log('📧 Sending test email with template:', TEMPLATE_UNVERIFIED);
+                    console.log('📧 Params:', templateParams);
+
+                    const response = await emailjs.send(
+                        EMAILJS_SERVICE_ID,
+                        TEMPLATE_UNVERIFIED,
+                        templateParams
+                    );
+
+                    console.log('📧 Test email sent successfully!', response);
+                    showToast(`✅ Test email sent to ${testEmailAddress}!`);
+                    alert(`✅ Test email sent successfully to ${testEmailAddress}!\n\nCheck your inbox/spam folder.\n\nResponse: ${response.status} ${response.text}`);
+
+                } catch (error) {
+                    console.error('❌ Test email failed:', error);
+                    console.error('Error details:', error.text || error.message);
+                    
+                    let errorMsg = 'Test email failed.';
+                    if (error.text) {
+                        errorMsg += '\nError: ' + error.text;
+                    } else if (error.message) {
+                        errorMsg += '\nError: ' + error.message;
+                    }
+                    
+                    alert(`❌ ${errorMsg}\n\nPlease check:\n1. EmailJS Service ID: ${EMAILJS_SERVICE_ID}\n2. Template ID: ${TEMPLATE_UNVERIFIED}\n3. Public Key: ${EMAILJS_PUBLIC_KEY}\n\nSee console for details.`);
+                    showToast('❌ Test email failed. Check console for details.', true);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-envelope"></i> Test Email';
+                }
+            }
+
+            document.getElementById('testEmailBtn').addEventListener('click', testEmail);
+
+            // ============================================
             // SEND UNVERIFY EMAIL - Uses template_hzraam8
             // ============================================
             async function sendUnverifyEmail(record, reason) {
                 try {
                     showToast('📧 Sending unverification email to ' + record.email + '...');
 
-                    // Prepare template parameters matching your EmailJS template
                     const templateParams = {
                         to_email: record.email,
                         to_name: record.fullName,
@@ -2395,7 +2464,6 @@
                     console.log('📧 Sending unverify email with template:', TEMPLATE_UNVERIFIED);
                     console.log('📧 Params:', templateParams);
 
-                    // Send with the unverified template
                     const response = await emailjs.send(
                         EMAILJS_SERVICE_ID,
                         TEMPLATE_UNVERIFIED,
@@ -3034,7 +3102,6 @@
 
                     const record = records[index];
                     
-                    // Unverify the member
                     record.isVerified = false;
                     record.verifiedDate = null;
                     record.emailSent = false;
@@ -3042,7 +3109,6 @@
                     record.unverifyDate = new Date().toISOString();
                     saveRegistrations(records);
 
-                    // Send unverify email if checked
                     let emailSent = false;
                     if (sendEmail) {
                         emailSent = await sendUnverifyEmail(record, reason);
@@ -3761,7 +3827,7 @@
             console.log('🏫 WUB EEE Club Registration System loaded successfully!');
             console.log('📧 Admin: eee-club@eee.wub.edu.bd');
             console.log('🔑 Password: Eee123@580Eee');
-            console.log('💳 Payment: bKash (01754526593) & Nagad (01754526594)');
+            console.log('💳 Payment: bKash (01754526593) & Nagad (01754526593)');
             console.log('📌 TRXID Formats:');
             console.log('   💚 bKash: Must start with "DG" and be exactly 10 characters (e.g., DGH5GB82G7)');
             console.log('   💙 Nagad: Must start with "75" and be exactly 8 characters (e.g., 75OPUQ5X)');
@@ -3773,6 +3839,7 @@
             console.log('   🟢 VERIFIED: Resend + Unverify');
             console.log('   🔴 UNVERIFIED: Verify only');
             console.log('✅ System ready!');
+            console.log('🛠️ Click "Test Email" to test the Unverified template!');
         })();
     </script>
 </body>
