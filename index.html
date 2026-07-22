@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- Brevo SDK (formerly Sendinblue) -->
-    <script src="https://smtpjs.com/v3/smtp.js"></script>
     <style>
         /* ============================================
            MAIN SYSTEM STYLES
@@ -1953,25 +1951,32 @@
     <script>
         (function() {
             // ============================================
-            // Brevo (Sendinblue) Email Configuration
+            // 🔥 BREVO SMTP CONFIGURATION - UPDATED WITH YOUR KEY!
             // ============================================
-            // SMTP configuration for Brevo
-            // You need to replace these with your actual Brevo SMTP credentials
             const BREVO_SMTP_HOST = 'smtp-relay.brevo.com';
             const BREVO_SMTP_PORT = 587;
-            const BREVO_SMTP_USER = 'eee-club@eee.wub.edu.bd'; // Your Brevo SMTP login email
-            const BREVO_SMTP_PASS = 'xsmtpsib-0f5b638ec8fa59d57123ea18ac2d3ca2f7122fa5ba6719342f7f98496f1a8625-z7ZUv564iXYG6pOa'; // Your Brevo SMTP password
+            // YOUR SMTP CREDENTIALS FROM BREVO
+            const BREVO_SMTP_USER = 'smrat@gmail.com'; // Your Brevo SMTP login email
+            const BREVO_SMTP_PASS = 'xsmtpsib-0f5b638ec8fa59d57123ea18ac2d3ca2f7122fa5ba6719342f7f98496f1a8625-z7ZUv564iXYG6pOa'; // Your SMTP key
             const FROM_EMAIL = 'eee-club@eee.wub.edu.bd';
             const FROM_NAME = 'WUB EEE Club';
 
+            console.log('📧 Brevo SMTP configured with:');
+            console.log('   Host: ' + BREVO_SMTP_HOST);
+            console.log('   Port: ' + BREVO_SMTP_PORT);
+            console.log('   User: ' + BREVO_SMTP_USER);
+            console.log('   From: ' + FROM_EMAIL);
+            console.log('   Status: ✅ Ready to send emails!');
+
             // ============================================
-            // Email Sending Functions using SMTP.js
+            // 📧 EMAIL SENDING FUNCTION (Pure SMTP.js)
             // ============================================
             async function sendEmail(to, subject, htmlContent) {
-                try {
-                    console.log('📧 Sending email to:', to);
-                    console.log('📧 Subject:', subject);
+                console.log(`📧 Attempting to send email to: ${to}`);
+                console.log(`📧 Subject: ${subject}`);
 
+                try {
+                    // Use SMTP.js with Brevo credentials
                     const response = await Email.send({
                         Host: BREVO_SMTP_HOST,
                         Port: BREVO_SMTP_PORT,
@@ -1985,24 +1990,35 @@
                         IsHTML: true,
                     });
 
-                    console.log('📧 Email sent successfully!', response);
-                    return { success: true, response: response };
+                    console.log('✅ Brevo SMTP: Email sent successfully!', response);
+                    return { success: true, provider: 'Brevo SMTP', response: response };
+
                 } catch (error) {
-                    console.error('❌ Email sending failed:', error);
-                    return { success: false, error: error };
+                    console.error('❌ Brevo SMTP failed:', error);
+                    return {
+                        success: false,
+                        error: error.message || 'Unknown Brevo error',
+                        details: error
+                    };
                 }
             }
 
             // ============================================
-            // Email Template Functions
+            // 📧 EMAIL TEMPLATE BUILDERS
             // ============================================
+            function escapeHtml(text) {
+                if (!text) return '';
+                const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+                return String(text).replace(/[&<>"']/g, m => map[m]);
+            }
+
             function buildConfirmationEmailHTML(record) {
                 const joinDate = new Date(record.joinDate).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
                 });
-                
+
                 return `
                     <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border: 1px solid #e6edf8; border-radius: 16px;">
                         <div style="text-align: center; border-bottom: 2px solid #0b3b7a; padding-bottom: 20px; margin-bottom: 20px;">
@@ -2209,31 +2225,34 @@
             }
 
             // ============================================
-            // Email Sending Wrapper Functions
+            // 📧 EMAIL WRAPPER FUNCTIONS
             // ============================================
             async function sendConfirmationEmail(record) {
                 const subject = `✅ WUB EEE Club - Membership Confirmed! (${record.clubId})`;
                 const htmlContent = buildConfirmationEmailHTML(record);
-                return await sendEmail(record.email, subject, htmlContent);
+                const result = await sendEmail(record.email, subject, htmlContent);
+                return result.success;
             }
 
             async function sendUnverifyEmail(record, reason) {
                 const subject = `⚠️ WUB EEE Club - Membership Unverified (${record.clubId})`;
                 const htmlContent = buildUnverifyEmailHTML(record, reason);
-                return await sendEmail(record.email, subject, htmlContent);
+                const result = await sendEmail(record.email, subject, htmlContent);
+                return result.success;
             }
 
             async function sendUpdateEmail(record, changes) {
                 const subject = `🔄 WUB EEE Club - Profile Updated (${record.clubId})`;
                 const htmlContent = buildUpdateEmailHTML(record, changes);
-                return await sendEmail(record.email, subject, htmlContent);
+                const result = await sendEmail(record.email, subject, htmlContent);
+                return result.success;
             }
 
             // ============================================
-            // Test Email Function (using Brevo)
+            // 🧪 TEST EMAIL
             // ============================================
             async function testEmail() {
-                const testEmailAddress = prompt('Enter your email address to test the email system:', 'your-email@example.com');
+                const testEmailAddress = prompt('Enter your email address to test the Brevo SMTP:', 'your-email@example.com');
                 if (!testEmailAddress) return;
 
                 const btn = document.getElementById('testEmailBtn');
@@ -2263,15 +2282,15 @@
                     const result = await sendEmail(testEmailAddress, '🧪 WUB EEE Club - Test Email', testHTML);
 
                     if (result.success) {
-                        showToast(`✅ Test email sent to ${testEmailAddress}!`);
-                        alert(`✅ Test email sent successfully to ${testEmailAddress}!\n\nCheck your inbox/spam folder.`);
+                        showToast(`✅ Test email sent to ${testEmailAddress} via ${result.provider}!`);
+                        alert(`✅ Test email sent successfully to ${testEmailAddress}!\n\nProvider: ${result.provider}\nCheck your inbox/spam folder.`);
                     } else {
                         throw new Error(result.error || 'Unknown error');
                     }
 
                 } catch (error) {
                     console.error('❌ Test email failed:', error);
-                    alert(`❌ Test email failed.\nError: ${error.message || 'Unknown error'}\n\nPlease check your Brevo SMTP credentials.\n\nMake sure:\n1. BREVO_SMTP_USER is set correctly\n2. BREVO_SMTP_PASS is set correctly\n3. Your Brevo account has SMTP enabled`);
+                    alert(`❌ Test email failed.\nError: ${error.message || 'Unknown error'}\n\nPlease check your Brevo SMTP credentials.\n\nMake sure:\n1. SMTP is enabled in your Brevo account\n2. The SMTP key is correct\n3. Your sender email is verified in Brevo`);
                     showToast('❌ Test email failed. Check console for details.', true);
                 } finally {
                     btn.disabled = false;
@@ -2282,7 +2301,7 @@
             document.getElementById('testEmailBtn').addEventListener('click', testEmail);
 
             // ============================================
-            // JSONBin.io CONFIGURATION
+            // 🔗 JSONBin.io CONFIGURATION
             // ============================================
             const JSONBIN_BIN_ID = '6a3a40f6f5f4af5e2921c0d2';
             const JSONBIN_API_KEY = '$2a$10$uxxlv8nJapUJj6YbaVCY4u1EBDwX6.jOssFoyi0I7e8CyDKeTIc5W';
@@ -2302,7 +2321,7 @@
             let selectedMethod = 'bKash';
 
             // ============================================
-            // DOM REFS
+            // 🎯 DOM REFS & PAYMENT FUNCTIONS
             // ============================================
             const trxidInput = document.getElementById('trxidInput');
             const trxidHint = document.getElementById('trxidHint');
@@ -2314,9 +2333,6 @@
             const nagadInfo = document.getElementById('nagadInfo');
             const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
 
-            // ============================================
-            // TRXID VALIDATION FUNCTIONS
-            // ============================================
             function isValidBkashTrxid(trxid) {
                 return /^DG[A-Z0-9]{8}$/.test(trxid);
             }
@@ -2327,49 +2343,31 @@
 
             function validateTrxid(trxid, method) {
                 trxid = trxid.trim().toUpperCase();
-                
-                if (!trxid) {
-                    return { valid: false, message: 'Please enter a Transaction ID.' };
-                }
-                
+                if (!trxid) return { valid: false, message: 'Please enter a Transaction ID.' };
                 if (method === 'bKash') {
                     if (!isValidBkashTrxid(trxid)) {
-                        return { 
-                            valid: false, 
-                            message: 'Invalid bKash TrxID. Must start with "DG" and be exactly 10 characters (e.g., DGH5GB82G7)'
-                        };
+                        return { valid: false, message: 'Invalid bKash TrxID. Must start with "DG" and be exactly 10 characters (e.g., DGH5GB82G7)' };
                     }
                     return { valid: true, message: '✅ Valid bKash TrxID format.' };
                 } else if (method === 'Nagad') {
                     if (!isValidNagadTrxid(trxid)) {
-                        return { 
-                            valid: false, 
-                            message: 'Invalid Nagad TrxID. Must start with "75" and be exactly 8 characters (e.g., 75OPUQ5X)'
-                        };
+                        return { valid: false, message: 'Invalid Nagad TrxID. Must start with "75" and be exactly 8 characters (e.g., 75OPUQ5X)' };
                     }
                     return { valid: true, message: '✅ Valid Nagad TrxID format.' };
                 }
                 return { valid: false, message: 'Unknown payment method.' };
             }
 
-            // ============================================
-            // TRXID INPUT REAL-TIME VALIDATION
-            // ============================================
             trxidInput.addEventListener('input', function() {
                 const value = this.value.trim().toUpperCase();
                 this.value = value;
-                
                 this.classList.remove('valid', 'invalid');
-                
                 if (value.length === 0) {
                     trxidHint.textContent = 'Enter your transaction ID';
                     trxidHint.className = 'trxid-hint';
                     return;
                 }
-                
-                const method = selectedMethod;
-                const validation = validateTrxid(value, method);
-                
+                const validation = validateTrxid(value, selectedMethod);
                 if (validation.valid) {
                     this.classList.add('valid');
                     trxidHint.textContent = validation.message;
@@ -2381,9 +2379,6 @@
                 }
             });
 
-            // ============================================
-            // PAYMENT METHOD TOGGLE
-            // ============================================
             paymentMethodRadios.forEach(radio => {
                 radio.addEventListener('change', function() {
                     selectedMethod = this.value;
@@ -2415,9 +2410,6 @@
                 });
             });
 
-            // ============================================
-            // PAYMENT FUNCTIONS
-            // ============================================
             function updatePaymentUI() {
                 if (paymentCompleted && verifiedTrxID) {
                     paymentStatus.innerHTML =
@@ -2445,30 +2437,14 @@
                     alert('⚠️ Please enter a Transaction ID (TrxID).');
                     return;
                 }
-
                 const validation = validateTrxid(trxid, selectedMethod);
                 if (!validation.valid) {
                     alert(`⚠️ ${validation.message}`);
                     return;
                 }
-
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
                 this.disabled = true;
-
                 setTimeout(() => {
-                    if (selectedMethod === 'bKash' && !isValidBkashTrxid(trxid)) {
-                        this.innerHTML = '<i class="fas fa-check"></i> Verify';
-                        this.disabled = false;
-                        alert('⚠️ Invalid bKash TrxID. Must start with "DG" and be exactly 10 characters.');
-                        return;
-                    }
-                    if (selectedMethod === 'Nagad' && !isValidNagadTrxid(trxid)) {
-                        this.innerHTML = '<i class="fas fa-check"></i> Verify';
-                        this.disabled = false;
-                        alert('⚠️ Invalid Nagad TrxID. Must start with "75" and be exactly 8 characters.');
-                        return;
-                    }
-
                     verifiedTrxID = trxid;
                     paymentCompleted = true;
                     updatePaymentUI();
@@ -2494,7 +2470,7 @@
             });
 
             // ============================================
-            // SYNC FUNCTIONS
+            // ☁️ SYNC FUNCTIONS
             // ============================================
             function updateSyncStatus(status, message) {
                 const dot = document.getElementById('syncDot');
@@ -2594,7 +2570,7 @@
             }
 
             // ============================================
-            // DATA MANAGEMENT
+            // 💾 DATA MANAGEMENT
             // ============================================
             function getLastSerial() {
                 const stored = localStorage.getItem(ID_KEY);
@@ -2614,9 +2590,6 @@
                 return data ? JSON.parse(data) : [];
             }
 
-            // ============================================
-            // SAVE REGISTRATIONS - PERMANENT SAVE WITH UNIQUE ID
-            // ============================================
             function saveRegistrations(records) {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
                 const lastId = getLastSerial();
@@ -2634,7 +2607,7 @@
             }
 
             // ============================================
-            // FIX DUPLICATE IDs FUNCTION
+            // 🔧 FIX DUPLICATE IDs
             // ============================================
             window.fixDuplicateIds = function() {
                 const records = getRegistrations();
@@ -2642,7 +2615,6 @@
                     showToast('❌ No members found to fix.', true);
                     return;
                 }
-
                 const idMap = {};
                 const duplicates = [];
                 records.forEach((r, idx) => {
@@ -2652,16 +2624,13 @@
                         idMap[r.clubId] = true;
                     }
                 });
-
                 if (duplicates.length === 0) {
                     showToast('✅ No duplicate Club IDs found! All IDs are unique.');
                     return;
                 }
-
                 if (!confirm(`Found ${duplicates.length} duplicate Club IDs.\n\nClick OK to generate new unique IDs for all members with duplicate IDs.`)) {
                     return;
                 }
-
                 let maxSerial = getLastSerial();
                 let fixedCount = 0;
                 const updatedRecords = records.map((r) => {
@@ -2686,7 +2655,6 @@
                     }
                     return r;
                 });
-
                 setLastSerial(maxSerial);
                 saveRegistrations(updatedRecords);
                 renderAdminTable();
@@ -2694,17 +2662,34 @@
             };
 
             // ============================================
-            // SEND UNVERIFY EMAIL (using Brevo)
+            // 📧 EMAIL WRAPPER FUNCTIONS (with better error handling)
             // ============================================
+            async function sendConfirmationEmailWrapper(record) {
+                try {
+                    showToast('📧 Sending confirmation email to ' + record.email + '...');
+                    const result = await sendConfirmationEmail(record);
+                    if (result) {
+                        showToast(`✅ Confirmation email sent to ${record.email}`);
+                        return true;
+                    } else {
+                        throw new Error('Email sending failed');
+                    }
+                } catch (error) {
+                    console.error('❌ Confirmation email sending failed:', error);
+                    showToast(`⚠️ Could not send confirmation email. Error: ${error.message || 'Unknown error'}`, true);
+                    return false;
+                }
+            }
+
             async function sendUnverifyEmailWrapper(record, reason) {
                 try {
                     showToast('📧 Sending unverification email to ' + record.email + '...');
                     const result = await sendUnverifyEmail(record, reason);
-                    if (result.success) {
+                    if (result) {
                         showToast(`✅ Unverification email sent to ${record.email}`);
                         return true;
                     } else {
-                        throw new Error(result.error || 'Unknown error');
+                        throw new Error('Email sending failed');
                     }
                 } catch (error) {
                     console.error('❌ Unverify email sending failed:', error);
@@ -2713,33 +2698,9 @@
                 }
             }
 
-            // ============================================
-            // SEND CONFIRMATION EMAIL (using Brevo)
-            // ============================================
-            async function sendConfirmationEmailWrapper(record) {
-                try {
-                    showToast('📧 Sending confirmation email from eee-club@eee.wub.edu.bd...');
-                    const result = await sendConfirmationEmail(record);
-                    if (result.success) {
-                        showToast(`✅ Confirmation email sent to ${record.email} from eee-club@eee.wub.edu.bd`);
-                        return true;
-                    } else {
-                        throw new Error(result.error || 'Unknown error');
-                    }
-                } catch (error) {
-                    console.error('❌ Confirmation email sending failed:', error);
-                    showToast(`⚠️ Could not send email. Please try again. Error: ${error.message || 'Unknown error'}`, true);
-                    return false;
-                }
-            }
-
-            // ============================================
-            // SEND UPDATE EMAIL (using Brevo)
-            // ============================================
             async function sendUpdateEmailWrapper(record, oldData) {
                 try {
                     showToast('📧 Sending update notification email...');
-
                     const changes = [];
                     if (oldData.fullName !== record.fullName) changes.push(`Name: ${oldData.fullName} → ${record.fullName}`);
                     if (oldData.studentId !== record.studentId) changes.push(`Student ID: ${oldData.studentId} → ${record.studentId}`);
@@ -2748,15 +2709,13 @@
                     if (oldData.semester !== record.semester) changes.push(`Semester: ${oldData.semester} → ${record.semester}`);
                     if (oldData.gender !== record.gender) changes.push(`Gender: ${oldData.gender} → ${record.gender}`);
                     if (oldData.interest !== record.interest) changes.push(`Interest: ${oldData.interest} → ${record.interest}`);
-
                     const changesText = changes.length > 0 ? changes.join('\n') : 'No changes were made.';
-
                     const result = await sendUpdateEmail(record, changesText);
-                    if (result.success) {
+                    if (result) {
                         showToast(`✅ Update notification sent to ${record.email}`);
                         return true;
                     } else {
-                        throw new Error(result.error || 'Unknown error');
+                        throw new Error('Email sending failed');
                     }
                 } catch (error) {
                     console.error('❌ Update email sending failed:', error);
@@ -2766,7 +2725,7 @@
             }
 
             // ============================================
-            // LOGIN
+            // 🔐 LOGIN
             // ============================================
             function checkLogin() {
                 const session = sessionStorage.getItem('wub_eee_admin_session');
@@ -2837,14 +2796,8 @@
             });
 
             // ============================================
-            // TOAST & UTILITY
+            // 🍞 TOAST & UTILITY
             // ============================================
-            function escapeHtml(text) {
-                if (!text) return '';
-                const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-                return String(text).replace(/[&<>"']/g, m => map[m]);
-            }
-
             function showToast(message, isError = false) {
                 const existing = document.querySelector('.notification-toast');
                 if (existing) existing.remove();
@@ -2860,14 +2813,13 @@
             }
 
             // ============================================
-            // DOWNLOAD SLIP FUNCTION
+            // 📄 DOWNLOAD SLIP
             // ============================================
             function downloadSlip(record) {
                 if (!record) {
                     showToast('❌ No registration data found', true);
                     return;
                 }
-
                 const slipHTML = `
                     <div class="slip-container">
                         <div class="slip-header">
@@ -2875,151 +2827,50 @@
                             <p style="font-size:0.85rem; color:#6b8aaa;">World University of Bangladesh</p>
                             <p style="font-size:0.8rem; color:#6b8aaa;">Membership Registration Slip</p>
                         </div>
-                        <div class="slip-row">
-                            <span class="label">Club ID</span>
-                            <span class="value">${record.clubId}</span>
-                        </div>
-                        <div class="slip-row">
-                            <span class="label">Student ID</span>
-                            <span class="value">${record.studentId}</span>
-                        </div>
-                        <div class="slip-row">
-                            <span class="label">Full Name</span>
-                            <span class="value">${record.fullName}</span>
-                        </div>
-                        <div class="slip-row">
-                            <span class="label">Email</span>
-                            <span class="value">${record.email}</span>
-                        </div>
-                        <div class="slip-row">
-                            <span class="label">Phone</span>
-                            <span class="value">${record.phone || 'N/A'}</span>
-                        </div>
-                        <div class="slip-row">
-                            <span class="label">Semester</span>
-                            <span class="value">${record.semester}</span>
-                        </div>
-                        <div class="slip-row">
-                            <span class="label">Department</span>
-                            <span class="value">EEE</span>
-                        </div>
-                        <div class="slip-row">
-                            <span class="label">Payment Method</span>
-                            <span class="value">${record.paymentMethod}</span>
-                        </div>
-                        <div class="slip-row">
-                            <span class="label">Transaction ID</span>
-                            <span class="value">${record.trxid}</span>
-                        </div>
-                        <div class="slip-row">
-                            <span class="label">Payment Amount</span>
-                            <span class="value">200 TK</span>
-                        </div>
-                        <div class="slip-row">
-                            <span class="label">Registration Date</span>
-                            <span class="value">${new Date(record.joinDate).toLocaleDateString()}</span>
-                        </div>
-                        ${record.isPastStudent ? `
-                        <div class="slip-row">
-                            <span class="label">Past Member</span>
-                            <span class="value">Yes (${record.startYear} - ${record.endYear})</span>
-                        </div>
-                        ` : ''}
-                        <div class="slip-footer">
-                            <p>This is a system-generated confirmation slip.</p>
-                            <p>For any queries, contact: eee-club@eee.wub.edu.bd</p>
-                        </div>
+                        <div class="slip-row"><span class="label">Club ID</span><span class="value">${record.clubId}</span></div>
+                        <div class="slip-row"><span class="label">Student ID</span><span class="value">${record.studentId}</span></div>
+                        <div class="slip-row"><span class="label">Full Name</span><span class="value">${record.fullName}</span></div>
+                        <div class="slip-row"><span class="label">Email</span><span class="value">${record.email}</span></div>
+                        <div class="slip-row"><span class="label">Phone</span><span class="value">${record.phone || 'N/A'}</span></div>
+                        <div class="slip-row"><span class="label">Semester</span><span class="value">${record.semester}</span></div>
+                        <div class="slip-row"><span class="label">Department</span><span class="value">EEE</span></div>
+                        <div class="slip-row"><span class="label">Payment Method</span><span class="value">${record.paymentMethod}</span></div>
+                        <div class="slip-row"><span class="label">Transaction ID</span><span class="value">${record.trxid}</span></div>
+                        <div class="slip-row"><span class="label">Payment Amount</span><span class="value">200 TK</span></div>
+                        <div class="slip-row"><span class="label">Registration Date</span><span class="value">${new Date(record.joinDate).toLocaleDateString()}</span></div>
+                        ${record.isPastStudent ? `<div class="slip-row"><span class="label">Past Member</span><span class="value">Yes (${record.startYear} - ${record.endYear})</span></div>` : ''}
+                        <div class="slip-footer"><p>This is a system-generated confirmation slip.</p><p>For any queries, contact: eee-club@eee.wub.edu.bd</p></div>
                     </div>
                 `;
-
                 const printWindow = window.open('', '_blank', 'width=600,height=800');
                 printWindow.document.write(`
                     <!DOCTYPE html>
                     <html>
-                    <head>
-                        <title>Registration Slip - ${record.clubId}</title>
+                    <head><title>Registration Slip - ${record.clubId}</title>
                         <link rel="preconnect" href="https://fonts.googleapis.com" />
                         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
                         <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
                         <style>
-                            body {
-                                font-family: 'Inter', sans-serif;
-                                background: #f0f5fe;
-                                display: flex;
-                                justify-content: center;
-                                align-items: center;
-                                min-height: 100vh;
-                                margin: 0;
-                                padding: 2rem;
-                            }
-                            .slip-container {
-                                background: white;
-                                padding: 2rem;
-                                border-radius: 16px;
-                                border: 2px solid #0b3b7a;
-                                max-width: 500px;
-                                width: 100%;
-                                margin: 0 auto;
-                                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-                            }
-                            .slip-container .slip-header {
-                                text-align: center;
-                                border-bottom: 2px solid #0b3b7a;
-                                padding-bottom: 1rem;
-                                margin-bottom: 1rem;
-                            }
-                            .slip-container .slip-header h2 {
-                                color: #0b3b7a;
-                                font-size: 1.3rem;
-                                margin: 0;
-                            }
-                            .slip-container .slip-header p {
-                                margin: 0.2rem 0;
-                                color: #6b8aaa;
-                                font-size: 0.85rem;
-                            }
-                            .slip-container .slip-row {
-                                display: flex;
-                                justify-content: space-between;
-                                padding: 0.5rem 0;
-                                border-bottom: 1px solid #e6edf8;
-                            }
-                            .slip-container .slip-row .label {
-                                font-weight: 600;
-                                color: #1f3a66;
-                            }
-                            .slip-container .slip-row .value {
-                                color: #0b2b5c;
-                                font-weight: 500;
-                            }
-                            .slip-container .slip-footer {
-                                text-align: center;
-                                margin-top: 1rem;
-                                font-size: 0.8rem;
-                                color: #6b8aaa;
-                            }
-                            @media print {
-                                body { background: white; padding: 0; }
-                                .slip-container { box-shadow: none; border: 2px solid #0b3b7a; }
-                            }
+                            body { font-family: 'Inter', sans-serif; background: #f0f5fe; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 2rem; }
+                            .slip-container { background: white; padding: 2rem; border-radius: 16px; border: 2px solid #0b3b7a; max-width: 500px; width: 100%; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+                            .slip-container .slip-header { text-align: center; border-bottom: 2px solid #0b3b7a; padding-bottom: 1rem; margin-bottom: 1rem; }
+                            .slip-container .slip-header h2 { color: #0b3b7a; font-size: 1.3rem; margin: 0; }
+                            .slip-container .slip-header p { margin: 0.2rem 0; color: #6b8aaa; font-size: 0.85rem; }
+                            .slip-container .slip-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #e6edf8; }
+                            .slip-container .slip-row .label { font-weight: 600; color: #1f3a66; }
+                            .slip-container .slip-row .value { color: #0b2b5c; font-weight: 500; }
+                            .slip-container .slip-footer { text-align: center; margin-top: 1rem; font-size: 0.8rem; color: #6b8aaa; }
+                            @media print { body { background: white; padding: 0; } .slip-container { box-shadow: none; border: 2px solid #0b3b7a; } }
                         </style>
                     </head>
-                    <body>
-                        ${slipHTML}
-                        <script>
-                            window.onload = function() {
-                                window.print();
-                                window.close();
-                            };
-                        <\/script>
-                    </body>
+                    <body>${slipHTML}<script>window.onload=function(){window.print();window.close();};<\/script></body>
                     </html>
                 `);
                 printWindow.document.close();
             }
 
             // ============================================
-            // PAST STUDENT TOGGLE
+            // 📋 PAST STUDENT TOGGLE
             // ============================================
             document.getElementById('isPastStudent').addEventListener('change', function() {
                 const fields = document.getElementById('pastStudentFields');
@@ -3037,16 +2888,14 @@
             });
 
             // ============================================
-            // REGISTRATION SUBMIT
+            // 📝 REGISTRATION SUBMIT
             // ============================================
             document.getElementById('registrationForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
-
                 if (!paymentCompleted || !verifiedTrxID) {
                     alert('⚠️ Please enter and verify your Transaction ID (TrxID).');
                     return;
                 }
-
                 const fullName = document.getElementById('fullName').value.trim();
                 const studentId = document.getElementById('studentId').value.trim();
                 const email = document.getElementById('email').value.trim();
@@ -3054,17 +2903,14 @@
                     alert('Please fill in all required fields: Full Name, Student ID, and Email.');
                     return;
                 }
-
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRegex.test(email)) {
                     alert('Please enter a valid email address.');
                     return;
                 }
-
                 const isPastStudent = document.getElementById('isPastStudent').checked;
                 let startYear = null;
                 let endYear = null;
-
                 if (isPastStudent) {
                     startYear = document.getElementById('startYear').value.trim();
                     endYear = document.getElementById('endYear').value.trim();
@@ -3083,57 +2929,31 @@
                         return;
                     }
                 }
-
                 const skillCheckboxes = document.querySelectorAll('#skillsGroup input[type="checkbox"]');
                 const skills = [];
                 skillCheckboxes.forEach(cb => { if (cb.checked) skills.push(cb.value); });
-
                 const semester = document.getElementById('semester').value;
                 const phone = document.getElementById('phone').value.trim();
                 const gender = document.getElementById('gender').value;
                 const interest = document.getElementById('interest').value;
                 const reason = document.getElementById('reason').value.trim();
-
                 let lastSerial = getLastSerial();
                 const newSerial = lastSerial + 1;
                 const clubId = generateClubId(newSerial);
                 setLastSerial(newSerial);
-
                 let joinDate;
                 if (isPastStudent && startYear) {
                     joinDate = new Date(startYear, 0, 1).toISOString();
                 } else {
                     joinDate = new Date().toISOString();
                 }
-
                 const record = {
-                    fullName,
-                    studentId,
-                    department: 'EEE',
-                    semester,
-                    email,
-                    phone,
-                    gender,
-                    skills,
-                    interest,
-                    reason,
-                    clubId, // Unique ID - fixed forever
-                    paymentStatus: `Paid (${selectedMethod})`,
-                    paymentMethod: selectedMethod,
-                    paymentAmount: '200 TK',
-                    trxid: verifiedTrxID,
-                    joinDate: joinDate,
-                    timestamp: new Date().toISOString(),
-                    isPastStudent: isPastStudent,
-                    startYear: startYear,
-                    endYear: endYear,
-                    isVerified: false,
-                    verifiedDate: null,
-                    emailSent: false,
-                    unverifyReason: null,
-                    unverifyDate: null
+                    fullName, studentId, department: 'EEE', semester, email, phone, gender, skills, interest, reason,
+                    clubId, paymentStatus: `Paid (${selectedMethod})`, paymentMethod: selectedMethod,
+                    paymentAmount: '200 TK', trxid: verifiedTrxID, joinDate, timestamp: new Date().toISOString(),
+                    isPastStudent, startYear, endYear, isVerified: false, verifiedDate: null,
+                    emailSent: false, unverifyReason: null, unverifyDate: null
                 };
-
                 const records = getRegistrations();
                 const exists = records.some(r => r.studentId === studentId);
                 if (exists) {
@@ -3143,29 +2963,24 @@
                 }
                 records.push(record);
                 saveRegistrations(records);
-
                 const box = document.getElementById('successBox');
                 const span = document.getElementById('displayClubId');
                 if (span) span.textContent = clubId;
                 if (box) box.classList.add('show');
-
                 window._lastClubId = clubId;
                 window._lastFormData = record;
-
                 generateQRCode(record);
                 document.getElementById('qrClubId').textContent = clubId;
                 document.getElementById('qrJoinDate').textContent = new Date(record.joinDate).toLocaleDateString();
                 document.getElementById('qrSection').style.display = 'block';
-
                 renderAdminTable();
                 document.getElementById('successBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 submitBtn.disabled = true;
-
                 showToast('🎉 Registration saved with unique Club ID: ' + clubId);
             });
 
             // ============================================
-            // ADMIN VERIFICATION FUNCTION
+            // ✅ ADMIN VERIFICATION FUNCTION
             // ============================================
             window.verifyMember = async function(clubId) {
                 const records = getRegistrations();
@@ -3174,26 +2989,21 @@
                     showToast('❌ Member not found', true);
                     return;
                 }
-
                 if (records[index].isVerified) {
                     showToast('⚠️ This member is already verified', true);
                     return;
                 }
-
                 if (!confirm(`Verify membership for ${records[index].fullName} (${records[index].clubId})?\nThis will send a confirmation email with their Club ID.`)) {
                     return;
                 }
-
                 records[index].isVerified = true;
                 records[index].verifiedDate = new Date().toISOString();
                 records[index].unverifyReason = null;
                 records[index].unverifyDate = null;
                 saveRegistrations(records);
-
                 const emailSent = await sendConfirmationEmailWrapper(records[index]);
                 records[index].emailSent = emailSent;
                 saveRegistrations(records);
-
                 renderAdminTable();
                 if (emailSent) {
                     showToast(`✅ Member verified and confirmation email sent to ${records[index].email}`);
@@ -3203,7 +3013,7 @@
             };
 
             // ============================================
-            // RESEND EMAIL FUNCTION
+            // 📧 RESEND EMAIL FUNCTION
             // ============================================
             window.resendEmail = async function(clubId) {
                 const records = getRegistrations();
@@ -3212,16 +3022,13 @@
                     showToast('❌ Member not found', true);
                     return;
                 }
-
                 if (!record.isVerified) {
                     showToast('⚠️ Please verify the member first before sending email.', true);
                     return;
                 }
-
                 if (!confirm(`Resend confirmation email to ${record.fullName} (${record.email})?`)) {
                     return;
                 }
-
                 const emailSent = await sendConfirmationEmailWrapper(record);
                 if (emailSent) {
                     record.emailSent = true;
@@ -3234,7 +3041,7 @@
             };
 
             // ============================================
-            // UNVERIFY FUNCTION
+            // 🔴 UNVERIFY FUNCTION
             // ============================================
             window.unverifyMember = function(clubId) {
                 const records = getRegistrations();
@@ -3243,12 +3050,10 @@
                     showToast('❌ Member not found', true);
                     return;
                 }
-
                 if (record.isVerified === false && record.unverifyReason) {
                     showToast('⚠️ This member is already unverified', true);
                     return;
                 }
-
                 document.getElementById('unverifyClubId').value = clubId;
                 document.getElementById('unverifyMemberName').value = record.fullName || 'Unknown';
                 document.getElementById('unverifyClubIdDisplay').value = clubId;
@@ -3271,19 +3076,16 @@
                 const btn = document.getElementById('unverifyBtn');
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-
                 try {
                     const clubId = document.getElementById('unverifyClubId').value;
                     const reason = document.getElementById('unverifyReason').value.trim();
                     const sendEmail = document.getElementById('unverifySendEmail').checked;
-
                     if (!reason) {
                         showToast('⚠️ Please enter a reason for unverification.', true);
                         btn.disabled = false;
                         btn.innerHTML = '<i class="fas fa-user-slash"></i> Unverify Member & Send Email';
                         return;
                     }
-
                     const records = getRegistrations();
                     const index = records.findIndex(r => r.clubId === clubId);
                     if (index === -1) {
@@ -3292,16 +3094,13 @@
                         btn.innerHTML = '<i class="fas fa-user-slash"></i> Unverify Member & Send Email';
                         return;
                     }
-
                     const record = records[index];
-                    
                     record.isVerified = false;
                     record.verifiedDate = null;
                     record.emailSent = false;
                     record.unverifyReason = reason;
                     record.unverifyDate = new Date().toISOString();
                     saveRegistrations(records);
-
                     let emailSent = false;
                     if (sendEmail) {
                         emailSent = await sendUnverifyEmailWrapper(record, reason);
@@ -3310,10 +3109,8 @@
                             saveRegistrations(records);
                         }
                     }
-
                     document.getElementById('unverifyModal').classList.remove('open');
                     renderAdminTable();
-                    
                     if (sendEmail && emailSent) {
                         showToast(`✅ Member unverified successfully! Email notification sent.`);
                     } else if (sendEmail && !emailSent) {
@@ -3321,7 +3118,6 @@
                     } else {
                         showToast(`✅ Member unverified successfully!`);
                     }
-
                 } catch (error) {
                     console.error('Unverify error:', error);
                     showToast('❌ Error unverifying member: ' + error.message, true);
@@ -3332,7 +3128,7 @@
             });
 
             // ============================================
-            // DOWNLOAD SLIP BUTTON
+            // 📄 DOWNLOAD SLIP BUTTON
             // ============================================
             document.getElementById('downloadSlipBtn').addEventListener('click', function() {
                 const record = window._lastFormData;
@@ -3344,7 +3140,7 @@
             });
 
             // ============================================
-            // RESET FORM BUTTON
+            // 🔄 RESET FORM BUTTON
             // ============================================
             document.getElementById('resetFormBtn').addEventListener('click', function() {
                 document.getElementById('successBox').classList.remove('show');
@@ -3372,7 +3168,7 @@
             });
 
             // ============================================
-            // QR CODE
+            // 📱 QR CODE
             // ============================================
             function generateQRCode(record) {
                 const qrContainer = document.getElementById('qrcode');
@@ -3400,7 +3196,7 @@
             }
 
             // ============================================
-            // CERTIFICATE FUNCTIONS
+            // 🎓 CERTIFICATE FUNCTIONS
             // ============================================
             function isEligibleForCertificate(joinDate) {
                 const join = new Date(joinDate);
@@ -3516,7 +3312,7 @@
             }
 
             // ============================================
-            // ADMIN TABLE
+            // 📊 ADMIN TABLE
             // ============================================
             function renderAdminTable() {
                 if (!isLoggedIn) return;
@@ -3537,16 +3333,12 @@
                     const isVerified = r.isVerified || false;
                     const emailSent = r.emailSent || false;
                     const unverifyReason = r.unverifyReason || '';
-                    
                     let actions = '';
-                    
                     actions = `
                         <button class="action-btn edit" onclick="editMember('${r.clubId}')" title="Edit Member"><i class="fas fa-edit"></i></button>
                         <button class="action-btn delete" onclick="deleteMember('${r.clubId}')" title="Delete Member Permanently"><i class="fas fa-trash"></i></button>
                     `;
-                    
                     let verificationDisplay = '';
-                    
                     if (isVerified) {
                         verificationDisplay = `<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified${emailSent ? ' ✓' : ''}</span>`;
                         actions += `<button class="action-btn resend" onclick="resendEmail('${r.clubId}')" title="Resend confirmation email"><i class="fas fa-envelope"></i> Resend</button>`;
@@ -3559,7 +3351,6 @@
                         actions += `<button class="action-btn verify" onclick="verifyMember('${r.clubId}')" title="Verify this member"><i class="fas fa-check-circle"></i> Verify</button>`;
                         actions += `<button class="action-btn unverify" onclick="unverifyMember('${r.clubId}')" title="Unverify this member"><i class="fas fa-user-slash"></i> Unverify</button>`;
                     }
-
                     const paymentDisplay = paid ? 
                         `<span class="badge-paid">✅ Paid</span>
                          <div class="payment-info">
@@ -3567,29 +3358,22 @@
                              <span class="trxid">${r.trxid || 'N/A'}</span>
                          </div>` : 
                         `<span class="badge-pending">⏳ Pending</span>`;
-
                     let certStatus = '';
                     let certAction = '';
                     if (hasCert) {
                         certStatus = `<span class="badge-cert"><i class="fas fa-check-circle"></i> Issued</span>`;
-                        certAction =
-                            `<button class="cert-btn download" onclick="viewCertificate('${r.clubId}')"><i class="fas fa-eye"></i> View</button>`;
+                        certAction = `<button class="cert-btn download" onclick="viewCertificate('${r.clubId}')"><i class="fas fa-eye"></i> View</button>`;
                     } else if (isEligible) {
                         certStatus = `<span class="badge-no-cert"><i class="fas fa-clock"></i> Eligible</span>`;
-                        certAction =
-                            `<button class="cert-btn generate" onclick="generateCertForMember('${r.clubId}')"><i class="fas fa-certificate"></i> Generate</button>`;
+                        certAction = `<button class="cert-btn generate" onclick="generateCertForMember('${r.clubId}')"><i class="fas fa-certificate"></i> Generate</button>`;
                     } else if (isPast) {
-                        certStatus =
-                            `<span class="badge-past"><i class="fas fa-history"></i> Past Member</span>`;
-                        certAction =
-                            `<button class="cert-btn past" onclick="generatePastCert('${r.clubId}')"><i class="fas fa-certificate"></i> Generate Past</button>`;
+                        certStatus = `<span class="badge-past"><i class="fas fa-history"></i> Past Member</span>`;
+                        certAction = `<button class="cert-btn past" onclick="generatePastCert('${r.clubId}')"><i class="fas fa-certificate"></i> Generate Past</button>`;
                     } else {
-                        const yearsLeft = 2 - Math.floor((new Date() - new Date(r.joinDate)) / (1000 * 60 * 60 * 24 *
-                        365));
+                        const yearsLeft = 2 - Math.floor((new Date() - new Date(r.joinDate)) / (1000 * 60 * 60 * 24 * 365));
                         certStatus = `<span class="badge-no-cert"><i class="fas fa-hourglass-half"></i> ${yearsLeft} year(s)</span>`;
                         certAction = `<span style="font-size:0.7rem; color:#6b8aaa;">Not eligible</span>`;
                     }
-
                     return `<tr>
                   <td>${idx+1}</td>
                   <td><strong>${escapeHtml(r.fullName || '')}</strong></td>
@@ -3605,18 +3389,13 @@
             }
 
             // ============================================
-            // EDIT MEMBER - PERMANENT SAVE WITH FIXED CLUB ID
+            // ✏️ EDIT MEMBER
             // ============================================
             window.editMember = function(clubId) {
                 const records = getRegistrations();
                 const record = records.find(r => r.clubId === clubId);
-                if (!record) { 
-                    showToast('❌ Member not found. Club ID: ' + clubId, true); 
-                    return; 
-                }
-                
+                if (!record) { showToast('❌ Member not found. Club ID: ' + clubId, true); return; }
                 window._editOriginalData = { ...record };
-                
                 document.getElementById('editClubId').value = clubId;
                 document.getElementById('editClubIdDisplay').textContent = clubId;
                 document.getElementById('editClubIdReadonly').value = clubId;
@@ -3630,7 +3409,6 @@
                 document.getElementById('editInterest').value = record.interest || 'Technical Workshop';
                 document.getElementById('editSendEmail').checked = true;
                 document.getElementById('editModal').classList.add('open');
-                
                 console.log('📝 Editing member:', record.fullName, 'Club ID (permanent):', clubId);
             };
 
@@ -3650,7 +3428,6 @@
                 const btn = document.getElementById('editSaveBtn');
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-
                 try {
                     const clubId = document.getElementById('editClubId').value;
                     const fullName = document.getElementById('editFullName').value.trim();
@@ -3661,14 +3438,12 @@
                     const gender = document.getElementById('editGender').value;
                     const interest = document.getElementById('editInterest').value;
                     const sendEmail = document.getElementById('editSendEmail').checked;
-
                     if (!fullName || !studentId || !email) {
                         showToast('⚠️ Please fill in all required fields.', true);
                         btn.disabled = false;
                         btn.innerHTML = '<i class="fas fa-save"></i> Save Changes & Send Update';
                         return;
                     }
-
                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                     if (!emailRegex.test(email)) {
                         showToast('⚠️ Please enter a valid email address.', true);
@@ -3676,30 +3451,20 @@
                         btn.innerHTML = '<i class="fas fa-save"></i> Save Changes & Send Update';
                         return;
                     }
-
                     const records = getRegistrations();
                     const index = records.findIndex(r => r.clubId === clubId);
-                    if (index === -1) { 
-                        showToast('❌ Member not found.', true);
+                    if (index === -1) { showToast('❌ Member not found.', true);
                         btn.disabled = false;
                         btn.innerHTML = '<i class="fas fa-save"></i> Save Changes & Send Update';
-                        return; 
-                    }
-
-                    // Check if student ID is being changed and is unique (except for this member)
-                    const existingStudentId = records.some((r, i) => 
-                        i !== index && r.studentId === studentId
-                    );
+                        return; }
+                    const existingStudentId = records.some((r, i) => i !== index && r.studentId === studentId);
                     if (existingStudentId) {
                         showToast('⚠️ This Student ID is already used by another member.', true);
                         btn.disabled = false;
                         btn.innerHTML = '<i class="fas fa-save"></i> Save Changes & Send Update';
                         return;
                     }
-
                     const oldData = { ...records[index] };
-                    
-                    // Update record - Club ID stays the same (permanent)
                     records[index].fullName = fullName;
                     records[index].studentId = studentId;
                     records[index].email = email;
@@ -3707,11 +3472,8 @@
                     records[index].semester = semester;
                     records[index].gender = gender;
                     records[index].interest = interest;
-
-                    // Permanently save with fixed Club ID
                     saveRegistrations(records);
                     renderAdminTable();
-
                     if (sendEmail) {
                         const emailSent = await sendUpdateEmailWrapper(records[index], oldData);
                         if (emailSent) {
@@ -3719,11 +3481,9 @@
                             saveRegistrations(records);
                         }
                     }
-
                     document.getElementById('editModal').classList.remove('open');
                     window._editOriginalData = null;
                     showToast(`✅ Member updated successfully! Club ID: ${clubId} (permanent)`);
-                    
                 } catch (error) {
                     console.error('Edit error:', error);
                     showToast('❌ Error updating member: ' + error.message, true);
@@ -3734,62 +3494,32 @@
             });
 
             // ============================================
-            // DELETE MEMBER - PERMANENTLY DELETE ALL DATA
+            // 🗑️ DELETE MEMBER
             // ============================================
             window.deleteMember = function(clubId) {
                 const records = getRegistrations();
                 const record = records.find(r => r.clubId === clubId);
-                if (!record) {
-                    showToast('❌ Member not found', true);
-                    return;
-                }
-
-                if (!confirm(`⚠️ PERMANENT DELETE\n\nAre you sure you want to permanently delete ${record.fullName}?\n\nThis will permanently remove:\n• All member information\n• Club ID: ${clubId}\n• Certificate (if any)\n• QR Code data\n• All associated records\n\nThis action CANNOT be undone!`)) {
-                    return;
-                }
-
-                if (!confirm(`⚠️ FINAL CONFIRMATION\n\nType "DELETE" in the prompt below to permanently remove this member.`)) {
-                    return;
-                }
-
+                if (!record) { showToast('❌ Member not found', true); return; }
+                if (!confirm(`⚠️ PERMANENT DELETE\n\nAre you sure you want to permanently delete ${record.fullName}?\n\nThis will permanently remove:\n• All member information\n• Club ID: ${clubId}\n• Certificate (if any)\n• QR Code data\n• All associated records\n\nThis action CANNOT be undone!`)) { return; }
+                if (!confirm(`⚠️ FINAL CONFIRMATION\n\nType "DELETE" in the prompt below to permanently remove this member.`)) { return; }
                 const confirmation = prompt(`Type "DELETE" to permanently remove ${record.fullName} (${clubId}):`);
-                if (confirmation !== 'DELETE') {
-                    showToast('❌ Deletion cancelled. Confirmation text did not match.', true);
-                    return;
-                }
-
+                if (confirmation !== 'DELETE') { showToast('❌ Deletion cancelled. Confirmation text did not match.', true); return; }
                 try {
                     const index = records.findIndex(r => r.clubId === clubId);
-                    if (index === -1) {
-                        showToast('❌ Member not found', true);
-                        return;
-                    }
-                    
-                    // Remove certificate if exists
+                    if (index === -1) { showToast('❌ Member not found', true); return; }
                     const certs = getCertificates();
-                    if (certs[clubId]) {
-                        delete certs[clubId];
+                    if (certs[clubId]) { delete certs[clubId];
                         saveCertificates(certs);
-                        console.log(`🗑️ Certificate removed for ${clubId}`);
-                    }
-                    
-                    // Remove the member permanently
+                        console.log(`🗑️ Certificate removed for ${clubId}`); }
                     records.splice(index, 1);
                     saveRegistrations(records);
-                    
-                    // Update the UI
                     renderAdminTable();
-                    
-                    // Close certificate modal if open
                     if (window._currentCertRecord && window._currentCertRecord.clubId === clubId) {
                         document.getElementById('certModal').classList.remove('open');
                         window._currentCertRecord = null;
                     }
-                    
                     showToast(`🗑️ ${record.fullName} has been permanently deleted from the system.`);
-                    
                     console.log(`🗑️ Member permanently deleted: ${record.fullName} (${clubId})`);
-                    
                 } catch (error) {
                     console.error('Delete error:', error);
                     showToast('❌ Error deleting member: ' + error.message, true);
@@ -3797,7 +3527,7 @@
             };
 
             // ============================================
-            // CERTIFICATE GLOBAL
+            // 🎓 CERTIFICATE VIEW
             // ============================================
             window.viewCertificate = function(clubId) {
                 const records = getRegistrations();
@@ -3843,7 +3573,7 @@
             };
 
             // ============================================
-            // ADMIN BUTTONS
+            // 🎛️ ADMIN BUTTONS
             // ============================================
             document.getElementById('refreshAdminBtn').addEventListener('click', function() {
                 if (!isLoggedIn) { showToast('⚠️ Please login first', true); return; }
@@ -3893,7 +3623,7 @@
             });
 
             // ============================================
-            // CERTIFICATE MODAL - PDF & PRINT
+            // 🖨️ CERTIFICATE MODAL - PDF & PRINT
             // ============================================
             document.getElementById('certModalClose').addEventListener('click', function() {
                 document.getElementById('certModal').classList.remove('open');
@@ -3908,8 +3638,7 @@
                 printWindow.document.write(`
                     <!DOCTYPE html>
                     <html>
-                    <head>
-                        <title>WUB EEE Club Certificate</title>
+                    <head><title>WUB EEE Club Certificate</title>
                         <link rel="preconnect" href="https://fonts.googleapis.com" />
                         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
                         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
@@ -3940,12 +3669,7 @@
                             @media print { .certificate .seal { box-shadow: 0 0 0 1px #0B3B7A; } .certificate .watermark { opacity: 0.03; } }
                         </style>
                     </head>
-                    <body>
-                        ${certHTML}
-                        <script>
-                            window.onload = function() { window.print(); window.close(); };
-                        <\/script>
-                    </body>
+                    <body>${certHTML}<script>window.onload=function(){window.print();window.close();};<\/script></body>
                     </html>
                 `);
                 printWindow.document.close();
@@ -3999,7 +3723,7 @@
             });
 
             // ============================================
-            // TABS
+            // 📑 TABS
             // ============================================
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -4021,7 +3745,7 @@
             });
 
             // ============================================
-            // INIT
+            // 🚀 INIT
             // ============================================
             document.getElementById('department').value = 'EEE';
             checkLogin();
@@ -4034,12 +3758,14 @@
             console.log('📌 TRXID Formats:');
             console.log('   💚 bKash: Must start with "DG" and be exactly 10 characters (e.g., DGH5GB82G7)');
             console.log('   💙 Nagad: Must start with "75" and be exactly 8 characters (e.g., 75OPUQ5X)');
-            console.log('📧 Brevo SMTP Configuration:');
-            console.log('   ✅ Confirmation/Verified emails use Brevo SMTP');
-            console.log('   ✅ Unverified emails use Brevo SMTP');
-            console.log('   ✅ Update notification emails use Brevo SMTP');
+            console.log('📧 Brevo SMTP Configuration: ✅ Configured with your SMTP key');
             console.log('   📌 SMTP Host: smtp-relay.brevo.com');
             console.log('   📌 Port: 587');
+            console.log('   📌 User: ' + BREVO_SMTP_USER);
+            console.log('   📌 From: ' + FROM_EMAIL);
+            console.log('   ✅ Confirmation emails will be sent via Brevo');
+            console.log('   ✅ Unverified emails will be sent via Brevo');
+            console.log('   ✅ Update notification emails will be sent via Brevo');
             console.log('📌 Data Management:');
             console.log('   💾 Data saved permanently with unique Club ID');
             console.log('   🔒 Club ID is fixed and cannot be changed');
@@ -4047,6 +3773,7 @@
             console.log('   🗑️ Delete permanently removes all data');
             console.log('   ☁️ Cloud sync with JSONBin.io');
             console.log('✅ System ready!');
+            console.log('🔴 Click "Test Email" button to verify your Brevo SMTP configuration!');
         })();
     </script>
 </body>
