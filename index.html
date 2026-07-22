@@ -1951,53 +1951,68 @@
     <script>
         (function() {
             // ============================================
-            // 🔥 BREVO SMTP CONFIGURATION - UPDATED WITH YOUR KEY!
+            // 🔥 BREVO API CONFIGURATION (Using REST API)
             // ============================================
-            const BREVO_SMTP_HOST = 'smtp-relay.brevo.com';
-            const BREVO_SMTP_PORT = 587;
-            // YOUR SMTP CREDENTIALS FROM BREVO
-            const BREVO_SMTP_USER = 'eee-club@eee.wub.edu.bd'; // Your Brevo SMTP login email
-            const BREVO_SMTP_PASS = 'xsmtpsib-0f5b638ec8fa59d57123ea18ac2d3ca2f7122fa5ba6719342f7f98496f1a8625-z7ZUv564iXYG6pOa'; // Your SMTP key
+            // Your Brevo API Key (v3)
+            const BREVO_API_KEY = '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';
+            const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
             const FROM_EMAIL = 'eee-club@eee.wub.edu.bd';
             const FROM_NAME = 'WUB EEE Club';
 
-            console.log('📧 Brevo SMTP configured with:');
-            console.log('   Host: ' + BREVO_SMTP_HOST);
-            console.log('   Port: ' + BREVO_SMTP_PORT);
-            console.log('   User: ' + BREVO_SMTP_USER);
+            console.log('📧 Brevo API configured with:');
+            console.log('   API Key: ' + BREVO_API_KEY.substring(0, 20) + '...');
             console.log('   From: ' + FROM_EMAIL);
-            console.log('   Status: ✅ Ready to send emails!');
+            console.log('   Status: ✅ Ready to send emails via Brevo REST API!');
 
             // ============================================
-            // 📧 EMAIL SENDING FUNCTION (Pure SMTP.js)
+            // 📧 EMAIL SENDING FUNCTION (Brevo REST API)
             // ============================================
             async function sendEmail(to, subject, htmlContent) {
                 console.log(`📧 Attempting to send email to: ${to}`);
                 console.log(`📧 Subject: ${subject}`);
 
                 try {
-                    // Use SMTP.js with Brevo credentials
-                    const response = await Email.send({
-                        Host: BREVO_SMTP_HOST,
-                        Port: BREVO_SMTP_PORT,
-                        Username: BREVO_SMTP_USER,
-                        Password: BREVO_SMTP_PASS,
-                        To: to,
-                        From: FROM_EMAIL,
-                        FromName: FROM_NAME,
-                        Subject: subject,
-                        Body: htmlContent,
-                        IsHTML: true,
+                    const payload = {
+                        sender: {
+                            name: FROM_NAME,
+                            email: FROM_EMAIL
+                        },
+                        to: [{
+                            email: to,
+                            name: to.split('@')[0] || 'Student'
+                        }],
+                        subject: subject,
+                        htmlContent: htmlContent
+                    };
+
+                    const response = await fetch(BREVO_API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'api-key': BREVO_API_KEY
+                        },
+                        body: JSON.stringify(payload)
                     });
 
-                    console.log('✅ Brevo SMTP: Email sent successfully!', response);
-                    return { success: true, provider: 'Brevo SMTP', response: response };
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        console.log('✅ Brevo API: Email sent successfully!', data);
+                        return { success: true, provider: 'Brevo API', response: data };
+                    } else {
+                        console.error('❌ Brevo API Error:', data);
+                        return {
+                            success: false,
+                            error: data.message || 'Brevo API error',
+                            details: data
+                        };
+                    }
 
                 } catch (error) {
-                    console.error('❌ Brevo SMTP failed:', error);
+                    console.error('❌ Brevo API request failed:', error);
                     return {
                         success: false,
-                        error: error.message || 'Unknown Brevo error',
+                        error: error.message || 'Network error',
                         details: error
                     };
                 }
@@ -2252,7 +2267,7 @@
             // 🧪 TEST EMAIL
             // ============================================
             async function testEmail() {
-                const testEmailAddress = prompt('Enter your email address to test the Brevo SMTP:', 'your-email@example.com');
+                const testEmailAddress = prompt('Enter your email address to test Brevo:', 'your-email@example.com');
                 if (!testEmailAddress) return;
 
                 const btn = document.getElementById('testEmailBtn');
@@ -2269,7 +2284,7 @@
                             <div style="text-align: center;">
                                 <h3 style="color: #1b754b; font-size: 20px; margin: 0 0 10px 0;">✅ Test Email</h3>
                                 <p style="color: #0b2b5c; font-size: 16px;">This is a test email from WUB EEE Club.</p>
-                                <p style="color: #6b8aaa; font-size: 14px;">Your Brevo SMTP configuration is working correctly!</p>
+                                <p style="color: #6b8aaa; font-size: 14px;">Your Brevo API is working correctly!</p>
                                 <p style="color: #6b8aaa; font-size: 12px;">Sent at: ${new Date().toLocaleString()}</p>
                             </div>
                             <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e6edf8; font-size: 12px; color: #6b8aaa;">
@@ -2282,15 +2297,15 @@
                     const result = await sendEmail(testEmailAddress, '🧪 WUB EEE Club - Test Email', testHTML);
 
                     if (result.success) {
-                        showToast(`✅ Test email sent to ${testEmailAddress} via ${result.provider}!`);
-                        alert(`✅ Test email sent successfully to ${testEmailAddress}!\n\nProvider: ${result.provider}\nCheck your inbox/spam folder.`);
+                        showToast(`✅ Test email sent to ${testEmailAddress} via Brevo API!`);
+                        alert(`✅ Test email sent successfully to ${testEmailAddress}!\n\nCheck your inbox/spam folder.`);
                     } else {
                         throw new Error(result.error || 'Unknown error');
                     }
 
                 } catch (error) {
                     console.error('❌ Test email failed:', error);
-                    alert(`❌ Test email failed.\nError: ${error.message || 'Unknown error'}\n\nPlease check your Brevo SMTP credentials.\n\nMake sure:\n1. SMTP is enabled in your Brevo account\n2. The SMTP key is correct\n3. Your sender email is verified in Brevo`);
+                    alert(`❌ Test email failed.\nError: ${error.message || 'Unknown error'}\n\nPlease check:\n1. Brevo API Key is correct\n2. Your Brevo account has email credits\n3. The sender email is verified in Brevo\n\nSee console for details.`);
                     showToast('❌ Test email failed. Check console for details.', true);
                 } finally {
                     btn.disabled = false;
@@ -3114,7 +3129,7 @@
                     if (sendEmail && emailSent) {
                         showToast(`✅ Member unverified successfully! Email notification sent.`);
                     } else if (sendEmail && !emailSent) {
-                        showToast(`⚠️ Member unverified but email could not be sent. Please check Brevo SMTP configuration.`, true);
+                        showToast(`⚠️ Member unverified but email could not be sent. Please check Brevo API configuration.`, true);
                     } else {
                         showToast(`✅ Member unverified successfully!`);
                     }
@@ -3758,14 +3773,12 @@
             console.log('📌 TRXID Formats:');
             console.log('   💚 bKash: Must start with "DG" and be exactly 10 characters (e.g., DGH5GB82G7)');
             console.log('   💙 Nagad: Must start with "75" and be exactly 8 characters (e.g., 75OPUQ5X)');
-            console.log('📧 Brevo SMTP Configuration: ✅ Configured with your SMTP key');
-            console.log('   📌 SMTP Host: smtp-relay.brevo.com');
-            console.log('   📌 Port: 587');
-            console.log('   📌 User: ' + BREVO_SMTP_USER);
+            console.log('📧 Brevo API Configuration: ✅ Configured with your API key');
+            console.log('   📌 API URL: https://api.brevo.com/v3/smtp/email');
             console.log('   📌 From: ' + FROM_EMAIL);
-            console.log('   ✅ Confirmation emails will be sent via Brevo');
-            console.log('   ✅ Unverified emails will be sent via Brevo');
-            console.log('   ✅ Update notification emails will be sent via Brevo');
+            console.log('   ✅ Confirmation emails will be sent via Brevo API');
+            console.log('   ✅ Unverified emails will be sent via Brevo API');
+            console.log('   ✅ Update notification emails will be sent via Brevo API');
             console.log('📌 Data Management:');
             console.log('   💾 Data saved permanently with unique Club ID');
             console.log('   🔒 Club ID is fixed and cannot be changed');
@@ -3773,7 +3786,7 @@
             console.log('   🗑️ Delete permanently removes all data');
             console.log('   ☁️ Cloud sync with JSONBin.io');
             console.log('✅ System ready!');
-            console.log('🔴 Click "Test Email" button to verify your Brevo SMTP configuration!');
+            console.log('🔴 Click "Test Email" button to verify your Brevo API configuration!');
         })();
     </script>
 </body>
