@@ -10,9 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- EmailJS SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
-    </script>
     <style>
         /* ============================================
            MAIN SYSTEM STYLES
@@ -698,13 +695,6 @@
         }
         .admin-actions .btn-fix:hover {
             background: #b82a55;
-        }
-        .admin-actions .btn-test-email {
-            background: #f5a623;
-            color: white;
-        }
-        .admin-actions .btn-test-email:hover {
-            background: #d48a1a;
         }
 
         .admin-table-wrap {
@@ -1755,7 +1745,7 @@
                     <div class="message"><i class="fas fa-check-circle" style="color:#1b754b;"></i> Registration Successful!</div>
                     <div style="margin-top:6px; font-weight:500;">Your Club ID: <span id="displayClubId" class="id-badge">WUB-EEE-2026-0001</span></div>
                     <div style="margin-top:4px; font-size:0.85rem; color:#0f422b;">
-                        <i class="fas fa-envelope"></i> Confirmation email sent from <strong>eee-club@eee.wub.edu.bd</strong>
+                        <i class="fas fa-envelope"></i> Confirmation sent to member's email from <strong>eee-club@eee.wub.edu.bd</strong>
                     </div>
                 </div>
                 <div class="slip-actions">
@@ -1803,7 +1793,6 @@
                 <button class="btn-purple" id="generatePastMembersBtn"><i class="fas fa-history"></i> Generate for Past Members</button>
                 <button class="btn-warning" id="forceGenerateBtn"><i class="fas fa-bolt"></i> Force Generate (Test)</button>
                 <button class="btn-fix" id="fixDuplicateIdsBtn"><i class="fas fa-hammer"></i> Fix Duplicate IDs</button>
-                <button class="btn-test-email" id="testEmailBtn"><i class="fas fa-envelope"></i> Test Email</button>
                 <button class="btn-danger" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
 
@@ -1895,7 +1884,7 @@
                     <label style="font-size:0.8rem; color:#6b8aaa;">
                         <i class="fas fa-envelope"></i> 
                         <input type="checkbox" id="editSendEmail" checked /> 
-                        Send update notification email to student
+                        Send update notification email to student (from eee-club@eee.wub.edu.bd)
                     </label>
                 </div>
                 <button type="submit" class="btn-save" id="editSaveBtn"><i class="fas fa-save"></i> Save Changes & Send Update</button>
@@ -1908,7 +1897,7 @@
         <div class="unverify-modal-content">
             <button class="unverify-modal-close" id="unverifyModalClose">&times;</button>
             <h3 style="color:#b22234; margin-bottom:1rem;"><i class="fas fa-user-slash"></i> Unverify Member</h3>
-            <p style="color:#6b8aaa; margin-bottom:1rem;">Enter the reason for unverifying this member. An email will be sent to the student.</p>
+            <p style="color:#6b8aaa; margin-bottom:1rem;">Enter the reason for unverifying this member. An email will be sent to the student from eee-club@eee.wub.edu.bd</p>
             <form id="unverifyForm">
                 <input type="hidden" id="unverifyClubId" />
                 <div class="form-group">
@@ -1927,7 +1916,7 @@
                     <label style="font-size:0.8rem; color:#6b8aaa;">
                         <i class="fas fa-envelope"></i> 
                         <input type="checkbox" id="unverifySendEmail" checked /> 
-                        Send unverification notification email to student
+                        Send unverification notification email to student (from eee-club@eee.wub.edu.bd)
                     </label>
                 </div>
                 <button type="submit" class="btn-unverify" id="unverifyBtn"><i class="fas fa-user-slash"></i> Unverify Member & Send Email</button>
@@ -1954,19 +1943,12 @@
     <script>
         (function() {
             // ============================================
-            // EmailJS Configuration
+            // CONFIGURATION
             // ============================================
-            const EMAILJS_PUBLIC_KEY = 'mZR55c2c8zMmSqBLL';
-            const EMAILJS_SERVICE_ID = 'service_3ectzds';
-            
-            // Template IDs
-            const TEMPLATE_VERIFIED = 'template_f00pkjl';    // Wub_confirmation
-            const TEMPLATE_UNVERIFIED = 'template_hzraam8';  // Unverified
-
-            // Initialize EmailJS
-            emailjs.init({
-                publicKey: EMAILJS_PUBLIC_KEY,
-            });
+            const ADMIN_EMAIL = 'eee-club@eee.wub.edu.bd';
+            const ADMIN_PASSWORD = 'Eee123@580Eee';
+            const year = new Date().getFullYear();
+            const CLUB_EMAIL = 'eee-club@eee.wub.edu.bd'; // The email that will appear as sender
 
             // ============================================
             // JSONBin.io CONFIGURATION
@@ -1978,9 +1960,6 @@
             const STORAGE_KEY = 'wub_eee_registrations';
             const ID_KEY = 'wub_eee_last_id';
             const CERT_KEY = 'wub_eee_certificates';
-            const ADMIN_EMAIL = 'eee-club@eee.wub.edu.bd';
-            const ADMIN_PASSWORD = 'Eee123@580Eee';
-            const year = new Date().getFullYear();
 
             let isLoggedIn = false;
             let isSyncing = false;
@@ -2002,6 +1981,176 @@
             const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
 
             // ============================================
+            // EMAIL FUNCTIONS - SEND TO MEMBERS FROM CLUB EMAIL
+            // ============================================
+            
+            // Send email to member using FormSubmit.co with auto-reply
+            async function sendEmailToMember(record, type, additionalData = {}) {
+                try {
+                    const subject = `WUB EEE Club: ${type} Notification`;
+                    let body = '';
+                    
+                    switch(type) {
+                        case 'Registration':
+                            body = `
+        Dear ${record.fullName},
+        
+        Thank you for registering with WUB EEE Club!
+        
+        Your registration has been received successfully.
+        
+        📋 Registration Details:
+        -------------------------
+        🆔 Club ID: ${record.clubId}
+        🆔 Student ID: ${record.studentId}
+        📚 Semester: ${record.semester}
+        💳 Payment Method: ${record.paymentMethod}
+        🔑 Transaction ID: ${record.trxid}
+        💰 Amount: 200 TK
+        📅 Registration Date: ${new Date(record.joinDate).toLocaleDateString()}
+        
+        🔐 Your account is pending verification. You will receive another email once your account is verified.
+        
+        📱 Keep your Club ID for future reference.
+        
+        Best regards,
+        WUB EEE Club
+        ${CLUB_EMAIL}
+                            `;
+                            break;
+                            
+                        case 'Verified':
+                            body = `
+        Dear ${record.fullName},
+        
+        Congratulations! Your membership has been VERIFIED.
+        
+        ✅ Your WUB EEE Club membership is now active.
+        
+        📋 Membership Details:
+        -----------------------
+        🆔 Club ID: ${record.clubId}
+        🆔 Student ID: ${record.studentId}
+        📅 Verification Date: ${new Date().toLocaleDateString()}
+        📚 Semester: ${record.semester}
+        
+        🎫 You are now eligible to:
+        • Participate in all club activities
+        • Access club resources
+        • Receive club updates
+        • Generate your membership certificate (after 2 years)
+        
+        📱 Keep your Club ID for all club-related activities.
+        
+        Best regards,
+        WUB EEE Club
+        ${CLUB_EMAIL}
+                            `;
+                            break;
+                            
+                        case 'Unverified':
+                            body = `
+        Dear ${record.fullName},
+        
+        ⚠️ Your membership verification has been REVOKED.
+        
+        Reason: ${additionalData.reason || 'No reason provided'}
+        
+        📋 Membership Status:
+        ---------------------
+        🆔 Club ID: ${record.clubId}
+        🆔 Student ID: ${record.studentId}
+        📅 Unverified Date: ${new Date().toLocaleDateString()}
+        
+        ❌ Your account is no longer verified. You will not be able to:
+        • Access verified-only club activities
+        • Generate certificates
+        • Participate in certain events
+        
+        📞 Please contact the club administration for more information.
+        
+        Best regards,
+        WUB EEE Club
+        ${CLUB_EMAIL}
+                            `;
+                            break;
+                            
+                        case 'Update':
+                            let changesText = additionalData.changes || 'No changes specified';
+                            body = `
+        Dear ${record.fullName},
+        
+        📝 Your WUB EEE Club profile has been UPDATED.
+        
+        Changes made:
+        ${changesText}
+        
+        📋 Current Details:
+        -------------------
+        🆔 Club ID: ${record.clubId}
+        🆔 Student ID: ${record.studentId}
+        📧 Email: ${record.email}
+        📚 Semester: ${record.semester}
+        
+        If you did not request these changes, please contact the club administration immediately.
+        
+        Best regards,
+        WUB EEE Club
+        ${CLUB_EMAIL}
+                            `;
+                            break;
+                    }
+                    
+                    // Send via FormSubmit.co with auto-reply to the member
+                    const formData = new FormData();
+                    formData.append('_captcha', 'false');
+                    formData.append('_subject', subject);
+                    formData.append('_autoresponse', body);
+                    formData.append('_template', 'box');
+                    formData.append('email', record.email);
+                    formData.append('_format', 'plain');
+                    formData.append('_blacklist', 'spam,sex,adult');
+                    
+                    // Add a hidden field to identify the sender
+                    formData.append('_from', CLUB_EMAIL);
+                    
+                    console.log(`📧 Sending ${type} email to ${record.email} from ${CLUB_EMAIL}`);
+                    
+                    const response = await fetch('https://formsubmit.co/ajax/' + CLUB_EMAIL, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (response.ok) {
+                        console.log(`✅ ${type} email sent successfully to ${record.email}`);
+                        return true;
+                    } else {
+                        console.warn('FormSubmit error:', response.status);
+                        // Fallback to mailto
+                        return sendMailToMember(record, type, body);
+                    }
+                } catch (error) {
+                    console.warn('Email error:', error);
+                    // Fallback to mailto
+                    return sendMailToMember(record, type, body);
+                }
+            }
+            
+            // Fallback: Open default email client
+            function sendMailToMember(record, type, body) {
+                try {
+                    const subject = `WUB EEE Club: ${type} Notification`;
+                    const encodedBody = encodeURIComponent(body);
+                    window.open(`mailto:${record.email}?subject=${subject}&body=${encodedBody}`);
+                    showToast(`📧 Email client opened for ${record.email}`);
+                    return true;
+                } catch (error) {
+                    console.error('Mailto error:', error);
+                    return false;
+                }
+            }
+
+            // ============================================
             // TRXID VALIDATION FUNCTIONS
             // ============================================
             function isValidBkashTrxid(trxid) {
@@ -2014,16 +2163,14 @@
 
             function validateTrxid(trxid, method) {
                 trxid = trxid.trim().toUpperCase();
-                
                 if (!trxid) {
                     return { valid: false, message: 'Please enter a Transaction ID.' };
                 }
-                
                 if (method === 'bKash') {
                     if (!isValidBkashTrxid(trxid)) {
                         return { 
                             valid: false, 
-                            message: 'Invalid bKash TrxID. Must start with "DG" and be exactly 10 characters (e.g., DGH5GB82G7)'
+                            message: 'Invalid bKash TrxID. Must start with "DG" and be exactly 10 characters'
                         };
                     }
                     return { valid: true, message: '✅ Valid bKash TrxID format.' };
@@ -2031,7 +2178,7 @@
                     if (!isValidNagadTrxid(trxid)) {
                         return { 
                             valid: false, 
-                            message: 'Invalid Nagad TrxID. Must start with "75" and be exactly 8 characters (e.g., 75OPUQ5X)'
+                            message: 'Invalid Nagad TrxID. Must start with "75" and be exactly 8 characters'
                         };
                     }
                     return { valid: true, message: '✅ Valid Nagad TrxID format.' };
@@ -2301,9 +2448,6 @@
                 return data ? JSON.parse(data) : [];
             }
 
-            // ============================================
-            // SAVE REGISTRATIONS - PERMANENT SAVE WITH UNIQUE ID
-            // ============================================
             function saveRegistrations(records) {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
                 const lastId = getLastSerial();
@@ -2380,191 +2524,13 @@
                 showToast(`✅ Fixed ${fixedCount} duplicate Club IDs! All members now have unique IDs.`);
             };
 
-            // ============================================
-            // TEST EMAIL FUNCTION
-            // ============================================
-            async function testEmail() {
-                const testEmailAddress = prompt('Enter your email address to test the Unverified email:', 'your-email@example.com');
-                if (!testEmailAddress) return;
-
-                const btn = document.getElementById('testEmailBtn');
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-
-                try {
-                    const templateParams = {
-                        email: testEmailAddress,
-                        to_name: 'Test User',
-                        club_id: 'WUB-EEE-2026-TEST',
-                        student_id: 'TEST-001',
-                        reason: 'This is a test email to verify EmailJS configuration.',
-                        unverified_date: new Date().toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        }),
-                        trxid: 'TEST-TRX-001'
-                    };
-
-                    console.log('📧 Sending test email with template:', TEMPLATE_UNVERIFIED);
-                    console.log('📧 Params:', templateParams);
-
-                    const response = await emailjs.send(
-                        EMAILJS_SERVICE_ID,
-                        TEMPLATE_UNVERIFIED,
-                        templateParams
-                    );
-
-                    console.log('📧 Test email sent successfully!', response);
-                    showToast(`✅ Test email sent to ${testEmailAddress}!`);
-                    alert(`✅ Test email sent successfully to ${testEmailAddress}!\n\nCheck your inbox/spam folder.`);
-
-                } catch (error) {
-                    console.error('❌ Test email failed:', error);
-                    alert(`❌ Test email failed.\nError: ${error.text || error.message}\n\nSee console for details.`);
-                    showToast('❌ Test email failed. Check console for details.', true);
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-envelope"></i> Test Email';
+            document.getElementById('fixDuplicateIdsBtn').addEventListener('click', function() {
+                if (!isLoggedIn) {
+                    showToast('⚠️ Please login first', true);
+                    return;
                 }
-            }
-
-            document.getElementById('testEmailBtn').addEventListener('click', testEmail);
-
-            // ============================================
-            // SEND UNVERIFY EMAIL
-            // ============================================
-            async function sendUnverifyEmail(record, reason) {
-                try {
-                    showToast('📧 Sending unverification email to ' + record.email + '...');
-
-                    const templateParams = {
-                        email: record.email,
-                        to_name: record.fullName,
-                        club_id: record.clubId,
-                        student_id: record.studentId,
-                        reason: reason,
-                        unverified_date: new Date().toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        }),
-                        trxid: record.trxid || 'N/A'
-                    };
-
-                    console.log('📧 Sending unverify email with template:', TEMPLATE_UNVERIFIED);
-                    console.log('📧 Params:', templateParams);
-
-                    const response = await emailjs.send(
-                        EMAILJS_SERVICE_ID,
-                        TEMPLATE_UNVERIFIED,
-                        templateParams
-                    );
-                    console.log('📧 Unverify email sent successfully!', response);
-                    showToast(`✅ Unverification email sent to ${record.email}`);
-                    return true;
-
-                } catch (error) {
-                    console.error('❌ Unverify email sending failed:', error);
-                    showToast(`⚠️ Could not send unverification email. Error: ${error.text || error.message}`, true);
-                    return false;
-                }
-            }
-
-            // ============================================
-            // SEND CONFIRMATION EMAIL - Uses template_f00pkjl
-            // ============================================
-            async function sendConfirmationEmail(record) {
-                try {
-                    showToast('📧 Sending confirmation email from eee-club@eee.wub.edu.bd...');
-
-                    const templateParams = {
-                        to_email: record.email,
-                        to_name: record.fullName,
-                        club_id: record.clubId,
-                        student_id: record.studentId,
-                        semester: record.semester,
-                        payment_method: record.paymentMethod,
-                        trxid: record.trxid,
-                        join_date: new Date(record.joinDate).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        })
-                    };
-
-                    console.log('📧 Sending confirmation email with template:', TEMPLATE_VERIFIED);
-                    console.log('📧 Params:', templateParams);
-
-                    const response = await emailjs.send(
-                        EMAILJS_SERVICE_ID,
-                        TEMPLATE_VERIFIED,
-                        templateParams
-                    );
-
-                    console.log('📧 Confirmation email sent successfully!', response);
-                    showToast(`✅ Confirmation email sent to ${record.email} from eee-club@eee.wub.edu.bd`);
-                    return true;
-
-                } catch (error) {
-                    console.error('❌ Confirmation email sending failed:', error);
-                    showToast(`⚠️ Could not send email. Please try again. Error: ${error.text || error.message}`, true);
-                    return false;
-                }
-            }
-
-            // ============================================
-            // SEND UPDATE EMAIL
-            // ============================================
-            async function sendUpdateEmail(record, oldData) {
-                try {
-                    showToast('📧 Sending update notification email...');
-
-                    const changes = [];
-                    if (oldData.fullName !== record.fullName) changes.push(`Name: ${oldData.fullName} → ${record.fullName}`);
-                    if (oldData.studentId !== record.studentId) changes.push(`Student ID: ${oldData.studentId} → ${record.studentId}`);
-                    if (oldData.email !== record.email) changes.push(`Email: ${oldData.email} → ${record.email}`);
-                    if (oldData.phone !== record.phone) changes.push(`Phone: ${oldData.phone || 'N/A'} → ${record.phone || 'N/A'}`);
-                    if (oldData.semester !== record.semester) changes.push(`Semester: ${oldData.semester} → ${record.semester}`);
-                    if (oldData.gender !== record.gender) changes.push(`Gender: ${oldData.gender} → ${record.gender}`);
-                    if (oldData.interest !== record.interest) changes.push(`Interest: ${oldData.interest} → ${record.interest}`);
-
-                    const changesText = changes.length > 0 ? changes.join('\n') : 'No changes were made.';
-
-                    const templateParams = {
-                        to_email: record.email,
-                        to_name: record.fullName,
-                        club_id: record.clubId,
-                        student_id: record.studentId,
-                        changes: changesText,
-                        update_date: new Date().toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        })
-                    };
-
-                    const response = await emailjs.send(
-                        EMAILJS_SERVICE_ID,
-                        TEMPLATE_VERIFIED,
-                        templateParams
-                    );
-                    console.log('📧 Update email sent successfully!', response);
-                    showToast(`✅ Update notification sent to ${record.email}`);
-                    return true;
-
-                } catch (error) {
-                    console.error('❌ Update email sending failed:', error);
-                    showToast(`⚠️ Could not send update email. Please try again.`, true);
-                    return false;
-                }
-            }
+                window.fixDuplicateIds();
+            });
 
             // ============================================
             // LOGIN
@@ -2627,14 +2593,6 @@
                 document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
                 document.getElementById('tab-register').classList.add('active');
                 showToast('👋 Logged out successfully');
-            });
-
-            document.getElementById('fixDuplicateIdsBtn').addEventListener('click', function() {
-                if (!isLoggedIn) {
-                    showToast('⚠️ Please login first', true);
-                    return;
-                }
-                window.fixDuplicateIds();
             });
 
             // ============================================
@@ -2728,7 +2686,7 @@
                         ` : ''}
                         <div class="slip-footer">
                             <p>This is a system-generated confirmation slip.</p>
-                            <p>For any queries, contact: eee-club@eee.wub.edu.bd</p>
+                            <p>For any queries, contact: ${CLUB_EMAIL}</p>
                         </div>
                     </div>
                 `;
@@ -2918,7 +2876,7 @@
                     skills,
                     interest,
                     reason,
-                    clubId, // Unique ID - fixed forever
+                    clubId,
                     paymentStatus: `Paid (${selectedMethod})`,
                     paymentMethod: selectedMethod,
                     paymentAmount: '200 TK',
@@ -2944,6 +2902,19 @@
                 }
                 records.push(record);
                 saveRegistrations(records);
+
+                // ============================================
+                // SEND CONFIRMATION EMAIL TO MEMBER
+                // ============================================
+                try {
+                    await sendEmailToMember(record, 'Registration');
+                    record.emailSent = true;
+                    saveRegistrations(records);
+                    showToast(`📧 Confirmation email sent to ${record.email} from ${CLUB_EMAIL}`);
+                } catch (error) {
+                    console.error('Email error:', error);
+                    showToast(`⚠️ Could not send email to ${record.email}. Please check your email client.`, true);
+                }
 
                 const box = document.getElementById('successBox');
                 const span = document.getElementById('displayClubId');
@@ -2981,7 +2952,7 @@
                     return;
                 }
 
-                if (!confirm(`Verify membership for ${records[index].fullName} (${records[index].clubId})?\nThis will send a confirmation email with their Club ID.`)) {
+                if (!confirm(`Verify membership for ${records[index].fullName} (${records[index].clubId})?\n\nThis will send a verification email from ${CLUB_EMAIL}.`)) {
                     return;
                 }
 
@@ -2991,16 +2962,21 @@
                 records[index].unverifyDate = null;
                 saveRegistrations(records);
 
-                const emailSent = await sendConfirmationEmail(records[index]);
-                records[index].emailSent = emailSent;
-                saveRegistrations(records);
+                // ============================================
+                // SEND VERIFIED EMAIL TO MEMBER
+                // ============================================
+                try {
+                    await sendEmailToMember(records[index], 'Verified');
+                    records[index].emailSent = true;
+                    saveRegistrations(records);
+                    showToast(`📧 Verification email sent to ${records[index].email} from ${CLUB_EMAIL}`);
+                } catch (error) {
+                    console.error('Email error:', error);
+                    showToast(`⚠️ Member verified but could not send email to ${records[index].email}.`, true);
+                }
 
                 renderAdminTable();
-                if (emailSent) {
-                    showToast(`✅ Member verified and confirmation email sent to ${records[index].email}`);
-                } else {
-                    showToast(`⚠️ Member verified but email could not be sent. Please try resending.`, true);
-                }
+                showToast(`✅ Member verified successfully!`);
             };
 
             // ============================================
@@ -3019,17 +2995,18 @@
                     return;
                 }
 
-                if (!confirm(`Resend confirmation email to ${record.fullName} (${record.email})?`)) {
+                if (!confirm(`Resend confirmation email to ${record.fullName} (${record.email}) from ${CLUB_EMAIL}?`)) {
                     return;
                 }
 
-                const emailSent = await sendConfirmationEmail(record);
-                if (emailSent) {
+                try {
+                    await sendEmailToMember(record, 'Verified');
                     record.emailSent = true;
                     saveRegistrations(records);
                     renderAdminTable();
-                    showToast(`✅ Confirmation email resent to ${record.email}`);
-                } else {
+                    showToast(`✅ Confirmation email resent to ${record.email} from ${CLUB_EMAIL}`);
+                } catch (error) {
+                    console.error('Email error:', error);
                     showToast(`⚠️ Failed to send email. Please try again.`, true);
                 }
             };
@@ -3105,10 +3082,15 @@
 
                     let emailSent = false;
                     if (sendEmail) {
-                        emailSent = await sendUnverifyEmail(record, reason);
-                        if (emailSent) {
+                        try {
+                            await sendEmailToMember(record, 'Unverified', { reason: reason });
+                            emailSent = true;
                             record.emailSent = false;
                             saveRegistrations(records);
+                            showToast(`📧 Unverification email sent to ${record.email} from ${CLUB_EMAIL}`);
+                        } catch (error) {
+                            console.error('Email error:', error);
+                            showToast(`⚠️ Member unverified but could not send email to ${record.email}.`, true);
                         }
                     }
 
@@ -3116,9 +3098,9 @@
                     renderAdminTable();
                     
                     if (sendEmail && emailSent) {
-                        showToast(`✅ Member unverified successfully! Email notification sent.`);
+                        showToast(`✅ Member unverified successfully! Email notification sent from ${CLUB_EMAIL}`);
                     } else if (sendEmail && !emailSent) {
-                        showToast(`⚠️ Member unverified but email could not be sent. Please check EmailJS configuration.`, true);
+                        showToast(`⚠️ Member unverified but email could not be sent.`, true);
                     } else {
                         showToast(`✅ Member unverified successfully!`);
                     }
@@ -3336,7 +3318,6 @@
                     const isPast = isPastMember(r.joinDate) || r.isPastStudent;
                     const joinDate = new Date(r.joinDate).toLocaleDateString();
                     const isVerified = r.isVerified || false;
-                    const emailSent = r.emailSent || false;
                     const unverifyReason = r.unverifyReason || '';
                     
                     let actions = '';
@@ -3349,7 +3330,7 @@
                     let verificationDisplay = '';
                     
                     if (isVerified) {
-                        verificationDisplay = `<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified${emailSent ? ' ✓' : ''}</span>`;
+                        verificationDisplay = `<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified</span>`;
                         actions += `<button class="action-btn resend" onclick="resendEmail('${r.clubId}')" title="Resend confirmation email"><i class="fas fa-envelope"></i> Resend</button>`;
                         actions += `<button class="action-btn unverify" onclick="unverifyMember('${r.clubId}')" title="Unverify this member"><i class="fas fa-user-slash"></i> Unverify</button>`;
                     } else if (unverifyReason) {
@@ -3406,7 +3387,7 @@
             }
 
             // ============================================
-            // EDIT MEMBER - PERMANENT SAVE WITH FIXED CLUB ID
+            // EDIT MEMBER
             // ============================================
             window.editMember = function(clubId) {
                 const records = getRegistrations();
@@ -3431,8 +3412,6 @@
                 document.getElementById('editInterest').value = record.interest || 'Technical Workshop';
                 document.getElementById('editSendEmail').checked = true;
                 document.getElementById('editModal').classList.add('open');
-                
-                console.log('📝 Editing member:', record.fullName, 'Club ID (permanent):', clubId);
             };
 
             document.getElementById('editModalClose').addEventListener('click', function() {
@@ -3487,7 +3466,6 @@
                         return; 
                     }
 
-                    // Check if student ID is being changed and is unique (except for this member)
                     const existingStudentId = records.some((r, i) => 
                         i !== index && r.studentId === studentId
                     );
@@ -3500,7 +3478,7 @@
 
                     const oldData = { ...records[index] };
                     
-                    // Update record - Club ID stays the same (permanent)
+                    // Update record
                     records[index].fullName = fullName;
                     records[index].studentId = studentId;
                     records[index].email = email;
@@ -3509,21 +3487,38 @@
                     records[index].gender = gender;
                     records[index].interest = interest;
 
-                    // Permanently save with fixed Club ID
                     saveRegistrations(records);
                     renderAdminTable();
 
+                    // ============================================
+                    // SEND UPDATE EMAIL TO MEMBER
+                    // ============================================
                     if (sendEmail) {
-                        const emailSent = await sendUpdateEmail(records[index], oldData);
-                        if (emailSent) {
+                        const changes = [];
+                        if (oldData.fullName !== fullName) changes.push(`Name: ${oldData.fullName} → ${fullName}`);
+                        if (oldData.studentId !== studentId) changes.push(`Student ID: ${oldData.studentId} → ${studentId}`);
+                        if (oldData.email !== email) changes.push(`Email: ${oldData.email} → ${email}`);
+                        if (oldData.phone !== phone) changes.push(`Phone: ${oldData.phone || 'N/A'} → ${phone || 'N/A'}`);
+                        if (oldData.semester !== semester) changes.push(`Semester: ${oldData.semester} → ${semester}`);
+                        if (oldData.gender !== gender) changes.push(`Gender: ${oldData.gender} → ${gender}`);
+                        if (oldData.interest !== interest) changes.push(`Interest: ${oldData.interest} → ${interest}`);
+                        
+                        const changesText = changes.length > 0 ? changes.join('\n') : 'No significant changes were made.';
+                        
+                        try {
+                            await sendEmailToMember(records[index], 'Update', { changes: changesText });
                             records[index].emailSent = true;
                             saveRegistrations(records);
+                            showToast(`📧 Update notification sent to ${records[index].email} from ${CLUB_EMAIL}`);
+                        } catch (error) {
+                            console.error('Email error:', error);
+                            showToast(`⚠️ Member updated but could not send email to ${records[index].email}.`, true);
                         }
                     }
 
                     document.getElementById('editModal').classList.remove('open');
                     window._editOriginalData = null;
-                    showToast(`✅ Member updated successfully! Club ID: ${clubId} (permanent)`);
+                    showToast(`✅ Member updated successfully! Club ID: ${clubId}`);
                     
                 } catch (error) {
                     console.error('Edit error:', error);
@@ -3535,7 +3530,7 @@
             });
 
             // ============================================
-            // DELETE MEMBER - PERMANENTLY DELETE ALL DATA
+            // DELETE MEMBER
             // ============================================
             window.deleteMember = function(clubId) {
                 const records = getRegistrations();
@@ -3566,31 +3561,22 @@
                         return;
                     }
                     
-                    // Remove certificate if exists
                     const certs = getCertificates();
                     if (certs[clubId]) {
                         delete certs[clubId];
                         saveCertificates(certs);
-                        console.log(`🗑️ Certificate removed for ${clubId}`);
                     }
                     
-                    // Remove the member permanently
                     records.splice(index, 1);
                     saveRegistrations(records);
-                    
-                    // Update the UI
                     renderAdminTable();
                     
-                    // Close certificate modal if open
                     if (window._currentCertRecord && window._currentCertRecord.clubId === clubId) {
                         document.getElementById('certModal').classList.remove('open');
                         window._currentCertRecord = null;
                     }
                     
-                    showToast(`🗑️ ${record.fullName} has been permanently deleted from the system.`);
-                    
-                    console.log(`🗑️ Member permanently deleted: ${record.fullName} (${clubId})`);
-                    
+                    showToast(`🗑️ ${record.fullName} has been permanently deleted.`);
                 } catch (error) {
                     console.error('Delete error:', error);
                     showToast('❌ Error deleting member: ' + error.message, true);
@@ -3831,18 +3817,18 @@
             console.log('🏫 WUB EEE Club Registration System loaded successfully!');
             console.log('📧 Admin: eee-club@eee.wub.edu.bd');
             console.log('🔑 Password: Eee123@580Eee');
+            console.log(`📧 Member emails sent from: ${CLUB_EMAIL}`);
             console.log('💳 Payment: bKash (01754526593) & Nagad (01754526593)');
-            console.log('📌 TRXID Formats:');
-            console.log('   💚 bKash: Must start with "DG" and be exactly 10 characters (e.g., DGH5GB82G7)');
-            console.log('   💙 Nagad: Must start with "75" and be exactly 8 characters (e.g., 75OPUQ5X)');
-            console.log('📧 EmailJS Templates:');
-            console.log('   ✅ Verified/Confirmation: template_f00pkjl (Wub_confirmation)');
-            console.log('   ❌ Unverified: template_hzraam8 (Unverified)');
+            console.log('   💚 bKash: Must start with "DG" and be exactly 10 characters');
+            console.log('   💙 Nagad: Must start with "75" and be exactly 8 characters');
+            console.log('📌 Email Triggers:');
+            console.log('   ✅ Registration → Member gets confirmation email');
+            console.log('   ✅ Verification → Member gets verified email');
+            console.log('   ❌ Unverification → Member gets unverified email with reason');
+            console.log('   ✏️ Edit → Member gets update notification email');
             console.log('📌 Data Management:');
             console.log('   💾 Data saved permanently with unique Club ID');
             console.log('   🔒 Club ID is fixed and cannot be changed');
-            console.log('   ✏️ Edit updates information but keeps Club ID');
-            console.log('   🗑️ Delete permanently removes all data');
             console.log('   ☁️ Cloud sync with JSONBin.io');
             console.log('✅ System ready!');
         })();
