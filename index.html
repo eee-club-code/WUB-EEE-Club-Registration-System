@@ -2023,190 +2023,202 @@
             }
 
             // ============================================
-// 📧 EMAIL TEMPLATE BUILDERS
-// ============================================
+            // 📧 EMAIL TEMPLATE BUILDERS
+            // ============================================
+            function escapeHtml(text) {
+                if (!text) return '';
+                const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+                return String(text).replace(/[&<>"']/g, m => map[m]);
+            }
 
-function buildConfirmationEmailHTML(record) {
-    const joinDate = new Date(record.joinDate).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+            // ============================================
+            // ✅ MEMBERSHIP VERIFIED EMAIL TEMPLATE
+            // ============================================
+            function buildConfirmationEmailHTML(record) {
+                const joinDate = new Date(record.joinDate).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
 
-    return `
-        <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border: 1px solid #e6edf8; border-radius: 16px;">
-            <div style="text-align: center; border-bottom: 2px solid #0b3b7a; padding-bottom: 20px; margin-bottom: 20px;">
-                <h2 style="color: #0b3b7a; font-size: 24px; margin: 0;">🏫 WUB EEE Club</h2>
-                <p style="color: #6b8aaa; font-size: 14px; margin: 5px 0 0 0;">World University of Bangladesh · Electrical & Electronic Engineering</p>
-            </div>
-            
-            <div style="text-align: center; margin-bottom: 25px;">
-                <h3 style="color: #1b754b; font-size: 20px; margin: 0 0 10px 0;">✅ Membership Verified</h3>
-                <p style="color: #0b2b5c; font-size: 16px; margin: 0;">Dear <strong>${escapeHtml(record.fullName)}</strong>,</p>
-            </div>
+                return `
+                    <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border: 1px solid #e6edf8; border-radius: 16px;">
+                        <div style="text-align: center; border-bottom: 2px solid #0b3b7a; padding-bottom: 20px; margin-bottom: 20px;">
+                            <h2 style="color: #0b3b7a; font-size: 24px; margin: 0;">🏫 WUB EEE Club</h2>
+                            <p style="color: #6b8aaa; font-size: 14px; margin: 5px 0 0 0;">World University of Bangladesh · Electrical & Electronic Engineering</p>
+                        </div>
+                        
+                        <div style="text-align: center; margin-bottom: 25px;">
+                            <h3 style="color: #1b754b; font-size: 20px; margin: 0 0 10px 0;">✅ Membership Verified</h3>
+                            <p style="color: #0b2b5c; font-size: 16px; margin: 0;">Dear <strong>${escapeHtml(record.fullName)}</strong>,</p>
+                        </div>
 
-            <div style="background: #f8faff; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-                <p style="margin: 5px 0; color: #1f3a66; font-size: 15px;">
-                    Congratulations! Your WUB EEE Club membership has been successfully verified. 
-                    You are now an official member of the club.
-                </p>
-            </div>
+                        <div style="background: #f8faff; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                            <p style="margin: 5px 0; color: #1f3a66; font-size: 15px;">
+                                Congratulations! Your WUB EEE Club membership has been successfully verified. 
+                                You are now an official member of the club.
+                            </p>
+                        </div>
 
-            <div style="margin-bottom: 20px;">
-                <h4 style="color: #0b2b5c; margin-bottom: 10px;">🎉 Welcome to WUB EEE Club</h4>
-                <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                    <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">📋 Your Club ID</td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b3b7a; font-weight: 700;">${escapeHtml(record.clubId)}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">🎓 Student ID</td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.studentId)}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">📚 Semester</td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.semester)}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">📅 Join Date</td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${joinDate}</td>
-                    </tr>
-                </table>
-            </div>
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: #0b2b5c; margin-bottom: 10px;">🎉 Welcome to WUB EEE Club</h4>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">📋 Your Club ID</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b3b7a; font-weight: 700;">${escapeHtml(record.clubId)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">🎓 Student ID</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.studentId)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">📚 Semester</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.semester)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">📅 Join Date</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${joinDate}</td>
+                                </tr>
+                            </table>
+                        </div>
 
-            <div style="background: #e5f2e9; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #1b754b;">
-                <h4 style="color: #0b2b5c; margin: 0 0 10px 0;">💳 Payment Confirmation</h4>
-                <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                    <tr>
-                        <td style="padding: 4px 0; font-weight: 600; color: #1f3a66;">Payment Method</td>
-                        <td style="padding: 4px 0; color: #0b2b5c;">${escapeHtml(record.paymentMethod)}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 4px 0; font-weight: 600; color: #1f3a66;">Amount</td>
-                        <td style="padding: 4px 0; color: #0b2b5c;">200 TK</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 4px 0; font-weight: 600; color: #1f3a66;">Transaction ID</td>
-                        <td style="padding: 4px 0; color: #0b2b5c; font-family: monospace;">${escapeHtml(record.trxid)}</td>
-                    </tr>
-                </table>
-            </div>
+                        <div style="background: #e5f2e9; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #1b754b;">
+                            <h4 style="color: #0b2b5c; margin: 0 0 10px 0;">💳 Payment Confirmation</h4>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                                <tr>
+                                    <td style="padding: 4px 0; font-weight: 600; color: #1f3a66;">Payment Method</td>
+                                    <td style="padding: 4px 0; color: #0b2b5c;">${escapeHtml(record.paymentMethod)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4px 0; font-weight: 600; color: #1f3a66;">Amount</td>
+                                    <td style="padding: 4px 0; color: #0b2b5c;">200 TK</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4px 0; font-weight: 600; color: #1f3a66;">Transaction ID</td>
+                                    <td style="padding: 4px 0; color: #0b2b5c; font-family: monospace;">${escapeHtml(record.trxid)}</td>
+                                </tr>
+                            </table>
+                        </div>
 
-            <div style="background: #f8faff; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #f5a623;">
-                <p style="margin: 0; color: #0b2b5c; font-size: 14px;">
-                    <strong>🔑 Your Club ID: ${escapeHtml(record.clubId)}</strong><br>
-                    This is your permanent member identifier. Keep it safe!
-                </p>
-            </div>
+                        <div style="background: #f8faff; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #f5a623;">
+                            <p style="margin: 0; color: #0b2b5c; font-size: 14px;">
+                                <strong>🔑 Your Club ID: ${escapeHtml(record.clubId)}</strong><br>
+                                This is your permanent member identifier. Keep it safe!
+                            </p>
+                        </div>
 
-            <div style="margin-bottom: 20px;">
-                <h4 style="color: #0b2b5c; margin-bottom: 10px;">📌 What's Next?</h4>
-                <ul style="margin: 0; padding-left: 20px; color: #1f3a66; font-size: 14px; line-height: 2;">
-                    <li>Save your Club ID</li>
-                    <li>Join our events and workshops</li>
-                    <li>Connect with fellow members</li>
-                    <li>Stay updated via email</li>
-                </ul>
-            </div>
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: #0b2b5c; margin-bottom: 10px;">📌 What's Next?</h4>
+                            <ul style="margin: 0; padding-left: 20px; color: #1f3a66; font-size: 14px; line-height: 2;">
+                                <li>Save your Club ID</li>
+                                <li>Join our events and workshops</li>
+                                <li>Connect with fellow members</li>
+                                <li>Stay updated via email</li>
+                            </ul>
+                        </div>
 
-            <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e6edf8; font-size: 12px; color: #6b8aaa;">
-                <p style="margin: 5px 0;">📧 For any questions: eee-club@eee.wub.edu.bd</p>
-                <p style="margin: 5px 0;">📱 bKash: 01754526593 | Nagad: 01754526593</p>
-                <p style="margin: 5px 0; font-weight: 600; color: #0b3b7a;">🏫 WUB EEE Club</p>
-                <p style="margin: 5px 0;">World University of Bangladesh · Electrical & Electronic Engineering</p>
-                <p style="margin: 10px 0 0 0; font-style: italic;">This is an automated notification. Please do not reply to this email.</p>
-            </div>
-        </div>
-    `;
-}
+                        <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e6edf8; font-size: 12px; color: #6b8aaa;">
+                            <p style="margin: 5px 0;">📧 For any questions: eee-club@eee.wub.edu.bd</p>
+                            <p style="margin: 5px 0;">📱 bKash: 01754526593 | Nagad: 01754526593</p>
+                            <p style="margin: 5px 0; font-weight: 600; color: #0b3b7a;">🏫 WUB EEE Club</p>
+                            <p style="margin: 5px 0;">World University of Bangladesh · Electrical & Electronic Engineering</p>
+                            <p style="margin: 10px 0 0 0; font-style: italic;">This is an automated notification. Please do not reply to this email.</p>
+                        </div>
+                    </div>
+                `;
+            }
 
-function buildUnverifyEmailHTML(record, reason) {
-    const unverifyDate = new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+            // ============================================
+            // ⚠️ MEMBERSHIP UNVERIFIED EMAIL TEMPLATE
+            // ============================================
+            function buildUnverifyEmailHTML(record, reason) {
+                const unverifyDate = new Date().toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
 
-    return `
-        <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border: 1px solid #e6edf8; border-radius: 16px;">
-            <div style="text-align: center; border-bottom: 2px solid #b22234; padding-bottom: 20px; margin-bottom: 20px;">
-                <h2 style="color: #b22234; font-size: 24px; margin: 0;">⚠️ WUB EEE Club</h2>
-                <p style="color: #6b8aaa; font-size: 14px; margin: 5px 0 0 0;">World University of Bangladesh · Electrical & Electronic Engineering</p>
-            </div>
-            
-            <div style="text-align: center; margin-bottom: 25px;">
-                <h3 style="color: #b22234; font-size: 20px; margin: 0 0 10px 0;">⚠️ Membership Unverified</h3>
-                <p style="color: #0b2b5c; font-size: 16px; margin: 0;">Dear <strong>${escapeHtml(record.fullName)}</strong>,</p>
-            </div>
+                return `
+                    <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border: 1px solid #e6edf8; border-radius: 16px;">
+                        <div style="text-align: center; border-bottom: 2px solid #b22234; padding-bottom: 20px; margin-bottom: 20px;">
+                            <h2 style="color: #b22234; font-size: 24px; margin: 0;">⚠️ WUB EEE Club</h2>
+                            <p style="color: #6b8aaa; font-size: 14px; margin: 5px 0 0 0;">World University of Bangladesh · Electrical & Electronic Engineering</p>
+                        </div>
+                        
+                        <div style="text-align: center; margin-bottom: 25px;">
+                            <h3 style="color: #b22234; font-size: 20px; margin: 0 0 10px 0;">⚠️ Membership Unverified</h3>
+                            <p style="color: #0b2b5c; font-size: 16px; margin: 0;">Dear <strong>${escapeHtml(record.fullName)}</strong>,</p>
+                        </div>
 
-            <div style="background: #fff5f5; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #f5c6c6;">
-                <p style="margin: 0; color: #b22234; font-size: 15px;">
-                    Your WUB EEE Club membership has been unverified by the admin. 
-                    This means your membership is currently not active.
-                </p>
-            </div>
+                        <div style="background: #fff5f5; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #f5c6c6;">
+                            <p style="margin: 0; color: #b22234; font-size: 15px;">
+                                Your WUB EEE Club membership has been unverified by the admin. 
+                                This means your membership is currently not active.
+                            </p>
+                        </div>
 
-            <div style="margin-bottom: 20px;">
-                <h4 style="color: #b22234; margin-bottom: 10px;">🔴 Membership Not Active</h4>
-                <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                    <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">📋 Club ID</td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b3b7a; font-weight: 700;">${escapeHtml(record.clubId)}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">🎓 Student ID</td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.studentId)}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">📅 Date</td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${unverifyDate}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0; font-weight: 600; color: #1f3a66;">💳 Transaction ID</td>
-                        <td style="padding: 8px 0; color: #0b2b5c; font-family: monospace;">${escapeHtml(record.trxid || 'N/A')}</td>
-                    </tr>
-                </table>
-            </div>
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: #b22234; margin-bottom: 10px;">🔴 Membership Not Active</h4>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">📋 Club ID</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b3b7a; font-weight: 700;">${escapeHtml(record.clubId)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">🎓 Student ID</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.studentId)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">📅 Date</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${unverifyDate}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; font-weight: 600; color: #1f3a66;">💳 Transaction ID</td>
+                                    <td style="padding: 8px 0; color: #0b2b5c; font-family: monospace;">${escapeHtml(record.trxid || 'N/A')}</td>
+                                </tr>
+                            </table>
+                        </div>
 
-            <div style="background: #fff5f5; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #b22234;">
-                <h4 style="color: #b22234; margin: 0 0 8px 0;">❌ Reason for Unverification</h4>
-                <p style="margin: 0; color: #1f3a66; font-size: 14px;">${escapeHtml(reason)}</p>
-            </div>
+                        <div style="background: #fff5f5; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #b22234;">
+                            <h4 style="color: #b22234; margin: 0 0 8px 0;">❌ Reason for Unverification</h4>
+                            <p style="margin: 0; color: #1f3a66; font-size: 14px;">${escapeHtml(reason)}</p>
+                        </div>
 
-            <div style="margin-bottom: 20px;">
-                <h4 style="color: #b22234; margin-bottom: 10px;">🔴 What does this mean?</h4>
-                <p style="margin: 0; color: #1f3a66; font-size: 14px; line-height: 1.8;">
-                    Your membership is currently not verified. You may not be able to access club benefits, 
-                    events, or services until this is resolved.
-                </p>
-            </div>
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: #b22234; margin-bottom: 10px;">🔴 What does this mean?</h4>
+                            <p style="margin: 0; color: #1f3a66; font-size: 14px; line-height: 1.8;">
+                                Your membership is currently not verified. You may not be able to access club benefits, 
+                                events, or services until this is resolved.
+                            </p>
+                        </div>
 
-            <div style="background: #f8faff; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
-                <h4 style="color: #0b2b5c; margin: 0 0 10px 0;">📞 What should you do?</h4>
-                <p style="margin: 0; color: #1f3a66; font-size: 14px;">Please contact the club admin immediately to resolve this issue.</p>
-            </div>
+                        <div style="background: #f8faff; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                            <h4 style="color: #0b2b5c; margin: 0 0 10px 0;">📞 What should you do?</h4>
+                            <p style="margin: 0; color: #1f3a66; font-size: 14px;">Please contact the club admin immediately to resolve this issue.</p>
+                        </div>
 
-            <div style="margin-bottom: 20px;">
-                <h4 style="color: #0b2b5c; margin-bottom: 10px;">📋 Next Steps:</h4>
-                <ol style="margin: 0; padding-left: 20px; color: #1f3a66; font-size: 14px; line-height: 2.5;">
-                    <li>Contact the club admin via email</li>
-                    <li>Provide correct information or resolve the issue</li>
-                    <li>Wait for re-verification by the admin</li>
-                </ol>
-            </div>
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: #0b2b5c; margin-bottom: 10px;">📋 Next Steps:</h4>
+                            <ol style="margin: 0; padding-left: 20px; color: #1f3a66; font-size: 14px; line-height: 2.5;">
+                                <li>Contact the club admin via email</li>
+                                <li>Provide correct information or resolve the issue</li>
+                                <li>Wait for re-verification by the admin</li>
+                            </ol>
+                        </div>
 
-            <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e6edf8; font-size: 12px; color: #6b8aaa;">
-                <p style="margin: 5px 0;">📧 For any questions: eee-club@eee.wub.edu.bd</p>
-                <p style="margin: 5px 0;">📱 bKash: 01754526593 | Nagad: 01754526593</p>
-                <p style="margin: 5px 0; font-weight: 600; color: #0b3b7a;">🏫 WUB EEE Club</p>
-                <p style="margin: 5px 0;">World University of Bangladesh · Electrical & Electronic Engineering</p>
-                <p style="margin: 10px 0 0 0; font-style: italic;">This is an automated notification. Please do not reply to this email.</p>
-            </div>
-        </div>
-    `;
-}
+                        <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e6edf8; font-size: 12px; color: #6b8aaa;">
+                            <p style="margin: 5px 0;">📧 For any questions: eee-club@eee.wub.edu.bd</p>
+                            <p style="margin: 5px 0;">📱 bKash: 01754526593 | Nagad: 01754526593</p>
+                            <p style="margin: 5px 0; font-weight: 600; color: #0b3b7a;">🏫 WUB EEE Club</p>
+                            <p style="margin: 5px 0;">World University of Bangladesh · Electrical & Electronic Engineering</p>
+                            <p style="margin: 10px 0 0 0; font-style: italic;">This is an automated notification. Please do not reply to this email.</p>
+                        </div>
+                    </div>
+                `;
+            }
+
             // ============================================
             // 📧 EMAIL WRAPPER FUNCTIONS
             // ============================================
