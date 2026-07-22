@@ -1959,7 +1959,7 @@
             const EMAILJS_PUBLIC_KEY = 'mZR55c2c8zMmSqBLL';
             const EMAILJS_SERVICE_ID = 'service_3ectzds';
             
-            // Template IDs (from your EmailJS dashboard)
+            // Template IDs
             const TEMPLATE_VERIFIED = 'template_f00pkjl';    // Wub_confirmation
             const TEMPLATE_UNVERIFIED = 'template_hzraam8';  // Unverified
 
@@ -2002,7 +2002,7 @@
             const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
 
             // ============================================
-            // TRXID VALIDATION FUNCTIONS - STRICT RULES
+            // TRXID VALIDATION FUNCTIONS
             // ============================================
             function isValidBkashTrxid(trxid) {
                 return /^DG[A-Z0-9]{8}$/.test(trxid);
@@ -2301,10 +2301,14 @@
                 return data ? JSON.parse(data) : [];
             }
 
+            // ============================================
+            // SAVE REGISTRATIONS - PERMANENT SAVE WITH UNIQUE ID
+            // ============================================
             function saveRegistrations(records) {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
                 const lastId = getLastSerial();
                 setTimeout(() => syncDataToCloud(records, lastId), 100);
+                console.log('💾 Data saved permanently with unique Club IDs');
             }
 
             function getCertificates() {
@@ -2389,12 +2393,12 @@
 
                 try {
                     const templateParams = {
-                        to_email: testEmailAddress,
+                        email: testEmailAddress,
                         to_name: 'Test User',
                         club_id: 'WUB-EEE-2026-TEST',
                         student_id: 'TEST-001',
                         reason: 'This is a test email to verify EmailJS configuration.',
-                        unverify_date: new Date().toLocaleDateString('en-US', {
+                        unverified_date: new Date().toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',
@@ -2415,20 +2419,11 @@
 
                     console.log('📧 Test email sent successfully!', response);
                     showToast(`✅ Test email sent to ${testEmailAddress}!`);
-                    alert(`✅ Test email sent successfully to ${testEmailAddress}!\n\nCheck your inbox/spam folder.\n\nResponse: ${response.status} ${response.text}`);
+                    alert(`✅ Test email sent successfully to ${testEmailAddress}!\n\nCheck your inbox/spam folder.`);
 
                 } catch (error) {
                     console.error('❌ Test email failed:', error);
-                    console.error('Error details:', error.text || error.message);
-                    
-                    let errorMsg = 'Test email failed.';
-                    if (error.text) {
-                        errorMsg += '\nError: ' + error.text;
-                    } else if (error.message) {
-                        errorMsg += '\nError: ' + error.message;
-                    }
-                    
-                    alert(`❌ ${errorMsg}\n\nPlease check:\n1. EmailJS Service ID: ${EMAILJS_SERVICE_ID}\n2. Template ID: ${TEMPLATE_UNVERIFIED}\n3. Public Key: ${EMAILJS_PUBLIC_KEY}\n\nSee console for details.`);
+                    alert(`❌ Test email failed.\nError: ${error.text || error.message}\n\nSee console for details.`);
                     showToast('❌ Test email failed. Check console for details.', true);
                 } finally {
                     btn.disabled = false;
@@ -2439,19 +2434,19 @@
             document.getElementById('testEmailBtn').addEventListener('click', testEmail);
 
             // ============================================
-            // SEND UNVERIFY EMAIL - Uses template_hzraam8
+            // SEND UNVERIFY EMAIL
             // ============================================
             async function sendUnverifyEmail(record, reason) {
                 try {
                     showToast('📧 Sending unverification email to ' + record.email + '...');
 
                     const templateParams = {
-                        to_email: record.email,
+                        email: record.email,
                         to_name: record.fullName,
                         club_id: record.clubId,
                         student_id: record.studentId,
                         reason: reason,
-                        unverify_date: new Date().toLocaleDateString('en-US', {
+                        unverified_date: new Date().toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',
@@ -2475,14 +2470,13 @@
 
                 } catch (error) {
                     console.error('❌ Unverify email sending failed:', error);
-                    console.error('Error details:', error.text || error.message);
                     showToast(`⚠️ Could not send unverification email. Error: ${error.text || error.message}`, true);
                     return false;
                 }
             }
 
             // ============================================
-            // SEND VERIFIED/CONFIRMATION EMAIL - Uses template_f00pkjl
+            // SEND CONFIRMATION EMAIL - Uses template_f00pkjl
             // ============================================
             async function sendConfirmationEmail(record) {
                 try {
@@ -2524,7 +2518,7 @@
             }
 
             // ============================================
-            // SEND UPDATE EMAIL - Uses template_f00pkjl
+            // SEND UPDATE EMAIL
             // ============================================
             async function sendUpdateEmail(record, oldData) {
                 try {
@@ -2924,7 +2918,7 @@
                     skills,
                     interest,
                     reason,
-                    clubId,
+                    clubId, // Unique ID - fixed forever
                     paymentStatus: `Paid (${selectedMethod})`,
                     paymentMethod: selectedMethod,
                     paymentAmount: '200 TK',
@@ -2968,7 +2962,7 @@
                 document.getElementById('successBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 submitBtn.disabled = true;
 
-                showToast('🎉 Registration saved! Waiting for admin verification and email confirmation.');
+                showToast('🎉 Registration saved with unique Club ID: ' + clubId);
             });
 
             // ============================================
@@ -3412,7 +3406,7 @@
             }
 
             // ============================================
-            // EDIT & DELETE
+            // EDIT MEMBER - PERMANENT SAVE WITH FIXED CLUB ID
             // ============================================
             window.editMember = function(clubId) {
                 const records = getRegistrations();
@@ -3438,7 +3432,7 @@
                 document.getElementById('editSendEmail').checked = true;
                 document.getElementById('editModal').classList.add('open');
                 
-                console.log('📝 Editing member:', record.fullName, 'Club ID:', clubId);
+                console.log('📝 Editing member:', record.fullName, 'Club ID (permanent):', clubId);
             };
 
             document.getElementById('editModalClose').addEventListener('click', function() {
@@ -3493,6 +3487,7 @@
                         return; 
                     }
 
+                    // Check if student ID is being changed and is unique (except for this member)
                     const existingStudentId = records.some((r, i) => 
                         i !== index && r.studentId === studentId
                     );
@@ -3505,6 +3500,7 @@
 
                     const oldData = { ...records[index] };
                     
+                    // Update record - Club ID stays the same (permanent)
                     records[index].fullName = fullName;
                     records[index].studentId = studentId;
                     records[index].email = email;
@@ -3513,6 +3509,7 @@
                     records[index].gender = gender;
                     records[index].interest = interest;
 
+                    // Permanently save with fixed Club ID
                     saveRegistrations(records);
                     renderAdminTable();
 
@@ -3526,7 +3523,7 @@
 
                     document.getElementById('editModal').classList.remove('open');
                     window._editOriginalData = null;
-                    showToast(`✅ Member updated successfully!${sendEmail ? ' Email notification sent.' : ''}`);
+                    showToast(`✅ Member updated successfully! Club ID: ${clubId} (permanent)`);
                     
                 } catch (error) {
                     console.error('Edit error:', error);
@@ -3537,6 +3534,9 @@
                 }
             });
 
+            // ============================================
+            // DELETE MEMBER - PERMANENTLY DELETE ALL DATA
+            // ============================================
             window.deleteMember = function(clubId) {
                 const records = getRegistrations();
                 const record = records.find(r => r.clubId === clubId);
@@ -3545,7 +3545,7 @@
                     return;
                 }
 
-                if (!confirm(`⚠️ PERMANENT DELETE\n\nAre you sure you want to permanently delete ${record.fullName}?\n\nThis will permanently remove:\n• All member information\n• Club ID: ${clubId}\n• Certificate (if any)\n• QR Code data\n\nThis action CANNOT be undone!`)) {
+                if (!confirm(`⚠️ PERMANENT DELETE\n\nAre you sure you want to permanently delete ${record.fullName}?\n\nThis will permanently remove:\n• All member information\n• Club ID: ${clubId}\n• Certificate (if any)\n• QR Code data\n• All associated records\n\nThis action CANNOT be undone!`)) {
                     return;
                 }
 
@@ -3553,7 +3553,7 @@
                     return;
                 }
 
-                const confirmation = prompt(`Type "DELETE" to permanently remove ${record.fullName}:`);
+                const confirmation = prompt(`Type "DELETE" to permanently remove ${record.fullName} (${clubId}):`);
                 if (confirmation !== 'DELETE') {
                     showToast('❌ Deletion cancelled. Confirmation text did not match.', true);
                     return;
@@ -3566,6 +3566,7 @@
                         return;
                     }
                     
+                    // Remove certificate if exists
                     const certs = getCertificates();
                     if (certs[clubId]) {
                         delete certs[clubId];
@@ -3573,11 +3574,14 @@
                         console.log(`🗑️ Certificate removed for ${clubId}`);
                     }
                     
+                    // Remove the member permanently
                     records.splice(index, 1);
                     saveRegistrations(records);
                     
+                    // Update the UI
                     renderAdminTable();
                     
+                    // Close certificate modal if open
                     if (window._currentCertRecord && window._currentCertRecord.clubId === clubId) {
                         document.getElementById('certModal').classList.remove('open');
                         window._currentCertRecord = null;
@@ -3834,12 +3838,13 @@
             console.log('📧 EmailJS Templates:');
             console.log('   ✅ Verified/Confirmation: template_f00pkjl (Wub_confirmation)');
             console.log('   ❌ Unverified: template_hzraam8 (Unverified)');
-            console.log('📌 Button Logic:');
-            console.log('   🔵 PENDING: Verify + Unverify');
-            console.log('   🟢 VERIFIED: Resend + Unverify');
-            console.log('   🔴 UNVERIFIED: Verify only');
+            console.log('📌 Data Management:');
+            console.log('   💾 Data saved permanently with unique Club ID');
+            console.log('   🔒 Club ID is fixed and cannot be changed');
+            console.log('   ✏️ Edit updates information but keeps Club ID');
+            console.log('   🗑️ Delete permanently removes all data');
+            console.log('   ☁️ Cloud sync with JSONBin.io');
             console.log('✅ System ready!');
-            console.log('🛠️ Click "Test Email" to test the Unverified template!');
         })();
     </script>
 </body>
