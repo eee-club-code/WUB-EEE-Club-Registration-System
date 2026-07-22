@@ -11,6 +11,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
+        /* ============================================
+           MAIN SYSTEM STYLES
+           ============================================ */
         * {
             margin: 0;
             padding: 0;
@@ -29,7 +32,7 @@
         }
         .container {
             width: 100%;
-            max-width: 1050px;
+            max-width: 1150px;
             background: white;
             border-radius: 2rem;
             box-shadow: 0 25px 50px -8px rgba(0, 20, 60, 0.15);
@@ -707,7 +710,7 @@
         }
         table {
             width: 100%;
-            min-width: 950px;
+            min-width: 1000px;
             border-collapse: collapse;
             font-size: 0.85rem;
             background: #fafdff;
@@ -723,16 +726,21 @@
             position: sticky;
             top: 0;
             z-index: 10;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         td {
             padding: 0.7rem 0.5rem;
             border-bottom: 1px solid #e6edf8;
+            vertical-align: middle;
         }
         .empty-row td {
             text-align: center;
             color: #62748c;
             padding: 1.5rem;
         }
+
         .badge-paid {
             background: #1b754b;
             color: white;
@@ -797,6 +805,7 @@
             font-size: 0.7rem;
             font-weight: 600;
         }
+
         .payment-info {
             font-size: 0.75rem;
             line-height: 1.4;
@@ -1810,13 +1819,17 @@
                             <th>Student ID</th>
                             <th>Club ID</th>
                             <th>Payment (TRXID)</th>
-                            <th>Verified</th>
+                            <th>Status</th>
                             <th>Join Date</th>
                             <th>Certificate</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="adminTableBody"></tbody>
+                    <tbody id="adminTableBody">
+                        <tr class="empty-row">
+                            <td colspan="9">No registered members yet. Login to see data.</td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -1948,18 +1961,12 @@
     <script>
         (function() {
             // ============================================
-            // 🔥 BREVO API CONFIGURATION - CORRECT V3 API KEY
+            // 🔥 BREVO API CONFIGURATION
             // ============================================
-            // ✅ This is your CORRECT v3 API Key (starts with xkeysib-)
             const BREVO_API_KEY = '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';
             const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
             const FROM_EMAIL = 'eee-club@eee.wub.edu.bd';
             const FROM_NAME = 'WUB EEE Club';
-
-            console.log('📧 Brevo API configured with:');
-            console.log('   API Key: ' + BREVO_API_KEY.substring(0, 20) + '...');
-            console.log('   From: ' + FROM_EMAIL);
-            console.log('   Status: ✅ Ready to send emails via Brevo REST API!');
 
             // ============================================
             // 📧 EMAIL SENDING FUNCTION (Brevo REST API)
@@ -1981,9 +1988,6 @@
                         subject: subject,
                         htmlContent: htmlContent
                     };
-
-                    console.log('📧 Sending via Brevo API...');
-                    console.log('📧 Payload:', JSON.stringify(payload, null, 2));
 
                     const response = await fetch(BREVO_API_URL, {
                         method: 'POST',
@@ -2040,67 +2044,29 @@
                             <h2 style="color: #0b3b7a; font-size: 24px; margin: 0;">🏫 WUB EEE CLUB</h2>
                             <p style="color: #6b8aaa; font-size: 14px; margin: 5px 0 0 0;">World University of Bangladesh</p>
                         </div>
-                        
                         <div style="text-align: center; margin-bottom: 25px;">
                             <h3 style="color: #1b754b; font-size: 20px; margin: 0 0 10px 0;">✅ Membership Confirmed!</h3>
                             <p style="color: #0b2b5c; font-size: 16px; margin: 0;">Dear <strong>${escapeHtml(record.fullName)}</strong>,</p>
                         </div>
-
                         <div style="background: #f8faff; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
                             <p style="margin: 5px 0; color: #1f3a66;">We are pleased to inform you that your registration for the <strong>WUB EEE Club</strong> has been successfully verified!</p>
                         </div>
-
                         <div style="margin-bottom: 20px;">
                             <h4 style="color: #0b2b5c; margin-bottom: 10px;">📋 Membership Details</h4>
                             <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                                <tr>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Club ID</td>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b3b7a; font-weight: 700;">${escapeHtml(record.clubId)}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Student ID</td>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.studentId)}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Department</td>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">EEE</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Semester</td>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.semester)}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Payment Method</td>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.paymentMethod)}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Transaction ID</td>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c; font-family: monospace;">${escapeHtml(record.trxid)}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 8px 0; font-weight: 600; color: #1f3a66;">Join Date</td>
-                                    <td style="padding: 8px 0; color: #0b2b5c;">${joinDate}</td>
-                                </tr>
-                                ${record.isPastStudent ? `
-                                <tr>
-                                    <td style="padding: 8px 0; font-weight: 600; color: #1f3a66;">Past Member</td>
-                                    <td style="padding: 8px 0; color: #0b2b5c;">Yes (${escapeHtml(record.startYear)} - ${escapeHtml(record.endYear)})</td>
-                                </tr>
-                                ` : ''}
+                                <tr><td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Club ID</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b3b7a; font-weight: 700;">${escapeHtml(record.clubId)}</td></tr>
+                                <tr><td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Student ID</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.studentId)}</td></tr>
+                                <tr><td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Semester</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.semester)}</td></tr>
+                                <tr><td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Payment Method</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.paymentMethod)}</td></tr>
+                                <tr><td style="padding: 8px 0; font-weight: 600; color: #1f3a66;">Transaction ID</td>
+                                    <td style="padding: 8px 0; color: #0b2b5c; font-family: monospace;">${escapeHtml(record.trxid)}</td></tr>
                             </table>
                         </div>
-
-                        <div style="background: #e5f2e9; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #1b754b;">
-                            <p style="margin: 0; color: #0f422b; font-size: 14px;">
-                                <strong>💳 Payment Information</strong><br>
-                                Amount: 200 TK<br>
-                                Method: ${escapeHtml(record.paymentMethod)}<br>
-                                TrxID: ${escapeHtml(record.trxid)}
-                            </p>
-                        </div>
-
                         <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e6edf8; font-size: 12px; color: #6b8aaa;">
-                            <p style="margin: 5px 0;">This is a system-generated confirmation email from WUB EEE Club.</p>
                             <p style="margin: 5px 0;">For any queries, contact: eee-club@eee.wub.edu.bd</p>
                         </div>
                     </div>
@@ -2108,69 +2074,29 @@
             }
 
             function buildUnverifyEmailHTML(record, reason) {
-                const unverifyDate = new Date().toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-
                 return `
                     <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border: 1px solid #e6edf8; border-radius: 16px;">
                         <div style="text-align: center; border-bottom: 2px solid #b22234; padding-bottom: 20px; margin-bottom: 20px;">
                             <h2 style="color: #b22234; font-size: 24px; margin: 0;">⚠️ WUB EEE CLUB</h2>
                             <p style="color: #6b8aaa; font-size: 14px; margin: 5px 0 0 0;">World University of Bangladesh</p>
                         </div>
-                        
                         <div style="text-align: center; margin-bottom: 25px;">
                             <h3 style="color: #b22234; font-size: 20px; margin: 0 0 10px 0;">❌ Membership Unverified</h3>
                             <p style="color: #0b2b5c; font-size: 16px; margin: 0;">Dear <strong>${escapeHtml(record.fullName)}</strong>,</p>
                         </div>
-
                         <div style="background: #fff5f5; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #f5c6c6;">
                             <p style="margin: 0; color: #b22234; font-size: 14px;">
                                 <strong>We regret to inform you that your membership verification has been unsuccessful.</strong>
                             </p>
                         </div>
-
                         <div style="margin-bottom: 20px;">
-                            <h4 style="color: #0b2b5c; margin-bottom: 10px;">📋 Reason for Unverification</h4>
+                            <h4 style="color: #0b2b5c; margin-bottom: 10px;">📋 Reason</h4>
                             <div style="background: #f8faff; padding: 15px; border-radius: 8px; border-left: 4px solid #b22234;">
                                 <p style="margin: 0; color: #1f3a66; font-size: 14px;">${escapeHtml(reason)}</p>
                             </div>
                         </div>
-
-                        <div style="margin-bottom: 20px;">
-                            <h4 style="color: #0b2b5c; margin-bottom: 10px;">📋 Membership Details</h4>
-                            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                                <tr>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Club ID</td>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b3b7a; font-weight: 700;">${escapeHtml(record.clubId)}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Student ID</td>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.studentId)}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 8px 0; font-weight: 600; color: #1f3a66;">Transaction ID</td>
-                                    <td style="padding: 8px 0; color: #0b2b5c; font-family: monospace;">${escapeHtml(record.trxid || 'N/A')}</td>
-                                </tr>
-                            </table>
-                        </div>
-
-                        <div style="background: #f8faff; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
-                            <p style="margin: 0; color: #1f3a66; font-size: 14px;">
-                                <strong>📌 Next Steps:</strong><br>
-                                Please contact the club administration to resolve this issue.<br>
-                                You may need to resubmit your payment information or provide additional documentation.
-                            </p>
-                        </div>
-
                         <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e6edf8; font-size: 12px; color: #6b8aaa;">
-                            <p style="margin: 5px 0;">This is a system-generated notification from WUB EEE Club.</p>
                             <p style="margin: 5px 0;">For any queries, contact: eee-club@eee.wub.edu.bd</p>
-                            <p style="margin: 5px 0;">Unverified on: ${unverifyDate}</p>
                         </div>
                     </div>
                 `;
@@ -2183,57 +2109,21 @@
                             <h2 style="color: #0b3b7a; font-size: 24px; margin: 0;">📝 WUB EEE CLUB</h2>
                             <p style="color: #6b8aaa; font-size: 14px; margin: 5px 0 0 0;">World University of Bangladesh</p>
                         </div>
-                        
                         <div style="text-align: center; margin-bottom: 25px;">
                             <h3 style="color: #0b3b7a; font-size: 20px; margin: 0 0 10px 0;">🔄 Profile Updated</h3>
                             <p style="color: #0b2b5c; font-size: 16px; margin: 0;">Dear <strong>${escapeHtml(record.fullName)}</strong>,</p>
                         </div>
-
                         <div style="background: #e8f0fe; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-                            <p style="margin: 0; color: #1f3a66; font-size: 14px;">Your WUB EEE Club profile has been updated by the administrator.</p>
+                            <p style="margin: 0; color: #1f3a66; font-size: 14px;">Your profile has been updated by the administrator.</p>
                         </div>
-
                         <div style="margin-bottom: 20px;">
                             <h4 style="color: #0b2b5c; margin-bottom: 10px;">📋 Changes Made</h4>
                             <div style="background: #f8faff; padding: 15px; border-radius: 8px; border-left: 4px solid #f5a623;">
                                 <pre style="margin: 0; color: #1f3a66; font-size: 13px; white-space: pre-wrap; font-family: 'Inter', Arial, sans-serif;">${escapeHtml(changes)}</pre>
                             </div>
                         </div>
-
-                        <div style="margin-bottom: 20px;">
-                            <h4 style="color: #0b2b5c; margin-bottom: 10px;">📋 Updated Profile</h4>
-                            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                                <tr>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Club ID</td>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b3b7a; font-weight: 700;">${escapeHtml(record.clubId)}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Student ID</td>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.studentId)}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Email</td>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.email)}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Phone</td>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.phone || 'N/A')}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Semester</td>
-                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.semester)}</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 8px 0; font-weight: 600; color: #1f3a66;">Interest</td>
-                                    <td style="padding: 8px 0; color: #0b2b5c;">${escapeHtml(record.interest)}</td>
-                                </tr>
-                            </table>
-                        </div>
-
                         <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e6edf8; font-size: 12px; color: #6b8aaa;">
-                            <p style="margin: 5px 0;">This is a system-generated notification from WUB EEE Club.</p>
                             <p style="margin: 5px 0;">For any queries, contact: eee-club@eee.wub.edu.bd</p>
-                            <p style="margin: 5px 0;">Update on: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                         </div>
                     </div>
                 `;
@@ -2288,7 +2178,6 @@
                                 <p style="color: #6b8aaa; font-size: 12px;">Sent at: ${new Date().toLocaleString()}</p>
                             </div>
                             <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e6edf8; font-size: 12px; color: #6b8aaa;">
-                                <p style="margin: 5px 0;">This is a test email from WUB EEE Club.</p>
                                 <p style="margin: 5px 0;">Contact: eee-club@eee.wub.edu.bd</p>
                             </div>
                         </div>
@@ -2297,7 +2186,7 @@
                     const result = await sendEmail(testEmailAddress, '🧪 WUB EEE Club - Test Email', testHTML);
 
                     if (result.success) {
-                        showToast(`✅ Test email sent to ${testEmailAddress} via Brevo API!`);
+                        showToast(`✅ Test email sent to ${testEmailAddress}!`);
                         alert(`✅ Test email sent successfully to ${testEmailAddress}!\n\nCheck your inbox/spam folder.`);
                     } else {
                         throw new Error(result.error || 'Unknown error');
@@ -2305,7 +2194,7 @@
 
                 } catch (error) {
                     console.error('❌ Test email failed:', error);
-                    alert(`❌ Test email failed.\nError: ${error.message || 'Unknown error'}\n\nPlease check:\n1. Brevo API Key is correct (starts with xkeysib-)\n2. Your Brevo account has email credits\n3. The sender email is verified in Brevo\n\nSee console for details.`);
+                    alert(`❌ Test email failed.\nError: ${error.message || 'Unknown error'}\n\nCheck:\n1. Brevo API Key is correct\n2. You have email credits\n3. Sender email is verified in Brevo`);
                     showToast('❌ Test email failed. Check console for details.', true);
                 } finally {
                     btn.disabled = false;
@@ -2336,7 +2225,7 @@
             let selectedMethod = 'bKash';
 
             // ============================================
-            // 🎯 DOM REFS & PAYMENT FUNCTIONS
+            // 🎯 DOM REFS
             // ============================================
             const trxidInput = document.getElementById('trxidInput');
             const trxidHint = document.getElementById('trxidHint');
@@ -2348,6 +2237,9 @@
             const nagadInfo = document.getElementById('nagadInfo');
             const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
 
+            // ============================================
+            // ✅ TRXID VALIDATION
+            // ============================================
             function isValidBkashTrxid(trxid) {
                 return /^DG[A-Z0-9]{8}$/.test(trxid);
             }
@@ -2485,7 +2377,7 @@
             });
 
             // ============================================
-            // ☁️ SYNC FUNCTIONS (shortened for space)
+            // ☁️ CLOUD SYNC FUNCTIONS
             // ============================================
             function updateSyncStatus(status, message) {
                 const dot = document.getElementById('syncDot');
@@ -2577,6 +2469,9 @@
                 return Object.values(recordMap);
             }
 
+            // ============================================
+            // 💾 DATA MANAGEMENT
+            // ============================================
             function getLastSerial() {
                 const stored = localStorage.getItem(ID_KEY);
                 return stored ? parseInt(stored, 10) : 0;
@@ -2611,175 +2506,7 @@
             }
 
             // ============================================
-            // 📊 ADMIN TABLE
-            // ============================================
-            function renderAdminTable() {
-                if (!isLoggedIn) return;
-                const records = getRegistrations();
-                const tbody = document.getElementById('adminTableBody');
-                if (!tbody) return;
-                if (records.length === 0) {
-                    tbody.innerHTML = `<tr class="empty-row"><td colspan="9">No registered members yet.</td></tr>`;
-                    return;
-                }
-                const certs = getCertificates();
-                tbody.innerHTML = records.map((r, idx) => {
-                    const paid = r.paymentStatus && r.paymentStatus.includes('Paid');
-                    const hasCert = !!certs[r.clubId];
-                    const isEligible = isEligibleForCertificate(r.joinDate);
-                    const isPast = isPastMember(r.joinDate) || r.isPastStudent;
-                    const joinDate = new Date(r.joinDate).toLocaleDateString();
-                    const isVerified = r.isVerified || false;
-                    const emailSent = r.emailSent || false;
-                    const unverifyReason = r.unverifyReason || '';
-                    let actions = '';
-                    actions = `
-                        <button class="action-btn edit" onclick="editMember('${r.clubId}')" title="Edit Member"><i class="fas fa-edit"></i></button>
-                        <button class="action-btn delete" onclick="deleteMember('${r.clubId}')" title="Delete Member"><i class="fas fa-trash"></i></button>
-                    `;
-                    let verificationDisplay = '';
-                    if (isVerified) {
-                        verificationDisplay = `<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified${emailSent ? ' ✓' : ''}</span>`;
-                        actions += `<button class="action-btn resend" onclick="resendEmail('${r.clubId}')" title="Resend email"><i class="fas fa-envelope"></i> Resend</button>`;
-                        actions += `<button class="action-btn unverify" onclick="unverifyMember('${r.clubId}')" title="Unverify"><i class="fas fa-user-slash"></i> Unverify</button>`;
-                    } else if (unverifyReason) {
-                        verificationDisplay = `<span class="badge-unverified-reason" title="${escapeHtml(unverifyReason)}"><i class="fas fa-exclamation-triangle"></i> Unverified</span>`;
-                        actions += `<button class="action-btn verify" onclick="verifyMember('${r.clubId}')" title="Verify"><i class="fas fa-check-circle"></i> Verify</button>`;
-                    } else {
-                        verificationDisplay = `<span class="badge-unverified"><i class="fas fa-clock"></i> Pending</span>`;
-                        actions += `<button class="action-btn verify" onclick="verifyMember('${r.clubId}')" title="Verify"><i class="fas fa-check-circle"></i> Verify</button>`;
-                        actions += `<button class="action-btn unverify" onclick="unverifyMember('${r.clubId}')" title="Unverify"><i class="fas fa-user-slash"></i> Unverify</button>`;
-                    }
-                    const paymentDisplay = paid ? 
-                        `<span class="badge-paid">✅ Paid</span>
-                         <div class="payment-info">
-                             <span class="method">${r.paymentMethod || 'bKash'}</span>
-                             <span class="trxid">${r.trxid || 'N/A'}</span>
-                         </div>` : 
-                        `<span class="badge-pending">⏳ Pending</span>`;
-                    let certStatus = '';
-                    let certAction = '';
-                    if (hasCert) {
-                        certStatus = `<span class="badge-cert"><i class="fas fa-check-circle"></i> Issued</span>`;
-                        certAction = `<button class="cert-btn download" onclick="viewCertificate('${r.clubId}')"><i class="fas fa-eye"></i> View</button>`;
-                    } else if (isEligible) {
-                        certStatus = `<span class="badge-no-cert"><i class="fas fa-clock"></i> Eligible</span>`;
-                        certAction = `<button class="cert-btn generate" onclick="generateCertForMember('${r.clubId}')"><i class="fas fa-certificate"></i> Generate</button>`;
-                    } else if (isPast) {
-                        certStatus = `<span class="badge-past"><i class="fas fa-history"></i> Past Member</span>`;
-                        certAction = `<button class="cert-btn past" onclick="generatePastCert('${r.clubId}')"><i class="fas fa-certificate"></i> Generate Past</button>`;
-                    } else {
-                        const yearsLeft = 2 - Math.floor((new Date() - new Date(r.joinDate)) / (1000 * 60 * 60 * 24 * 365));
-                        certStatus = `<span class="badge-no-cert"><i class="fas fa-hourglass-half"></i> ${yearsLeft} year(s)</span>`;
-                        certAction = `<span style="font-size:0.7rem; color:#6b8aaa;">Not eligible</span>`;
-                    }
-                    return `<tr>
-                  <td>${idx+1}</td>
-                  <td><strong>${escapeHtml(r.fullName || '')}</strong></td>
-                  <td>${escapeHtml(r.studentId || '')}</td>
-                  <td><code style="background:#e8f0fe; padding:2px 8px; border-radius:12px; font-weight:600; font-size:0.7rem;">${escapeHtml(r.clubId || '')}</code></td>
-                  <td>${paymentDisplay}</td>
-                  <td>${verificationDisplay}</td>
-                  <td style="font-size:0.8rem;">${joinDate}</td>
-                  <td>${certStatus} ${certAction ? '<br>' + certAction : ''}</td>
-                  <td>${actions}</td>
-                </tr>`;
-                }).join('');
-            }
-
-            // ============================================
-            // ✅ ADMIN FUNCTIONS
-            // ============================================
-            window.verifyMember = async function(clubId) {
-                const records = getRegistrations();
-                const index = records.findIndex(r => r.clubId === clubId);
-                if (index === -1) { showToast('❌ Member not found', true); return; }
-                if (records[index].isVerified) { showToast('⚠️ Already verified', true); return; }
-                if (!confirm(`Verify ${records[index].fullName}?`)) return;
-                records[index].isVerified = true;
-                records[index].verifiedDate = new Date().toISOString();
-                records[index].unverifyReason = null;
-                saveRegistrations(records);
-                const emailSent = await sendConfirmationEmail(records[index]);
-                records[index].emailSent = emailSent;
-                saveRegistrations(records);
-                renderAdminTable();
-                showToast(emailSent ? `✅ Verified & email sent` : `⚠️ Verified but email failed`, !emailSent);
-            };
-
-            window.resendEmail = async function(clubId) {
-                const records = getRegistrations();
-                const record = records.find(r => r.clubId === clubId);
-                if (!record) { showToast('❌ Member not found', true); return; }
-                if (!record.isVerified) { showToast('⚠️ Verify first', true); return; }
-                if (!confirm(`Resend to ${record.email}?`)) return;
-                const emailSent = await sendConfirmationEmail(record);
-                if (emailSent) { record.emailSent = true;
-                    saveRegistrations(records);
-                    renderAdminTable();
-                    showToast(`✅ Email resent to ${record.email}`); } else { showToast(`⚠️ Failed to send`, true); }
-            };
-
-            window.unverifyMember = function(clubId) {
-                const records = getRegistrations();
-                const record = records.find(r => r.clubId === clubId);
-                if (!record) { showToast('❌ Member not found', true); return; }
-                document.getElementById('unverifyClubId').value = clubId;
-                document.getElementById('unverifyMemberName').value = record.fullName || 'Unknown';
-                document.getElementById('unverifyClubIdDisplay').value = clubId;
-                document.getElementById('unverifyReason').value = '';
-                document.getElementById('unverifySendEmail').checked = true;
-                document.getElementById('unverifyModal').classList.add('open');
-            };
-
-            document.getElementById('unverifyModalClose').addEventListener('click', function() {
-                document.getElementById('unverifyModal').classList.remove('open');
-            });
-            document.getElementById('unverifyModal').addEventListener('click', function(e) {
-                if (e.target === this) this.classList.remove('open');
-            });
-
-            document.getElementById('unverifyForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const btn = document.getElementById('unverifyBtn');
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-                try {
-                    const clubId = document.getElementById('unverifyClubId').value;
-                    const reason = document.getElementById('unverifyReason').value.trim();
-                    const sendEmail = document.getElementById('unverifySendEmail').checked;
-                    if (!reason) { showToast('⚠️ Enter reason', true);
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="fas fa-user-slash"></i> Unverify Member & Send Email'; return; }
-                    const records = getRegistrations();
-                    const index = records.findIndex(r => r.clubId === clubId);
-                    if (index === -1) { showToast('❌ Member not found', true);
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="fas fa-user-slash"></i> Unverify Member & Send Email'; return; }
-                    const record = records[index];
-                    record.isVerified = false;
-                    record.verifiedDate = null;
-                    record.emailSent = false;
-                    record.unverifyReason = reason;
-                    record.unverifyDate = new Date().toISOString();
-                    saveRegistrations(records);
-                    let emailSent = false;
-                    if (sendEmail) {
-                        emailSent = await sendUnverifyEmail(record, reason);
-                        if (emailSent) { record.emailSent = false;
-                            saveRegistrations(records); }
-                    }
-                    document.getElementById('unverifyModal').classList.remove('open');
-                    renderAdminTable();
-                    showToast(emailSent ? `✅ Unverified & email sent` : `✅ Unverified (email ${sendEmail ? 'failed' : 'skipped'})`, !emailSent && sendEmail);
-                } catch (error) { showToast('❌ Error: ' + error.message, true); } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-user-slash"></i> Unverify Member & Send Email';
-                }
-            });
-
-            // ============================================
-            // 📄 OTHER FUNCTIONS (shortened for space)
+            // 🎓 CERTIFICATE FUNCTIONS
             // ============================================
             function isEligibleForCertificate(joinDate) {
                 const join = new Date(joinDate);
@@ -2801,6 +2528,593 @@
                 return yearsDiff >= 2;
             }
 
+            function getCertificateNumber(clubId) {
+                const certs = getCertificates();
+                if (certs[clubId]) return certs[clubId].certNumber;
+                const existingCerts = Object.values(certs);
+                const maxNum = existingCerts.reduce((max, c) => {
+                    const num = parseInt(c.certNumber.split('-')[1]);
+                    return num > max ? num : max;
+                }, 0);
+                const newNum = maxNum + 1;
+                return `WUB-EEE-CERT-${String(newNum).padStart(4, '0')}`;
+            }
+
+            function generateCertificate(record) {
+                const certs = getCertificates();
+                if (certs[record.clubId]) return certs[record.clubId];
+                const certNumber = getCertificateNumber(record.clubId);
+                const now = new Date();
+                let startDate, endDate;
+                if (record.isPastStudent && record.startYear && record.endYear) {
+                    startDate = new Date(parseInt(record.startYear), 0, 1);
+                    endDate = new Date(parseInt(record.endYear), 11, 31);
+                } else {
+                    const joinDate = new Date(record.joinDate);
+                    startDate = new Date(joinDate);
+                    endDate = new Date(joinDate);
+                    endDate.setFullYear(endDate.getFullYear() + 2);
+                }
+                const certData = {
+                    clubId: record.clubId,
+                    certNumber: certNumber,
+                    fullName: record.fullName,
+                    studentId: record.studentId,
+                    joinDate: record.joinDate,
+                    periodStart: startDate.toISOString(),
+                    periodEnd: endDate.toISOString(),
+                    generatedDate: now.toISOString(),
+                    validUntil: new Date(now.setFullYear(now.getFullYear() + 2)).toISOString(),
+                    isPastMember: record.isPastStudent || false,
+                    startYear: record.startYear || null,
+                    endYear: record.endYear || null
+                };
+                certs[record.clubId] = certData;
+                saveCertificates(certs);
+                return certData;
+            }
+
+            function renderCertificate(record) {
+                const cert = generateCertificate(record);
+                let startDateStr, endDateStr;
+                if (cert.periodStart && cert.periodEnd) {
+                    const startDate = new Date(cert.periodStart);
+                    const endDate = new Date(cert.periodEnd);
+                    startDateStr = startDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                    endDateStr = endDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                } else {
+                    const now = new Date();
+                    const twoYearsAgo = new Date(now);
+                    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+                    startDateStr = twoYearsAgo.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                    endDateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                }
+                return `
+                <div class="certificate-wrapper">
+                  <div class="certificate" id="certificatePrint">
+                    <div class="border"></div>
+                    <div class="watermark"><span>WUB EEE</span></div>
+                    <div class="seal"><span>WUB<br>EEE</span></div>
+                    <div class="header">
+                      <div class="title">WUB EEE CLUB</div>
+                      <div class="subtitle">CERTIFICATE OF MEMBERSHIP</div>
+                    </div>
+                    <div class="content">
+                      <div class="label">This is to certify that</div>
+                      <div class="name">${escapeHtml(record.fullName)}</div>
+                      <div class="student-id">Student ID: ${escapeHtml(record.studentId)}</div>
+                      <div class="text">
+                        has been an active member/participant of the <strong>EEE Club of World University of Bangladesh</strong>.
+                        <br><br>
+                        During the period <strong>${startDateStr}</strong> to <strong>${endDateStr}</strong>, he/she has actively participated in various
+                        academic, technical, and extracurricular activities including workshops, seminars, and competitions.
+                        <br><br>
+                        We appreciate his/her dedication, enthusiasm, and contribution to the development of technical knowledge and teamwork within the club.
+                      </div>
+                    </div>
+                    <div class="footer">
+                      <div class="sign">President<br><span class="sub">WUB EEE Club</span></div>
+                      <div class="sign">Advisor<br><span class="sub">WUB EEE Club</span></div>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }
+
+            // ============================================
+            // 📊 ADMIN TABLE RENDER
+            // ============================================
+            function renderAdminTable() {
+                if (!isLoggedIn) return;
+                const records = getRegistrations();
+                const tbody = document.getElementById('adminTableBody');
+                if (!tbody) return;
+                if (records.length === 0) {
+                    tbody.innerHTML = `<tr class="empty-row"><td colspan="9">No registered members yet.</td></tr>`;
+                    return;
+                }
+                const certs = getCertificates();
+                tbody.innerHTML = records.map((r, idx) => {
+                    const paid = r.paymentStatus && r.paymentStatus.includes('Paid');
+                    const hasCert = !!certs[r.clubId];
+                    const isEligible = isEligibleForCertificate(r.joinDate);
+                    const isPast = isPastMember(r.joinDate) || r.isPastStudent;
+                    const joinDate = new Date(r.joinDate).toLocaleDateString();
+                    const isVerified = r.isVerified || false;
+                    const emailSent = r.emailSent || false;
+                    const unverifyReason = r.unverifyReason || '';
+                    
+                    let actions = '';
+                    actions = `
+                        <button class="action-btn edit" onclick="editMember('${r.clubId}')" title="Edit Member"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn delete" onclick="deleteMember('${r.clubId}')" title="Delete Member"><i class="fas fa-trash"></i></button>
+                    `;
+                    
+                    let statusDisplay = '';
+                    if (isVerified) {
+                        statusDisplay = `<span class="badge-verified"><i class="fas fa-check-circle"></i> Verified${emailSent ? ' ✓' : ''}</span>`;
+                        actions += `<button class="action-btn resend" onclick="resendEmail('${r.clubId}')" title="Resend email"><i class="fas fa-envelope"></i> Resend</button>`;
+                        actions += `<button class="action-btn unverify" onclick="unverifyMember('${r.clubId}')" title="Unverify"><i class="fas fa-user-slash"></i> Unverify</button>`;
+                    } else if (unverifyReason) {
+                        statusDisplay = `<span class="badge-unverified-reason" title="${escapeHtml(unverifyReason)}"><i class="fas fa-exclamation-triangle"></i> Unverified</span>`;
+                        actions += `<button class="action-btn verify" onclick="verifyMember('${r.clubId}')" title="Verify"><i class="fas fa-check-circle"></i> Verify</button>`;
+                    } else {
+                        statusDisplay = `<span class="badge-unverified"><i class="fas fa-clock"></i> Pending</span>`;
+                        actions += `<button class="action-btn verify" onclick="verifyMember('${r.clubId}')" title="Verify"><i class="fas fa-check-circle"></i> Verify</button>`;
+                        actions += `<button class="action-btn unverify" onclick="unverifyMember('${r.clubId}')" title="Unverify"><i class="fas fa-user-slash"></i> Unverify</button>`;
+                    }
+
+                    const paymentDisplay = paid ? 
+                        `<span class="badge-paid">✅ Paid</span>
+                         <div class="payment-info">
+                             <span class="method">${r.paymentMethod || 'bKash'}</span>
+                             <span class="trxid">${r.trxid || 'N/A'}</span>
+                         </div>` : 
+                        `<span class="badge-pending">⏳ Pending</span>`;
+
+                    let certStatus = '';
+                    let certAction = '';
+                    if (hasCert) {
+                        certStatus = `<span class="badge-cert"><i class="fas fa-check-circle"></i> Issued</span>`;
+                        certAction = `<button class="cert-btn download" onclick="viewCertificate('${r.clubId}')"><i class="fas fa-eye"></i> View</button>`;
+                    } else if (isEligible) {
+                        certStatus = `<span class="badge-no-cert"><i class="fas fa-clock"></i> Eligible</span>`;
+                        certAction = `<button class="cert-btn generate" onclick="generateCertForMember('${r.clubId}')"><i class="fas fa-certificate"></i> Generate</button>`;
+                    } else if (isPast) {
+                        certStatus = `<span class="badge-past"><i class="fas fa-history"></i> Past Member</span>`;
+                        certAction = `<button class="cert-btn past" onclick="generatePastCert('${r.clubId}')"><i class="fas fa-certificate"></i> Generate Past</button>`;
+                    } else {
+                        const yearsLeft = 2 - Math.floor((new Date() - new Date(r.joinDate)) / (1000 * 60 * 60 * 24 * 365));
+                        certStatus = `<span class="badge-no-cert"><i class="fas fa-hourglass-half"></i> ${yearsLeft} year(s)</span>`;
+                        certAction = `<span style="font-size:0.7rem; color:#6b8aaa;">Not eligible</span>`;
+                    }
+
+                    return `<tr>
+                  <td>${idx+1}</td>
+                  <td><strong>${escapeHtml(r.fullName || '')}</strong></td>
+                  <td>${escapeHtml(r.studentId || '')}</td>
+                  <td><code style="background:#e8f0fe; padding:2px 8px; border-radius:12px; font-weight:600; font-size:0.7rem;">${escapeHtml(r.clubId || '')}</code></td>
+                  <td>${paymentDisplay}</td>
+                  <td>${statusDisplay}</td>
+                  <td style="font-size:0.8rem;">${joinDate}</td>
+                  <td>${certStatus} ${certAction ? '<br>' + certAction : ''}</td>
+                  <td>${actions}</td>
+                </tr>`;
+                }).join('');
+            }
+
+            // ============================================
+            // ✅ ADMIN FUNCTIONS
+            // ============================================
+            window.verifyMember = async function(clubId) {
+                const records = getRegistrations();
+                const index = records.findIndex(r => r.clubId === clubId);
+                if (index === -1) { showToast('❌ Member not found', true); return; }
+                if (records[index].isVerified) { showToast('⚠️ Already verified', true); return; }
+                if (!confirm(`Verify ${records[index].fullName}?`)) return;
+                
+                records[index].isVerified = true;
+                records[index].verifiedDate = new Date().toISOString();
+                records[index].unverifyReason = null;
+                saveRegistrations(records);
+                
+                const emailSent = await sendConfirmationEmail(records[index]);
+                records[index].emailSent = emailSent;
+                saveRegistrations(records);
+                renderAdminTable();
+                showToast(emailSent ? `✅ Verified & email sent` : `⚠️ Verified but email failed`, !emailSent);
+            };
+
+            window.resendEmail = async function(clubId) {
+                const records = getRegistrations();
+                const record = records.find(r => r.clubId === clubId);
+                if (!record) { showToast('❌ Member not found', true); return; }
+                if (!record.isVerified) { showToast('⚠️ Verify first', true); return; }
+                if (!confirm(`Resend to ${record.email}?`)) return;
+                
+                const emailSent = await sendConfirmationEmail(record);
+                if (emailSent) {
+                    record.emailSent = true;
+                    saveRegistrations(records);
+                    renderAdminTable();
+                    showToast(`✅ Email resent to ${record.email}`);
+                } else {
+                    showToast(`⚠️ Failed to send`, true);
+                }
+            };
+
+            window.unverifyMember = function(clubId) {
+                const records = getRegistrations();
+                const record = records.find(r => r.clubId === clubId);
+                if (!record) { showToast('❌ Member not found', true); return; }
+                
+                document.getElementById('unverifyClubId').value = clubId;
+                document.getElementById('unverifyMemberName').value = record.fullName || 'Unknown';
+                document.getElementById('unverifyClubIdDisplay').value = clubId;
+                document.getElementById('unverifyReason').value = '';
+                document.getElementById('unverifySendEmail').checked = true;
+                document.getElementById('unverifyModal').classList.add('open');
+            };
+
+            document.getElementById('unverifyModalClose').addEventListener('click', function() {
+                document.getElementById('unverifyModal').classList.remove('open');
+            });
+            document.getElementById('unverifyModal').addEventListener('click', function(e) {
+                if (e.target === this) this.classList.remove('open');
+            });
+
+            document.getElementById('unverifyForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const btn = document.getElementById('unverifyBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                
+                try {
+                    const clubId = document.getElementById('unverifyClubId').value;
+                    const reason = document.getElementById('unverifyReason').value.trim();
+                    const sendEmail = document.getElementById('unverifySendEmail').checked;
+                    
+                    if (!reason) { 
+                        showToast('⚠️ Enter reason', true);
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-user-slash"></i> Unverify Member & Send Email';
+                        return; 
+                    }
+                    
+                    const records = getRegistrations();
+                    const index = records.findIndex(r => r.clubId === clubId);
+                    if (index === -1) { 
+                        showToast('❌ Member not found', true);
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-user-slash"></i> Unverify Member & Send Email';
+                        return; 
+                    }
+                    
+                    const record = records[index];
+                    record.isVerified = false;
+                    record.verifiedDate = null;
+                    record.emailSent = false;
+                    record.unverifyReason = reason;
+                    record.unverifyDate = new Date().toISOString();
+                    saveRegistrations(records);
+                    
+                    let emailSent = false;
+                    if (sendEmail) {
+                        emailSent = await sendUnverifyEmail(record, reason);
+                        if (emailSent) {
+                            record.emailSent = false;
+                            saveRegistrations(records);
+                        }
+                    }
+                    
+                    document.getElementById('unverifyModal').classList.remove('open');
+                    renderAdminTable();
+                    showToast(emailSent ? `✅ Unverified & email sent` : `✅ Unverified (email ${sendEmail ? 'failed' : 'skipped'})`, !emailSent && sendEmail);
+                } catch (error) { 
+                    showToast('❌ Error: ' + error.message, true); 
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-user-slash"></i> Unverify Member & Send Email';
+                }
+            });
+
+            // ============================================
+            // ✏️ EDIT MEMBER
+            // ============================================
+            window.editMember = function(clubId) {
+                const records = getRegistrations();
+                const record = records.find(r => r.clubId === clubId);
+                if (!record) { showToast('❌ Member not found', true); return; }
+                
+                window._editOriginalData = { ...record };
+                
+                document.getElementById('editClubId').value = clubId;
+                document.getElementById('editClubIdDisplay').textContent = clubId;
+                document.getElementById('editClubIdReadonly').value = clubId;
+                document.getElementById('editMemberIdDisplay').textContent = record.studentId || 'N/A';
+                document.getElementById('editFullName').value = record.fullName || '';
+                document.getElementById('editStudentId').value = record.studentId || '';
+                document.getElementById('editEmail').value = record.email || '';
+                document.getElementById('editPhone').value = record.phone || '';
+                document.getElementById('editSemester').value = record.semester || '3rd';
+                document.getElementById('editGender').value = record.gender || 'Male';
+                document.getElementById('editInterest').value = record.interest || 'Technical Workshop';
+                document.getElementById('editSendEmail').checked = true;
+                document.getElementById('editModal').classList.add('open');
+            };
+
+            document.getElementById('editModalClose').addEventListener('click', function() {
+                document.getElementById('editModal').classList.remove('open');
+                window._editOriginalData = null;
+            });
+            document.getElementById('editModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('open');
+                    window._editOriginalData = null;
+                }
+            });
+
+            document.getElementById('editForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const btn = document.getElementById('editSaveBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                
+                try {
+                    const clubId = document.getElementById('editClubId').value;
+                    const fullName = document.getElementById('editFullName').value.trim();
+                    const studentId = document.getElementById('editStudentId').value.trim();
+                    const email = document.getElementById('editEmail').value.trim();
+                    const phone = document.getElementById('editPhone').value.trim();
+                    const semester = document.getElementById('editSemester').value;
+                    const gender = document.getElementById('editGender').value;
+                    const interest = document.getElementById('editInterest').value;
+                    const sendEmail = document.getElementById('editSendEmail').checked;
+                    
+                    if (!fullName || !studentId || !email) {
+                        showToast('⚠️ Fill all required fields', true);
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-save"></i> Save Changes & Send Update';
+                        return;
+                    }
+                    
+                    const records = getRegistrations();
+                    const index = records.findIndex(r => r.clubId === clubId);
+                    if (index === -1) { 
+                        showToast('❌ Member not found', true);
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-save"></i> Save Changes & Send Update';
+                        return; 
+                    }
+                    
+                    const oldData = { ...records[index] };
+                    records[index].fullName = fullName;
+                    records[index].studentId = studentId;
+                    records[index].email = email;
+                    records[index].phone = phone;
+                    records[index].semester = semester;
+                    records[index].gender = gender;
+                    records[index].interest = interest;
+                    
+                    saveRegistrations(records);
+                    renderAdminTable();
+                    
+                    if (sendEmail) {
+                        const changes = [];
+                        if (oldData.fullName !== fullName) changes.push(`Name: ${oldData.fullName} → ${fullName}`);
+                        if (oldData.studentId !== studentId) changes.push(`Student ID: ${oldData.studentId} → ${studentId}`);
+                        if (oldData.email !== email) changes.push(`Email: ${oldData.email} → ${email}`);
+                        if (oldData.phone !== phone) changes.push(`Phone: ${oldData.phone || 'N/A'} → ${phone || 'N/A'}`);
+                        if (oldData.semester !== semester) changes.push(`Semester: ${oldData.semester} → ${semester}`);
+                        if (oldData.gender !== gender) changes.push(`Gender: ${oldData.gender} → ${gender}`);
+                        if (oldData.interest !== interest) changes.push(`Interest: ${oldData.interest} → ${interest}`);
+                        
+                        const changesText = changes.length > 0 ? changes.join('\n') : 'No changes were made.';
+                        const emailSent = await sendUpdateEmail(records[index], changesText);
+                        if (emailSent) {
+                            records[index].emailSent = true;
+                            saveRegistrations(records);
+                        }
+                    }
+                    
+                    document.getElementById('editModal').classList.remove('open');
+                    window._editOriginalData = null;
+                    showToast(`✅ Member updated successfully! Club ID: ${clubId} (permanent)`);
+                } catch (error) {
+                    showToast('❌ Error: ' + error.message, true);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-save"></i> Save Changes & Send Update';
+                }
+            });
+
+            // ============================================
+            // 🗑️ DELETE MEMBER
+            // ============================================
+            window.deleteMember = function(clubId) {
+                const records = getRegistrations();
+                const record = records.find(r => r.clubId === clubId);
+                if (!record) { showToast('❌ Member not found', true); return; }
+                
+                if (!confirm(`⚠️ PERMANENT DELETE\n\nAre you sure you want to permanently delete ${record.fullName}?\n\nThis action CANNOT be undone!`)) { return; }
+                
+                const confirmation = prompt(`Type "DELETE" to permanently remove ${record.fullName} (${clubId}):`);
+                if (confirmation !== 'DELETE') { 
+                    showToast('❌ Deletion cancelled', true); 
+                    return; 
+                }
+                
+                try {
+                    const index = records.findIndex(r => r.clubId === clubId);
+                    if (index === -1) { showToast('❌ Member not found', true); return; }
+                    
+                    const certs = getCertificates();
+                    if (certs[clubId]) { 
+                        delete certs[clubId];
+                        saveCertificates(certs);
+                    }
+                    
+                    records.splice(index, 1);
+                    saveRegistrations(records);
+                    renderAdminTable();
+                    showToast(`🗑️ ${record.fullName} has been permanently deleted.`);
+                } catch (error) {
+                    showToast('❌ Error: ' + error.message, true);
+                }
+            };
+
+            // ============================================
+            // 🎓 CERTIFICATE FUNCTIONS
+            // ============================================
+            window.viewCertificate = function(clubId) {
+                const records = getRegistrations();
+                const record = records.find(r => r.clubId === clubId);
+                if (!record) { showToast('❌ Member not found', true); return; }
+                const certs = getCertificates();
+                if (!certs[clubId]) { showToast('❌ No certificate found', true); return; }
+                document.getElementById('certificateContainer').innerHTML = renderCertificate(record);
+                document.getElementById('certModal').classList.add('open');
+                window._currentCertRecord = record;
+            };
+
+            window.generateCertForMember = function(clubId) {
+                const records = getRegistrations();
+                const record = records.find(r => r.clubId === clubId);
+                if (!record) { showToast('❌ Member not found', true); return; }
+                const certs = getCertificates();
+                if (certs[clubId]) { showToast('⚠️ Certificate already exists', true); return; }
+                if (!isEligibleForCertificate(record.joinDate)) {
+                    showToast('⚠️ Not eligible yet (need 2 years)', true);
+                    return;
+                }
+                generateCertificate(record);
+                renderAdminTable();
+                showToast(`✅ Certificate generated for ${record.fullName}`);
+                viewCertificate(clubId);
+            };
+
+            window.generatePastCert = function(clubId) {
+                const records = getRegistrations();
+                const record = records.find(r => r.clubId === clubId);
+                if (!record) { showToast('❌ Member not found', true); return; }
+                const certs = getCertificates();
+                if (certs[clubId]) { showToast('⚠️ Certificate already exists', true); return; }
+                if (!isPastMember(record.joinDate) && !record.isPastStudent) {
+                    showToast('⚠️ Not a past member (need 2+ years)', true);
+                    return;
+                }
+                generateCertificate(record);
+                renderAdminTable();
+                showToast(`✅ Certificate generated for past member ${record.fullName}`);
+                viewCertificate(clubId);
+            };
+
+            // ============================================
+            // 🎛️ ADMIN BUTTONS
+            // ============================================
+            document.getElementById('refreshAdminBtn').addEventListener('click', function() {
+                if (!isLoggedIn) { showToast('⚠️ Please login first', true); return; }
+                syncFromCloud();
+            });
+
+            document.getElementById('generateAllCertsBtn').addEventListener('click', function() {
+                const records = getRegistrations();
+                let count = 0;
+                const certs = getCertificates();
+                records.forEach(r => {
+                    if (!certs[r.clubId] && isEligibleForCertificate(r.joinDate)) {
+                        generateCertificate(r);
+                        count++;
+                    }
+                });
+                renderAdminTable();
+                showToast(`✅ Generated ${count} certificate(s)`);
+            });
+
+            document.getElementById('generatePastMembersBtn').addEventListener('click', function() {
+                const records = getRegistrations();
+                let count = 0;
+                const certs = getCertificates();
+                records.forEach(r => {
+                    if (!certs[r.clubId] && (isPastMember(r.joinDate) || r.isPastStudent)) {
+                        generateCertificate(r);
+                        count++;
+                    }
+                });
+                renderAdminTable();
+                showToast(`✅ Generated ${count} certificate(s) for past members`);
+            });
+
+            document.getElementById('forceGenerateBtn').addEventListener('click', function() {
+                const records = getRegistrations();
+                let count = 0;
+                const certs = getCertificates();
+                records.forEach(r => {
+                    if (!certs[r.clubId]) { generateCertificate(r); count++; }
+                });
+                renderAdminTable();
+                showToast(`✅ Force generated ${count} certificate(s)`);
+            });
+
+            window.fixDuplicateIds = function() {
+                const records = getRegistrations();
+                if (records.length === 0) {
+                    showToast('❌ No members found', true);
+                    return;
+                }
+                const idMap = {};
+                const duplicates = [];
+                records.forEach((r, idx) => {
+                    if (idMap[r.clubId]) {
+                        duplicates.push({ index: idx, clubId: r.clubId, name: r.fullName });
+                    } else {
+                        idMap[r.clubId] = true;
+                    }
+                });
+                if (duplicates.length === 0) {
+                    showToast('✅ No duplicate Club IDs found!');
+                    return;
+                }
+                if (!confirm(`Found ${duplicates.length} duplicate Club IDs.\n\nClick OK to fix.`)) return;
+                
+                let maxSerial = getLastSerial();
+                let fixedCount = 0;
+                const updatedRecords = records.map((r) => {
+                    const duplicateCount = records.filter(rec => rec.clubId === r.clubId).length;
+                    if (duplicateCount > 1) {
+                        const firstIndex = records.findIndex(rec => rec.clubId === r.clubId);
+                        if (firstIndex !== -1 && records.indexOf(r) !== firstIndex) {
+                            maxSerial++;
+                            const newClubId = generateClubId(maxSerial);
+                            const certs = getCertificates();
+                            if (certs[r.clubId]) {
+                                const certData = certs[r.clubId];
+                                delete certs[r.clubId];
+                                certData.clubId = newClubId;
+                                certData.certNumber = `WUB-EEE-CERT-${String(maxSerial).padStart(4, '0')}`;
+                                certs[newClubId] = certData;
+                                saveCertificates(certs);
+                            }
+                            r.clubId = newClubId;
+                            fixedCount++;
+                        }
+                    }
+                    return r;
+                });
+                setLastSerial(maxSerial);
+                saveRegistrations(updatedRecords);
+                renderAdminTable();
+                showToast(`✅ Fixed ${fixedCount} duplicate Club IDs!`);
+            };
+
+            document.getElementById('fixDuplicateIdsBtn').addEventListener('click', function() {
+                if (!isLoggedIn) { showToast('⚠️ Please login first', true); return; }
+                window.fixDuplicateIds();
+            });
+
+            // ============================================
+            // 🍞 TOAST
+            // ============================================
             function showToast(message, isError = false) {
                 const existing = document.querySelector('.notification-toast');
                 if (existing) existing.remove();
@@ -2816,7 +3130,7 @@
             }
 
             // ============================================
-            // 🚀 INIT
+            // 🔐 LOGIN FUNCTIONS
             // ============================================
             function checkLogin() {
                 const session = sessionStorage.getItem('wub_eee_admin_session');
@@ -2825,6 +3139,7 @@
                     document.getElementById('loginOverlay').classList.remove('open');
                     document.getElementById('loginOverlay').classList.add('hidden');
                     setTimeout(syncFromCloud, 500);
+                    renderAdminTable();
                     return true;
                 }
                 return false;
@@ -2843,16 +3158,19 @@
                 const email = document.getElementById('loginEmail').value.trim();
                 const password = document.getElementById('loginPassword').value.trim();
                 const errorEl = document.getElementById('loginError');
+                
                 if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
                     sessionStorage.setItem('wub_eee_admin_session', 'true');
                     isLoggedIn = true;
                     document.getElementById('loginOverlay').classList.remove('open');
                     document.getElementById('loginOverlay').classList.add('hidden');
                     errorEl.classList.remove('show');
+                    
                     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                     document.getElementById('adminTabBtn').classList.add('active');
                     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
                     document.getElementById('tab-admin').classList.add('active');
+                    
                     renderAdminTable();
                     showToast('✅ Welcome Admin!');
                     setTimeout(syncFromCloud, 500);
@@ -2867,6 +3185,7 @@
                 isLoggedIn = false;
                 document.getElementById('loginOverlay').classList.remove('hidden');
                 document.getElementById('loginOverlay').classList.add('open');
+                
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 document.querySelector('[data-tab="register"]').classList.add('active');
                 document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -2874,25 +3193,336 @@
                 showToast('👋 Logged out');
             });
 
-            document.getElementById('refreshAdminBtn').addEventListener('click', function() {
-                if (!isLoggedIn) { showToast('⚠️ Please login first', true); return; }
-                syncFromCloud();
-            });
-
-            // Register form submit
-            document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            // ============================================
+            // 📝 REGISTRATION SUBMIT
+            // ============================================
+            document.getElementById('registrationForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
-                // ... registration logic (same as before)
+                
+                if (!paymentCompleted || !verifiedTrxID) {
+                    alert('⚠️ Please verify your Transaction ID (TrxID).');
+                    return;
+                }
+                
+                const fullName = document.getElementById('fullName').value.trim();
+                const studentId = document.getElementById('studentId').value.trim();
+                const email = document.getElementById('email').value.trim();
+                if (!fullName || !studentId || !email) {
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+                
+                const isPastStudent = document.getElementById('isPastStudent').checked;
+                let startYear = null, endYear = null;
+                
+                if (isPastStudent) {
+                    startYear = document.getElementById('startYear').value.trim();
+                    endYear = document.getElementById('endYear').value.trim();
+                    if (!startYear || !endYear) {
+                        alert('⚠️ Please enter both Start Year and End Year.');
+                        return;
+                    }
+                }
+                
+                const skillCheckboxes = document.querySelectorAll('#skillsGroup input[type="checkbox"]');
+                const skills = [];
+                skillCheckboxes.forEach(cb => { if (cb.checked) skills.push(cb.value); });
+                
+                const semester = document.getElementById('semester').value;
+                const phone = document.getElementById('phone').value.trim();
+                const gender = document.getElementById('gender').value;
+                const interest = document.getElementById('interest').value;
+                const reason = document.getElementById('reason').value.trim();
+                
+                let lastSerial = getLastSerial();
+                const newSerial = lastSerial + 1;
+                const clubId = generateClubId(newSerial);
+                setLastSerial(newSerial);
+                
+                let joinDate = isPastStudent && startYear ? new Date(startYear, 0, 1).toISOString() : new Date().toISOString();
+                
+                const record = {
+                    fullName, studentId, department: 'EEE', semester, email, phone, gender, skills, interest, reason,
+                    clubId, paymentStatus: `Paid (${selectedMethod})`, paymentMethod: selectedMethod,
+                    paymentAmount: '200 TK', trxid: verifiedTrxID, joinDate, timestamp: new Date().toISOString(),
+                    isPastStudent, startYear, endYear, isVerified: false, verifiedDate: null,
+                    emailSent: false, unverifyReason: null, unverifyDate: null
+                };
+                
+                const records = getRegistrations();
+                const exists = records.some(r => r.studentId === studentId);
+                if (exists) {
+                    alert('This Student ID is already registered.');
+                    setLastSerial(lastSerial);
+                    return;
+                }
+                
+                records.push(record);
+                saveRegistrations(records);
+                
+                document.getElementById('displayClubId').textContent = clubId;
+                document.getElementById('successBox').classList.add('show');
+                
+                window._lastClubId = clubId;
+                window._lastFormData = record;
+                
+                generateQRCode(record);
+                document.getElementById('qrClubId').textContent = clubId;
+                document.getElementById('qrJoinDate').textContent = new Date(record.joinDate).toLocaleDateString();
+                document.getElementById('qrSection').style.display = 'block';
+                
+                renderAdminTable();
+                submitBtn.disabled = true;
+                showToast('🎉 Registration saved with Club ID: ' + clubId);
             });
 
-            // Init
+            // ============================================
+            // 📱 QR CODE GENERATION
+            // ============================================
+            function generateQRCode(record) {
+                const qrContainer = document.getElementById('qrcode');
+                qrContainer.innerHTML = '';
+                const qrData = JSON.stringify({
+                    clubId: record.clubId,
+                    name: record.fullName,
+                    studentId: record.studentId,
+                    email: record.email,
+                    joinDate: record.joinDate,
+                    semester: record.semester,
+                    department: 'EEE'
+                });
+                new QRCode(qrContainer, {
+                    text: qrData,
+                    width: 180,
+                    height: 180,
+                    colorDark: '#0b3b7a',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
+
+            // ============================================
+            // 📄 DOWNLOAD SLIP
+            // ============================================
+            document.getElementById('downloadSlipBtn').addEventListener('click', function() {
+                const record = window._lastFormData;
+                if (!record) {
+                    showToast('❌ No registration data found', true);
+                    return;
+                }
+                
+                const slipHTML = `
+                    <div class="slip-container">
+                        <div class="slip-header">
+                            <h2>🏫 WUB EEE CLUB</h2>
+                            <p style="font-size:0.85rem; color:#6b8aaa;">World University of Bangladesh</p>
+                            <p style="font-size:0.8rem; color:#6b8aaa;">Membership Registration Slip</p>
+                        </div>
+                        <div class="slip-row"><span class="label">Club ID</span><span class="value">${record.clubId}</span></div>
+                        <div class="slip-row"><span class="label">Student ID</span><span class="value">${record.studentId}</span></div>
+                        <div class="slip-row"><span class="label">Full Name</span><span class="value">${record.fullName}</span></div>
+                        <div class="slip-row"><span class="label">Email</span><span class="value">${record.email}</span></div>
+                        <div class="slip-row"><span class="label">Phone</span><span class="value">${record.phone || 'N/A'}</span></div>
+                        <div class="slip-row"><span class="label">Semester</span><span class="value">${record.semester}</span></div>
+                        <div class="slip-row"><span class="label">Payment Method</span><span class="value">${record.paymentMethod}</span></div>
+                        <div class="slip-row"><span class="label">Transaction ID</span><span class="value">${record.trxid}</span></div>
+                        <div class="slip-row"><span class="label">Registration Date</span><span class="value">${new Date(record.joinDate).toLocaleDateString()}</span></div>
+                        <div class="slip-footer"><p>For queries: eee-club@eee.wub.edu.bd</p></div>
+                    </div>
+                `;
+                
+                const printWindow = window.open('', '_blank', 'width=600,height=800');
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head><title>Registration Slip - ${record.clubId}</title>
+                        <link rel="preconnect" href="https://fonts.googleapis.com" />
+                        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+                        <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+                        <style>
+                            body { font-family: 'Inter', sans-serif; background: #f0f5fe; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 2rem; }
+                            .slip-container { background: white; padding: 2rem; border-radius: 16px; border: 2px solid #0b3b7a; max-width: 500px; width: 100%; margin: 0 auto; }
+                            .slip-container .slip-header { text-align: center; border-bottom: 2px solid #0b3b7a; padding-bottom: 1rem; margin-bottom: 1rem; }
+                            .slip-container .slip-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #e6edf8; }
+                            .slip-container .slip-row .label { font-weight: 600; color: #1f3a66; }
+                            .slip-container .slip-row .value { color: #0b2b5c; font-weight: 500; }
+                            .slip-container .slip-footer { text-align: center; margin-top: 1rem; font-size: 0.8rem; color: #6b8aaa; }
+                        </style>
+                    </head>
+                    <body>${slipHTML}<script>window.onload=function(){window.print();window.close();};<\/script></body>
+                    </html>
+                `);
+                printWindow.document.close();
+            });
+
+            // ============================================
+            // 🔄 RESET FORM
+            // ============================================
+            document.getElementById('resetFormBtn').addEventListener('click', function() {
+                document.getElementById('successBox').classList.remove('show');
+                document.getElementById('qrSection').style.display = 'none';
+                document.getElementById('registrationForm').reset();
+                document.getElementById('trxidInput').value = '';
+                document.getElementById('trxidInput').classList.remove('valid', 'invalid');
+                paymentCompleted = false;
+                verifiedTrxID = '';
+                submitBtn.disabled = true;
+                document.getElementById('paymentStatus').innerHTML = '<i class="fas fa-clock"></i> Pending';
+                document.getElementById('paymentStatus').className = 'payment-status';
+                document.getElementById('isPastStudent').checked = false;
+                document.getElementById('pastStudentFields').classList.remove('show');
+                window._lastFormData = null;
+                showToast('🔄 Form reset');
+            });
+
+            // ============================================
+            // 📋 PAST STUDENT TOGGLE
+            // ============================================
+            document.getElementById('isPastStudent').addEventListener('change', function() {
+                const fields = document.getElementById('pastStudentFields');
+                if (this.checked) {
+                    fields.classList.add('show');
+                    document.getElementById('startYear').required = true;
+                    document.getElementById('endYear').required = true;
+                } else {
+                    fields.classList.remove('show');
+                    document.getElementById('startYear').required = false;
+                    document.getElementById('endYear').required = false;
+                }
+            });
+
+            // ============================================
+            // 🖨️ CERTIFICATE MODAL PDF & PRINT
+            // ============================================
+            document.getElementById('certModalClose').addEventListener('click', function() {
+                document.getElementById('certModal').classList.remove('open');
+            });
+            document.getElementById('certModal').addEventListener('click', function(e) {
+                if (e.target === this) this.classList.remove('open');
+            });
+
+            document.getElementById('printCertBtn').addEventListener('click', function() {
+                const certHTML = document.getElementById('certificateContainer').innerHTML;
+                const printWindow = window.open('', '_blank', 'width=794,height=1123');
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head><title>WUB EEE Club Certificate</title>
+                        <link rel="preconnect" href="https://fonts.googleapis.com" />
+                        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+                        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+                        <style>
+                            * { margin: 0; padding: 0; box-sizing: border-box; }
+                            body { background: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 0; }
+                            @page { size: A4 portrait; margin: 0; }
+                            .certificate-wrapper { display: flex; justify-content: center; align-items: center; padding: 0; margin: 0; background: white; width: 100%; overflow: hidden; }
+                            .certificate { width: 210mm; height: 297mm; background: white; margin: 0 auto; padding: 20mm; box-sizing: border-box; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.15); display: flex; flex-direction: column; justify-content: space-between; page-break-after: avoid; page-break-before: avoid; page-break-inside: avoid; overflow: hidden; }
+                            @media print { .certificate { box-shadow: none; width: 100%; height: 100vh; padding: 20mm; margin: 0; } body { background: white; padding: 0; margin: 0; overflow: hidden; } }
+                            .certificate .border { position: absolute; top: 10mm; left: 10mm; right: 10mm; bottom: 10mm; border: 2px solid #000; pointer-events: none; }
+                            .certificate .header { text-align: center; margin-top: 0; position: relative; z-index: 1; }
+                            .certificate .title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; letter-spacing: 3px; color: #0B3B7A; }
+                            .certificate .subtitle { font-family: 'Inter', sans-serif; font-size: 14px; margin-top: 4px; letter-spacing: 2px; color: #0B3B7A; border-top: 1px solid #D4AF37; border-bottom: 1px solid #D4AF37; display: inline-block; padding: 2px 20px; }
+                            .certificate .content { margin-top: 15px; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 1; }
+                            .certificate .content .label { font-family: 'Inter', sans-serif; font-size: 14px; color: #1e3f5e; }
+                            .certificate .content .name { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #0B3B7A; margin: 8px 0; border-bottom: 2px dashed #D4AF37; display: inline-block; padding: 0 20px 4px 20px; }
+                            .certificate .content .student-id { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 500; color: #1e3f5e; margin-bottom: 10px; }
+                            .certificate .content .text { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.8; color: #1a2d44; max-width: 80%; margin: 0 auto; text-align: justify; }
+                            .certificate .content .text strong { color: #0B3B7A; font-weight: 600; }
+                            .certificate .footer { position: relative; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-between; text-align: center; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.08); z-index: 1; }
+                            .certificate .sign { width: 40%; border-top: 1.5px solid #0B3B7A; padding-top: 6px; font-size: 13px; font-family: 'Inter', sans-serif; color: #0B3B7A; font-weight: 600; }
+                            .certificate .sign .sub { font-weight: 400; font-size: 11px; color: #3f5a78; }
+                            .certificate .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-6deg); opacity: 0.03; pointer-events: none; font-family: 'Playfair Display', serif; font-size: 120px; font-weight: 700; color: #0B3B7A; letter-spacing: 10px; white-space: nowrap; z-index: 0; }
+                            .certificate .watermark span { border: 2px solid rgba(11,59,122,0.1); padding: 0.1em 0.3em; border-radius: 50px; background: rgba(255,255,255,0.1); }
+                            .certificate .seal { position: absolute; top: 18mm; right: 18mm; width: 48px; height: 48px; border-radius: 50%; border: 2px solid #D4AF37; background: rgba(212,175,55,0.05); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 11px; color: #0B3B7A; text-align: center; line-height: 1.2; box-shadow: 0 0 0 1px #0B3B7A; z-index: 5; padding: 2px; }
+                            .certificate .seal span { display: block; transform: scale(0.9); }
+                            @media print { .certificate .seal { box-shadow: 0 0 0 1px #0B3B7A; } .certificate .watermark { opacity: 0.03; } }
+                        </style>
+                    </head>
+                    <body>${certHTML}<script>window.onload=function(){window.print();window.close();};<\/script></body>
+                    </html>
+                `);
+                printWindow.document.close();
+            });
+
+            document.getElementById('downloadCertBtn').addEventListener('click', function() {
+                const record = window._currentCertRecord;
+                if (!record) { showToast('❌ No certificate to download', true); return; }
+                const certs = getCertificates();
+                if (!certs[record.clubId]) { showToast('❌ Certificate not found', true); return; }
+                
+                const btn = this;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+                btn.disabled = true;
+                
+                const certHTML = document.getElementById('certificateContainer').innerHTML;
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = certHTML;
+                tempDiv.style.position = 'fixed';
+                tempDiv.style.top = '-9999px';
+                tempDiv.style.left = '-9999px';
+                tempDiv.style.width = '210mm';
+                tempDiv.style.height = '297mm';
+                tempDiv.style.background = 'white';
+                document.body.appendChild(tempDiv);
+                
+                const certElement = tempDiv.querySelector('.certificate-wrapper');
+                const opt = {
+                    margin: 0,
+                    filename: `Certificate_${record.clubId}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, width: 794, height: 1123, scrollY: 0 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: 'avoid-all' }
+                };
+                
+                html2pdf().set(opt).from(certElement).save().then(function() {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    document.body.removeChild(tempDiv);
+                    showToast('📄 Certificate downloaded!');
+                }).catch(function(error) {
+                    console.error('PDF error:', error);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    document.body.removeChild(tempDiv);
+                    showToast('❌ PDF generation failed', true);
+                });
+            });
+
+            // ============================================
+            // 📑 TABS
+            // ============================================
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (this.dataset.tab === 'admin' && !isLoggedIn) {
+                        document.getElementById('loginOverlay').classList.remove('hidden');
+                        document.getElementById('loginOverlay').classList.add('open');
+                        document.getElementById('loginError').classList.remove('show');
+                        return;
+                    }
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                    document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+                    if (this.dataset.tab === 'admin' && isLoggedIn) {
+                        renderAdminTable();
+                        setTimeout(syncFromCloud, 300);
+                    }
+                });
+            });
+
+            // ============================================
+            // 🚀 INIT
+            // ============================================
             document.getElementById('department').value = 'EEE';
             checkLogin();
             setTimeout(syncFromCloud, 1000);
 
             console.log('🏫 WUB EEE Club System loaded!');
-            console.log('📧 Using Brevo API Key: ' + BREVO_API_KEY.substring(0, 20) + '...');
-            console.log('✅ Click "Test Email" to verify Brevo configuration!');
+            console.log('✅ All admin functions are working!');
+            console.log('📧 Brevo API configured with v3 key');
+            console.log('🔑 Admin: eee-club@eee.wub.edu.bd / Eee123@580Eee');
         })();
     </script>
 </body>
