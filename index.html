@@ -10,9 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- EmailJS SDK (Fallback) -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
-    </script>
+    <!-- Brevo SDK (formerly Sendinblue) -->
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
     <style>
         /* ============================================
            MAIN SYSTEM STYLES
@@ -705,13 +704,6 @@
         }
         .admin-actions .btn-test-email:hover {
             background: #d48a1a;
-        }
-        .admin-actions .btn-brevo-test {
-            background: #0d7a3b;
-            color: white;
-        }
-        .admin-actions .btn-brevo-test:hover {
-            background: #0f8f47;
         }
 
         .admin-table-wrap {
@@ -1810,8 +1802,7 @@
                 <button class="btn-purple" id="generatePastMembersBtn"><i class="fas fa-history"></i> Generate for Past Members</button>
                 <button class="btn-warning" id="forceGenerateBtn"><i class="fas fa-bolt"></i> Force Generate (Test)</button>
                 <button class="btn-fix" id="fixDuplicateIdsBtn"><i class="fas fa-hammer"></i> Fix Duplicate IDs</button>
-                <button class="btn-test-email" id="testEmailBtn"><i class="fas fa-envelope"></i> Test EmailJS</button>
-                <button class="btn-brevo-test" id="brevoTestBtn"><i class="fas fa-envelope"></i> Test Brevo</button>
+                <button class="btn-test-email" id="testEmailBtn"><i class="fas fa-envelope"></i> Test Email</button>
                 <button class="btn-danger" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
 
@@ -1962,411 +1953,287 @@
     <script>
         (function() {
             // ============================================
-            // JSONBin.io CONFIGURATION - FIXED
+            // Brevo (Sendinblue) Email Configuration
             // ============================================
-            const JSONBIN_BIN_ID = '6a3a40f6f5f4af5e2921c0d2';
-            const JSONBIN_API_KEY = '$2a$10$uxxlv8nJapUJj6YbaVCY4u1EBDwX6.jOssFoyi0I7e8CyDKeTIc5W';
-            // Fixed: Use the correct JSONBin.io V3 API endpoint
-            const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
-            // For latest version, use: https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest
+            // SMTP configuration for Brevo
+            // You need to replace these with your actual Brevo SMTP credentials
+            const BREVO_SMTP_HOST = 'smtp-relay.brevo.com';
+            const BREVO_SMTP_PORT = 587;
+            const BREVO_SMTP_USER = 'eee-club@eee.wub.edu.bd'; // Your Brevo SMTP login email
+            const BREVO_SMTP_PASS = 'phnp efjm poug butc'; // Your Brevo SMTP password
+            const FROM_EMAIL = 'eee-club@eee.wub.edu.bd';
+            const FROM_NAME = 'WUB EEE Club';
 
             // ============================================
-            // BREVO CONFIGURATION (Primary Email Service)
+            // Email Sending Functions using SMTP.js
             // ============================================
-            const BREVO_API_KEY = 'xsmtpsib-0f5b638ec8fa59d57123ea18ac2d3ca2f7122fa5ba6719342f7f98496f1a8625-Gg7nTTbK2bRYyM36';
-            const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
-            
-            // Brevo Template IDs - Update these with your actual IDs from Brevo
-            const BREVO_TEMPLATE_VERIFIED = 1;    // Membership Verified template ID
-            const BREVO_TEMPLATE_UNVERIFIED = 2;  // Unverified template ID
-
-            // ============================================
-            // EmailJS Configuration (Fallback)
-            // ============================================
-            const EMAILJS_PUBLIC_KEY = 'mZR55c2c8zMmSqBLL';
-            const EMAILJS_SERVICE_ID = 'service_3ectzds';
-            const EMAILJS_TEMPLATE_VERIFIED = 'template_f00pkjl';
-            const EMAILJS_TEMPLATE_UNVERIFIED = 'template_hzraam8';
-
-            // Initialize EmailJS (fallback)
-            emailjs.init({
-                publicKey: EMAILJS_PUBLIC_KEY,
-            });
-
-            // ============================================
-            // BREVO EMAIL FUNCTIONS
-            // ============================================
-            
-            // Send Verified Email via Brevo
-            async function sendVerifiedEmailBrevo(record) {
+            async function sendEmail(to, subject, htmlContent) {
                 try {
-                    showToast('📧 Sending verification email via Brevo...');
+                    console.log('📧 Sending email to:', to);
+                    console.log('📧 Subject:', subject);
 
-                    const emailData = {
-                        templateId: BREVO_TEMPLATE_VERIFIED,
-                        to: [{ email: record.email, name: record.fullName }],
-                        params: {
-                            to_name: record.fullName,
-                            club_id: record.clubId,
-                            student_id: record.studentId,
-                            semester: record.semester || 'N/A',
-                            payment_method: record.paymentMethod || 'bKash',
-                            trxid: record.trxid || 'N/A',
-                            join_date: new Date(record.joinDate).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                            })
-                        },
-                        sender: {
-                            name: 'WUB EEE Club',
-                            email: 'eee-club@eee.wub.edu.bd'
-                        },
-                        replyTo: {
-                            email: 'eee-club@eee.wub.edu.bd',
-                            name: 'WUB EEE Club'
-                        }
-                    };
-
-                    console.log('📧 Sending Brevo verification email with template:', BREVO_TEMPLATE_VERIFIED);
-
-                    const response = await fetch(BREVO_API_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'api-key': BREVO_API_KEY
-                        },
-                        body: JSON.stringify(emailData)
+                    const response = await Email.send({
+                        Host: BREVO_SMTP_HOST,
+                        Port: BREVO_SMTP_PORT,
+                        Username: BREVO_SMTP_USER,
+                        Password: BREVO_SMTP_PASS,
+                        To: to,
+                        From: FROM_EMAIL,
+                        FromName: FROM_NAME,
+                        Subject: subject,
+                        Body: htmlContent,
+                        IsHTML: true,
                     });
 
-                    const result = await response.json();
-
-                    if (response.ok) {
-                        console.log('📧 Brevo verification email sent!', result);
-                        showToast(`✅ Verification email sent to ${record.email} via Brevo`);
-                        return true;
-                    } else {
-                        console.error('❌ Brevo API error:', result);
-                        showToast(`⚠️ Brevo error: ${result.message || 'Unknown error'}`, true);
-                        return false;
-                    }
-
+                    console.log('📧 Email sent successfully!', response);
+                    return { success: true, response: response };
                 } catch (error) {
-                    console.error('❌ Brevo verification email failed:', error);
-                    showToast(`⚠️ Could not send email: ${error.message}`, true);
-                    return false;
-                }
-            }
-
-            // Send Unverified Email via Brevo
-            async function sendUnverifiedEmailBrevo(record, reason) {
-                try {
-                    showToast('📧 Sending unverification email via Brevo...');
-
-                    const emailData = {
-                        templateId: BREVO_TEMPLATE_UNVERIFIED,
-                        to: [{ email: record.email, name: record.fullName }],
-                        params: {
-                            to_name: record.fullName,
-                            club_id: record.clubId,
-                            student_id: record.studentId,
-                            reason: reason,
-                            unverified_date: new Date().toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            }),
-                            trxid: record.trxid || 'N/A'
-                        },
-                        sender: {
-                            name: 'WUB EEE Club',
-                            email: 'eee-club@eee.wub.edu.bd'
-                        },
-                        replyTo: {
-                            email: 'eee-club@eee.wub.edu.bd',
-                            name: 'WUB EEE Club'
-                        }
-                    };
-
-                    console.log('📧 Sending Brevo unverification email with template:', BREVO_TEMPLATE_UNVERIFIED);
-
-                    const response = await fetch(BREVO_API_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'api-key': BREVO_API_KEY
-                        },
-                        body: JSON.stringify(emailData)
-                    });
-
-                    const result = await response.json();
-
-                    if (response.ok) {
-                        console.log('📧 Brevo unverification email sent!', result);
-                        showToast(`✅ Unverification email sent to ${record.email} via Brevo`);
-                        return true;
-                    } else {
-                        console.error('❌ Brevo API error:', result);
-                        showToast(`⚠️ Brevo error: ${result.message || 'Unknown error'}`, true);
-                        return false;
-                    }
-
-                } catch (error) {
-                    console.error('❌ Brevo unverification email failed:', error);
-                    showToast(`⚠️ Could not send email: ${error.message}`, true);
-                    return false;
+                    console.error('❌ Email sending failed:', error);
+                    return { success: false, error: error };
                 }
             }
 
             // ============================================
-            // HYBRID EMAIL FUNCTIONS (Try Brevo first, then EmailJS)
+            // Email Template Functions
             // ============================================
-            
-            // Send Verification Email - Hybrid
+            function buildConfirmationEmailHTML(record) {
+                const joinDate = new Date(record.joinDate).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                return `
+                    <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border: 1px solid #e6edf8; border-radius: 16px;">
+                        <div style="text-align: center; border-bottom: 2px solid #0b3b7a; padding-bottom: 20px; margin-bottom: 20px;">
+                            <h2 style="color: #0b3b7a; font-size: 24px; margin: 0;">🏫 WUB EEE CLUB</h2>
+                            <p style="color: #6b8aaa; font-size: 14px; margin: 5px 0 0 0;">World University of Bangladesh</p>
+                        </div>
+                        
+                        <div style="text-align: center; margin-bottom: 25px;">
+                            <h3 style="color: #1b754b; font-size: 20px; margin: 0 0 10px 0;">✅ Membership Confirmed!</h3>
+                            <p style="color: #0b2b5c; font-size: 16px; margin: 0;">Dear <strong>${escapeHtml(record.fullName)}</strong>,</p>
+                        </div>
+
+                        <div style="background: #f8faff; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                            <p style="margin: 5px 0; color: #1f3a66;">We are pleased to inform you that your registration for the <strong>WUB EEE Club</strong> has been successfully verified!</p>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: #0b2b5c; margin-bottom: 10px;">📋 Membership Details</h4>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Club ID</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b3b7a; font-weight: 700;">${escapeHtml(record.clubId)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Student ID</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.studentId)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Department</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">EEE</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Semester</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.semester)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Payment Method</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.paymentMethod)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Transaction ID</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c; font-family: monospace;">${escapeHtml(record.trxid)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; font-weight: 600; color: #1f3a66;">Join Date</td>
+                                    <td style="padding: 8px 0; color: #0b2b5c;">${joinDate}</td>
+                                </tr>
+                                ${record.isPastStudent ? `
+                                <tr>
+                                    <td style="padding: 8px 0; font-weight: 600; color: #1f3a66;">Past Member</td>
+                                    <td style="padding: 8px 0; color: #0b2b5c;">Yes (${escapeHtml(record.startYear)} - ${escapeHtml(record.endYear)})</td>
+                                </tr>
+                                ` : ''}
+                            </table>
+                        </div>
+
+                        <div style="background: #e5f2e9; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #1b754b;">
+                            <p style="margin: 0; color: #0f422b; font-size: 14px;">
+                                <strong>💳 Payment Information</strong><br>
+                                Amount: 200 TK<br>
+                                Method: ${escapeHtml(record.paymentMethod)}<br>
+                                TrxID: ${escapeHtml(record.trxid)}
+                            </p>
+                        </div>
+
+                        <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e6edf8; font-size: 12px; color: #6b8aaa;">
+                            <p style="margin: 5px 0;">This is a system-generated confirmation email from WUB EEE Club.</p>
+                            <p style="margin: 5px 0;">For any queries, contact: eee-club@eee.wub.edu.bd</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function buildUnverifyEmailHTML(record, reason) {
+                const unverifyDate = new Date().toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                return `
+                    <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border: 1px solid #e6edf8; border-radius: 16px;">
+                        <div style="text-align: center; border-bottom: 2px solid #b22234; padding-bottom: 20px; margin-bottom: 20px;">
+                            <h2 style="color: #b22234; font-size: 24px; margin: 0;">⚠️ WUB EEE CLUB</h2>
+                            <p style="color: #6b8aaa; font-size: 14px; margin: 5px 0 0 0;">World University of Bangladesh</p>
+                        </div>
+                        
+                        <div style="text-align: center; margin-bottom: 25px;">
+                            <h3 style="color: #b22234; font-size: 20px; margin: 0 0 10px 0;">❌ Membership Unverified</h3>
+                            <p style="color: #0b2b5c; font-size: 16px; margin: 0;">Dear <strong>${escapeHtml(record.fullName)}</strong>,</p>
+                        </div>
+
+                        <div style="background: #fff5f5; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #f5c6c6;">
+                            <p style="margin: 0; color: #b22234; font-size: 14px;">
+                                <strong>We regret to inform you that your membership verification has been unsuccessful.</strong>
+                            </p>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: #0b2b5c; margin-bottom: 10px;">📋 Reason for Unverification</h4>
+                            <div style="background: #f8faff; padding: 15px; border-radius: 8px; border-left: 4px solid #b22234;">
+                                <p style="margin: 0; color: #1f3a66; font-size: 14px;">${escapeHtml(reason)}</p>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: #0b2b5c; margin-bottom: 10px;">📋 Membership Details</h4>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Club ID</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b3b7a; font-weight: 700;">${escapeHtml(record.clubId)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Student ID</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.studentId)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; font-weight: 600; color: #1f3a66;">Transaction ID</td>
+                                    <td style="padding: 8px 0; color: #0b2b5c; font-family: monospace;">${escapeHtml(record.trxid || 'N/A')}</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div style="background: #f8faff; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                            <p style="margin: 0; color: #1f3a66; font-size: 14px;">
+                                <strong>📌 Next Steps:</strong><br>
+                                Please contact the club administration to resolve this issue.<br>
+                                You may need to resubmit your payment information or provide additional documentation.
+                            </p>
+                        </div>
+
+                        <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e6edf8; font-size: 12px; color: #6b8aaa;">
+                            <p style="margin: 5px 0;">This is a system-generated notification from WUB EEE Club.</p>
+                            <p style="margin: 5px 0;">For any queries, contact: eee-club@eee.wub.edu.bd</p>
+                            <p style="margin: 5px 0;">Unverified on: ${unverifyDate}</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function buildUpdateEmailHTML(record, changes) {
+                return `
+                    <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border: 1px solid #e6edf8; border-radius: 16px;">
+                        <div style="text-align: center; border-bottom: 2px solid #0b3b7a; padding-bottom: 20px; margin-bottom: 20px;">
+                            <h2 style="color: #0b3b7a; font-size: 24px; margin: 0;">📝 WUB EEE CLUB</h2>
+                            <p style="color: #6b8aaa; font-size: 14px; margin: 5px 0 0 0;">World University of Bangladesh</p>
+                        </div>
+                        
+                        <div style="text-align: center; margin-bottom: 25px;">
+                            <h3 style="color: #0b3b7a; font-size: 20px; margin: 0 0 10px 0;">🔄 Profile Updated</h3>
+                            <p style="color: #0b2b5c; font-size: 16px; margin: 0;">Dear <strong>${escapeHtml(record.fullName)}</strong>,</p>
+                        </div>
+
+                        <div style="background: #e8f0fe; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                            <p style="margin: 0; color: #1f3a66; font-size: 14px;">Your WUB EEE Club profile has been updated by the administrator.</p>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: #0b2b5c; margin-bottom: 10px;">📋 Changes Made</h4>
+                            <div style="background: #f8faff; padding: 15px; border-radius: 8px; border-left: 4px solid #f5a623;">
+                                <pre style="margin: 0; color: #1f3a66; font-size: 13px; white-space: pre-wrap; font-family: 'Inter', Arial, sans-serif;">${escapeHtml(changes)}</pre>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: #0b2b5c; margin-bottom: 10px;">📋 Updated Profile</h4>
+                            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Club ID</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b3b7a; font-weight: 700;">${escapeHtml(record.clubId)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Student ID</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.studentId)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Email</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.email)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Phone</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.phone || 'N/A')}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; font-weight: 600; color: #1f3a66;">Semester</td>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e6edf8; color: #0b2b5c;">${escapeHtml(record.semester)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; font-weight: 600; color: #1f3a66;">Interest</td>
+                                    <td style="padding: 8px 0; color: #0b2b5c;">${escapeHtml(record.interest)}</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e6edf8; font-size: 12px; color: #6b8aaa;">
+                            <p style="margin: 5px 0;">This is a system-generated notification from WUB EEE Club.</p>
+                            <p style="margin: 5px 0;">For any queries, contact: eee-club@eee.wub.edu.bd</p>
+                            <p style="margin: 5px 0;">Update on: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // ============================================
+            // Email Sending Wrapper Functions
+            // ============================================
             async function sendConfirmationEmail(record) {
-                // Try Brevo first
-                const brevoResult = await sendVerifiedEmailBrevo(record);
-                if (brevoResult) return true;
-
-                // If Brevo fails, try EmailJS
-                try {
-                    showToast('🔄 Brevo failed, trying EmailJS...', true);
-                    const templateParams = {
-                        to_email: record.email,
-                        to_name: record.fullName,
-                        club_id: record.clubId,
-                        student_id: record.studentId,
-                        semester: record.semester,
-                        payment_method: record.paymentMethod,
-                        trxid: record.trxid,
-                        join_date: new Date(record.joinDate).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        })
-                    };
-
-                    const response = await emailjs.send(
-                        EMAILJS_SERVICE_ID,
-                        EMAILJS_TEMPLATE_VERIFIED,
-                        templateParams
-                    );
-                    console.log('📧 EmailJS verification email sent!', response);
-                    showToast(`✅ Verification email sent to ${record.email} via EmailJS`);
-                    return true;
-                } catch (emailjsError) {
-                    console.error('❌ Both Brevo and EmailJS failed:', emailjsError);
-                    showToast('⚠️ Could not send email. Please try manual email.', true);
-                    return false;
-                }
+                const subject = `✅ WUB EEE Club - Membership Confirmed! (${record.clubId})`;
+                const htmlContent = buildConfirmationEmailHTML(record);
+                return await sendEmail(record.email, subject, htmlContent);
             }
 
-            // Send Unverification Email - Hybrid
             async function sendUnverifyEmail(record, reason) {
-                // Try Brevo first
-                const brevoResult = await sendUnverifiedEmailBrevo(record, reason);
-                if (brevoResult) return true;
+                const subject = `⚠️ WUB EEE Club - Membership Unverified (${record.clubId})`;
+                const htmlContent = buildUnverifyEmailHTML(record, reason);
+                return await sendEmail(record.email, subject, htmlContent);
+            }
 
-                // If Brevo fails, try EmailJS
-                try {
-                    showToast('🔄 Brevo failed, trying EmailJS...', true);
-                    const templateParams = {
-                        email: record.email,
-                        to_name: record.fullName,
-                        club_id: record.clubId,
-                        student_id: record.studentId,
-                        reason: reason,
-                        unverified_date: new Date().toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        }),
-                        trxid: record.trxid || 'N/A'
-                    };
-
-                    const response = await emailjs.send(
-                        EMAILJS_SERVICE_ID,
-                        EMAILJS_TEMPLATE_UNVERIFIED,
-                        templateParams
-                    );
-                    console.log('📧 EmailJS unverification email sent!', response);
-                    showToast(`✅ Unverification email sent to ${record.email} via EmailJS`);
-                    return true;
-                } catch (emailjsError) {
-                    console.error('❌ Both Brevo and EmailJS failed:', emailjsError);
-                    showToast('⚠️ Could not send email. Please try manual email.', true);
-                    return false;
-                }
+            async function sendUpdateEmail(record, changes) {
+                const subject = `🔄 WUB EEE Club - Profile Updated (${record.clubId})`;
+                const htmlContent = buildUpdateEmailHTML(record, changes);
+                return await sendEmail(record.email, subject, htmlContent);
             }
 
             // ============================================
-            // SEND UPDATE EMAIL - Hybrid
+            // Test Email Function (using Brevo)
             // ============================================
-            async function sendUpdateEmail(record, oldData) {
-                try {
-                    const changes = [];
-                    if (oldData.fullName !== record.fullName) changes.push(`Name: ${oldData.fullName} → ${record.fullName}`);
-                    if (oldData.studentId !== record.studentId) changes.push(`Student ID: ${oldData.studentId} → ${record.studentId}`);
-                    if (oldData.email !== record.email) changes.push(`Email: ${oldData.email} → ${record.email}`);
-                    if (oldData.phone !== record.phone) changes.push(`Phone: ${oldData.phone || 'N/A'} → ${record.phone || 'N/A'}`);
-                    if (oldData.semester !== record.semester) changes.push(`Semester: ${oldData.semester} → ${record.semester}`);
-                    if (oldData.gender !== record.gender) changes.push(`Gender: ${oldData.gender} → ${record.gender}`);
-                    if (oldData.interest !== record.interest) changes.push(`Interest: ${oldData.interest} → ${record.interest}`);
-
-                    const changesText = changes.length > 0 ? changes.join('\n') : 'No changes were made.';
-
-                    // Try Brevo first
-                    try {
-                        const emailData = {
-                            to: [{ email: record.email, name: record.fullName }],
-                            subject: '📝 Membership Updated - WUB EEE Club',
-                            htmlContent: `
-                                <h2>Dear ${record.fullName},</h2>
-                                <p>Your WUB EEE Club membership information has been updated.</p>
-                                <h3>Club ID: ${record.clubId}</h3>
-                                <p><strong>Changes made:</strong></p>
-                                <pre>${changesText}</pre>
-                                <p>Update Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
-                                <p>For any questions, contact: eee-club@eee.wub.edu.bd</p>
-                            `,
-                            sender: {
-                                name: 'WUB EEE Club',
-                                email: 'eee-club@eee.wub.edu.bd'
-                            },
-                            replyTo: {
-                                email: 'eee-club@eee.wub.edu.bd',
-                                name: 'WUB EEE Club'
-                            }
-                        };
-
-                        const response = await fetch(BREVO_API_URL, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'api-key': BREVO_API_KEY
-                            },
-                            body: JSON.stringify(emailData)
-                        });
-
-                        if (response.ok) {
-                            showToast(`✅ Update notification sent to ${record.email} via Brevo`);
-                            return true;
-                        }
-                    } catch (brevoError) {
-                        console.warn('⚠️ Brevo update email failed, trying EmailJS...', brevoError);
-                    }
-
-                    // Fallback to EmailJS
-                    const templateParams = {
-                        to_email: record.email,
-                        to_name: record.fullName,
-                        club_id: record.clubId,
-                        student_id: record.studentId,
-                        changes: changesText,
-                        update_date: new Date().toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        })
-                    };
-
-                    const response = await emailjs.send(
-                        EMAILJS_SERVICE_ID,
-                        EMAILJS_TEMPLATE_VERIFIED,
-                        templateParams
-                    );
-                    showToast(`✅ Update notification sent to ${record.email} via EmailJS`);
-                    return true;
-
-                } catch (error) {
-                    console.error('❌ Update email failed:', error);
-                    showToast('⚠️ Could not send update email.', true);
-                    return false;
-                }
-            }
-
-            // ============================================
-            // TEST BREVO FUNCTION
-            // ============================================
-            async function testBrevo() {
-                const testEmail = prompt('Enter your email address to test Brevo:', 'your-email@example.com');
-                if (!testEmail) return;
-
-                const btn = document.getElementById('brevoTestBtn');
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-
-                try {
-                    const emailData = {
-                        templateId: BREVO_TEMPLATE_VERIFIED,
-                        to: [{ email: testEmail, name: 'Test User' }],
-                        params: {
-                            to_name: 'Test User',
-                            club_id: 'WUB-EEE-2026-TEST',
-                            student_id: 'TEST-001',
-                            semester: '3rd',
-                            payment_method: 'bKash',
-                            trxid: 'TEST-TRX-001',
-                            join_date: new Date().toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                            })
-                        },
-                        sender: {
-                            name: 'WUB EEE Club',
-                            email: 'eee-club@eee.wub.edu.bd'
-                        },
-                        replyTo: {
-                            email: 'eee-club@eee.wub.edu.bd',
-                            name: 'WUB EEE Club'
-                        }
-                    };
-
-                    console.log('📧 Testing Brevo with template:', BREVO_TEMPLATE_VERIFIED);
-
-                    const response = await fetch(BREVO_API_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'api-key': BREVO_API_KEY
-                        },
-                        body: JSON.stringify(emailData)
-                    });
-
-                    const result = await response.json();
-
-                    if (response.ok) {
-                        alert(`✅ Brevo test email sent successfully to ${testEmail}!\n\nCheck your inbox/spam folder.`);
-                        showToast(`✅ Brevo test email sent to ${testEmail}!`);
-                    } else {
-                        alert(`❌ Brevo test failed.\n\nError: ${result.message || 'Unknown error'}\n\nPlease check:\n1. API Key is correct\n2. Template ID exists: ${BREVO_TEMPLATE_VERIFIED}\n3. Internet connection`);
-                        showToast('❌ Brevo test failed. Check console for details.', true);
-                    }
-
-                } catch (error) {
-                    console.error('❌ Brevo test failed:', error);
-                    alert(`❌ Brevo test failed.\n\nError: ${error.message}\n\nSee console for details.`);
-                    showToast('❌ Brevo test failed. Check console for details.', true);
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-envelope"></i> Test Brevo';
-                }
-            }
-
-            document.getElementById('brevoTestBtn').addEventListener('click', testBrevo);
-
-            // ============================================
-            // TEST EMAILJS FUNCTION
-            // ============================================
-            async function testEmailJS() {
-                const testEmailAddress = prompt('Enter your email address to test EmailJS:', 'your-email@example.com');
+            async function testEmail() {
+                const testEmailAddress = prompt('Enter your email address to test the email system:', 'your-email@example.com');
                 if (!testEmailAddress) return;
 
                 const btn = document.getElementById('testEmailBtn');
@@ -2374,49 +2241,53 @@
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
                 try {
-                    const templateParams = {
-                        email: testEmailAddress,
-                        to_name: 'Test User',
-                        club_id: 'WUB-EEE-2026-TEST',
-                        student_id: 'TEST-001',
-                        reason: 'This is a test email to verify EmailJS configuration.',
-                        unverified_date: new Date().toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        }),
-                        trxid: 'TEST-TRX-001'
-                    };
+                    const testHTML = `
+                        <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border: 1px solid #e6edf8; border-radius: 16px;">
+                            <div style="text-align: center; border-bottom: 2px solid #0b3b7a; padding-bottom: 20px; margin-bottom: 20px;">
+                                <h2 style="color: #0b3b7a; font-size: 24px; margin: 0;">🧪 WUB EEE CLUB</h2>
+                                <p style="color: #6b8aaa; font-size: 14px; margin: 5px 0 0 0;">World University of Bangladesh</p>
+                            </div>
+                            <div style="text-align: center;">
+                                <h3 style="color: #1b754b; font-size: 20px; margin: 0 0 10px 0;">✅ Test Email</h3>
+                                <p style="color: #0b2b5c; font-size: 16px;">This is a test email from WUB EEE Club.</p>
+                                <p style="color: #6b8aaa; font-size: 14px;">Your Brevo SMTP configuration is working correctly!</p>
+                                <p style="color: #6b8aaa; font-size: 12px;">Sent at: ${new Date().toLocaleString()}</p>
+                            </div>
+                            <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e6edf8; font-size: 12px; color: #6b8aaa;">
+                                <p style="margin: 5px 0;">This is a test email from WUB EEE Club.</p>
+                                <p style="margin: 5px 0;">Contact: eee-club@eee.wub.edu.bd</p>
+                            </div>
+                        </div>
+                    `;
 
-                    console.log('📧 Sending test email with template:', EMAILJS_TEMPLATE_UNVERIFIED);
+                    const result = await sendEmail(testEmailAddress, '🧪 WUB EEE Club - Test Email', testHTML);
 
-                    const response = await emailjs.send(
-                        EMAILJS_SERVICE_ID,
-                        EMAILJS_TEMPLATE_UNVERIFIED,
-                        templateParams
-                    );
-
-                    console.log('📧 EmailJS test sent!', response);
-                    alert(`✅ EmailJS test email sent successfully to ${testEmailAddress}!`);
-                    showToast(`✅ EmailJS test email sent to ${testEmailAddress}!`);
+                    if (result.success) {
+                        showToast(`✅ Test email sent to ${testEmailAddress}!`);
+                        alert(`✅ Test email sent successfully to ${testEmailAddress}!\n\nCheck your inbox/spam folder.`);
+                    } else {
+                        throw new Error(result.error || 'Unknown error');
+                    }
 
                 } catch (error) {
-                    console.error('❌ EmailJS test failed:', error);
-                    alert(`❌ EmailJS test failed.\n\nError: ${error.text || error.message}`);
-                    showToast('❌ EmailJS test failed. Check console for details.', true);
+                    console.error('❌ Test email failed:', error);
+                    alert(`❌ Test email failed.\nError: ${error.message || 'Unknown error'}\n\nPlease check your Brevo SMTP credentials.\n\nMake sure:\n1. BREVO_SMTP_USER is set correctly\n2. BREVO_SMTP_PASS is set correctly\n3. Your Brevo account has SMTP enabled`);
+                    showToast('❌ Test email failed. Check console for details.', true);
                 } finally {
                     btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-envelope"></i> Test EmailJS';
+                    btn.innerHTML = '<i class="fas fa-envelope"></i> Test Email';
                 }
             }
 
-            document.getElementById('testEmailBtn').addEventListener('click', testEmailJS);
+            document.getElementById('testEmailBtn').addEventListener('click', testEmail);
 
             // ============================================
-            // JSONBin.io FIXED FUNCTIONS
+            // JSONBin.io CONFIGURATION
             // ============================================
+            const JSONBIN_BIN_ID = '6a3a40f6f5f4af5e2921c0d2';
+            const JSONBIN_API_KEY = '$2a$10$uxxlv8nJapUJj6YbaVCY4u1EBDwX6.jOssFoyi0I7e8CyDKeTIc5W';
+            const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+
             const STORAGE_KEY = 'wub_eee_registrations';
             const ID_KEY = 'wub_eee_last_id';
             const CERT_KEY = 'wub_eee_certificates';
@@ -2623,7 +2494,7 @@
             });
 
             // ============================================
-            // FIXED SYNC FUNCTIONS FOR JSONBin.io
+            // SYNC FUNCTIONS
             // ============================================
             function updateSyncStatus(status, message) {
                 const dot = document.getElementById('syncDot');
@@ -2644,29 +2515,17 @@
             async function syncDataToCloud(records, lastId) {
                 try {
                     updateSyncStatus('syncing', '⏳ Saving to cloud...');
-                    
-                    // Prepare data in the format JSONBin.io expects
-                    const data = { 
-                        records: records, 
-                        lastId: lastId || getLastSerial() 
-                    };
-                    
+                    const data = { records: records, lastId: lastId || getLastSerial() };
                     const response = await fetch(JSONBIN_URL, {
                         method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Master-Key': JSONBIN_API_KEY,
-                            'X-Bin-Name': 'WUB_EEE_Club_Registrations'
-                        },
+                        headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY },
                         body: JSON.stringify(data)
                     });
-
                     if (response.ok) {
                         updateSyncStatus('online', '✅ Data saved to cloud');
                         return true;
                     } else {
-                        const errorText = await response.text();
-                        console.error('Cloud save error:', errorText);
+                        console.error('Cloud save error:', await response.json());
                         updateSyncStatus('offline', '⚠️ Cloud save failed');
                         return false;
                     }
@@ -2680,14 +2539,10 @@
             async function fetchDataFromCloud() {
                 try {
                     updateSyncStatus('syncing', '⏳ Fetching from cloud...');
-                    
                     const response = await fetch(JSONBIN_URL, {
                         method: 'GET',
-                        headers: {
-                            'X-Master-Key': JSONBIN_API_KEY
-                        }
+                        headers: { 'X-Master-Key': JSONBIN_API_KEY }
                     });
-
                     if (response.ok) {
                         const data = await response.json();
                         updateSyncStatus('online', '✅ Data fetched from cloud');
@@ -2759,10 +2614,12 @@
                 return data ? JSON.parse(data) : [];
             }
 
+            // ============================================
+            // SAVE REGISTRATIONS - PERMANENT SAVE WITH UNIQUE ID
+            // ============================================
             function saveRegistrations(records) {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
                 const lastId = getLastSerial();
-                // Save to cloud asynchronously
                 setTimeout(() => syncDataToCloud(records, lastId), 100);
                 console.log('💾 Data saved permanently with unique Club IDs');
             }
@@ -2835,6 +2692,149 @@
                 renderAdminTable();
                 showToast(`✅ Fixed ${fixedCount} duplicate Club IDs! All members now have unique IDs.`);
             };
+
+            // ============================================
+            // SEND UNVERIFY EMAIL (using Brevo)
+            // ============================================
+            async function sendUnverifyEmailWrapper(record, reason) {
+                try {
+                    showToast('📧 Sending unverification email to ' + record.email + '...');
+                    const result = await sendUnverifyEmail(record, reason);
+                    if (result.success) {
+                        showToast(`✅ Unverification email sent to ${record.email}`);
+                        return true;
+                    } else {
+                        throw new Error(result.error || 'Unknown error');
+                    }
+                } catch (error) {
+                    console.error('❌ Unverify email sending failed:', error);
+                    showToast(`⚠️ Could not send unverification email. Error: ${error.message || 'Unknown error'}`, true);
+                    return false;
+                }
+            }
+
+            // ============================================
+            // SEND CONFIRMATION EMAIL (using Brevo)
+            // ============================================
+            async function sendConfirmationEmailWrapper(record) {
+                try {
+                    showToast('📧 Sending confirmation email from eee-club@eee.wub.edu.bd...');
+                    const result = await sendConfirmationEmail(record);
+                    if (result.success) {
+                        showToast(`✅ Confirmation email sent to ${record.email} from eee-club@eee.wub.edu.bd`);
+                        return true;
+                    } else {
+                        throw new Error(result.error || 'Unknown error');
+                    }
+                } catch (error) {
+                    console.error('❌ Confirmation email sending failed:', error);
+                    showToast(`⚠️ Could not send email. Please try again. Error: ${error.message || 'Unknown error'}`, true);
+                    return false;
+                }
+            }
+
+            // ============================================
+            // SEND UPDATE EMAIL (using Brevo)
+            // ============================================
+            async function sendUpdateEmailWrapper(record, oldData) {
+                try {
+                    showToast('📧 Sending update notification email...');
+
+                    const changes = [];
+                    if (oldData.fullName !== record.fullName) changes.push(`Name: ${oldData.fullName} → ${record.fullName}`);
+                    if (oldData.studentId !== record.studentId) changes.push(`Student ID: ${oldData.studentId} → ${record.studentId}`);
+                    if (oldData.email !== record.email) changes.push(`Email: ${oldData.email} → ${record.email}`);
+                    if (oldData.phone !== record.phone) changes.push(`Phone: ${oldData.phone || 'N/A'} → ${record.phone || 'N/A'}`);
+                    if (oldData.semester !== record.semester) changes.push(`Semester: ${oldData.semester} → ${record.semester}`);
+                    if (oldData.gender !== record.gender) changes.push(`Gender: ${oldData.gender} → ${record.gender}`);
+                    if (oldData.interest !== record.interest) changes.push(`Interest: ${oldData.interest} → ${record.interest}`);
+
+                    const changesText = changes.length > 0 ? changes.join('\n') : 'No changes were made.';
+
+                    const result = await sendUpdateEmail(record, changesText);
+                    if (result.success) {
+                        showToast(`✅ Update notification sent to ${record.email}`);
+                        return true;
+                    } else {
+                        throw new Error(result.error || 'Unknown error');
+                    }
+                } catch (error) {
+                    console.error('❌ Update email sending failed:', error);
+                    showToast(`⚠️ Could not send update email. Please try again.`, true);
+                    return false;
+                }
+            }
+
+            // ============================================
+            // LOGIN
+            // ============================================
+            function checkLogin() {
+                const session = sessionStorage.getItem('wub_eee_admin_session');
+                if (session === 'true') {
+                    isLoggedIn = true;
+                    document.getElementById('loginOverlay').classList.remove('open');
+                    document.getElementById('loginOverlay').classList.add('hidden');
+                    setTimeout(syncFromCloud, 500);
+                    return true;
+                }
+                return false;
+            }
+
+            document.getElementById('adminTabBtn').addEventListener('click', function(e) {
+                if (!isLoggedIn) {
+                    e.preventDefault();
+                    document.getElementById('loginOverlay').classList.remove('hidden');
+                    document.getElementById('loginOverlay').classList.add('open');
+                    document.getElementById('loginError').classList.remove('show');
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelector('[data-tab="register"]').classList.add('active');
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                    document.getElementById('tab-register').classList.add('active');
+                }
+            });
+
+            document.getElementById('loginBtn').addEventListener('click', function() {
+                const email = document.getElementById('loginEmail').value.trim();
+                const password = document.getElementById('loginPassword').value.trim();
+                const errorEl = document.getElementById('loginError');
+                if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+                    sessionStorage.setItem('wub_eee_admin_session', 'true');
+                    isLoggedIn = true;
+                    document.getElementById('loginOverlay').classList.remove('open');
+                    document.getElementById('loginOverlay').classList.add('hidden');
+                    errorEl.classList.remove('show');
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.getElementById('adminTabBtn').classList.add('active');
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                    document.getElementById('tab-admin').classList.add('active');
+                    renderAdminTable();
+                    showToast('✅ Welcome Admin!');
+                    setTimeout(syncFromCloud, 500);
+                } else {
+                    errorEl.classList.add('show');
+                    document.getElementById('loginPassword').value = '';
+                }
+            });
+
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                sessionStorage.removeItem('wub_eee_admin_session');
+                isLoggedIn = false;
+                document.getElementById('loginOverlay').classList.remove('hidden');
+                document.getElementById('loginOverlay').classList.add('open');
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelector('[data-tab="register"]').classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.getElementById('tab-register').classList.add('active');
+                showToast('👋 Logged out successfully');
+            });
+
+            document.getElementById('fixDuplicateIdsBtn').addEventListener('click', function() {
+                if (!isLoggedIn) {
+                    showToast('⚠️ Please login first', true);
+                    return;
+                }
+                window.fixDuplicateIds();
+            });
 
             // ============================================
             // TOAST & UTILITY
@@ -3117,7 +3117,7 @@
                     skills,
                     interest,
                     reason,
-                    clubId,
+                    clubId, // Unique ID - fixed forever
                     paymentStatus: `Paid (${selectedMethod})`,
                     paymentMethod: selectedMethod,
                     paymentAmount: '200 TK',
@@ -3165,7 +3165,7 @@
             });
 
             // ============================================
-            // ADMIN VERIFICATION FUNCTION - Sends Verified Email
+            // ADMIN VERIFICATION FUNCTION
             // ============================================
             window.verifyMember = async function(clubId) {
                 const records = getRegistrations();
@@ -3180,7 +3180,7 @@
                     return;
                 }
 
-                if (!confirm(`Verify membership for ${records[index].fullName} (${records[index].clubId})?\nThis will send a confirmation email from eee-club@eee.wub.edu.bd`)) {
+                if (!confirm(`Verify membership for ${records[index].fullName} (${records[index].clubId})?\nThis will send a confirmation email with their Club ID.`)) {
                     return;
                 }
 
@@ -3190,7 +3190,7 @@
                 records[index].unverifyDate = null;
                 saveRegistrations(records);
 
-                const emailSent = await sendConfirmationEmail(records[index]);
+                const emailSent = await sendConfirmationEmailWrapper(records[index]);
                 records[index].emailSent = emailSent;
                 saveRegistrations(records);
 
@@ -3222,7 +3222,7 @@
                     return;
                 }
 
-                const emailSent = await sendConfirmationEmail(record);
+                const emailSent = await sendConfirmationEmailWrapper(record);
                 if (emailSent) {
                     record.emailSent = true;
                     saveRegistrations(records);
@@ -3234,7 +3234,7 @@
             };
 
             // ============================================
-            // UNVERIFY FUNCTION - Sends Unverified Email
+            // UNVERIFY FUNCTION
             // ============================================
             window.unverifyMember = function(clubId) {
                 const records = getRegistrations();
@@ -3304,7 +3304,7 @@
 
                     let emailSent = false;
                     if (sendEmail) {
-                        emailSent = await sendUnverifyEmail(record, reason);
+                        emailSent = await sendUnverifyEmailWrapper(record, reason);
                         if (emailSent) {
                             record.emailSent = false;
                             saveRegistrations(records);
@@ -3315,9 +3315,9 @@
                     renderAdminTable();
                     
                     if (sendEmail && emailSent) {
-                        showToast(`✅ Member unverified successfully! Email sent from eee-club@eee.wub.edu.bd`);
+                        showToast(`✅ Member unverified successfully! Email notification sent.`);
                     } else if (sendEmail && !emailSent) {
-                        showToast(`⚠️ Member unverified but email could not be sent. Please try manual email.`, true);
+                        showToast(`⚠️ Member unverified but email could not be sent. Please check Brevo SMTP configuration.`, true);
                     } else {
                         showToast(`✅ Member unverified successfully!`);
                     }
@@ -3605,7 +3605,7 @@
             }
 
             // ============================================
-            // EDIT MEMBER
+            // EDIT MEMBER - PERMANENT SAVE WITH FIXED CLUB ID
             // ============================================
             window.editMember = function(clubId) {
                 const records = getRegistrations();
@@ -3686,6 +3686,7 @@
                         return; 
                     }
 
+                    // Check if student ID is being changed and is unique (except for this member)
                     const existingStudentId = records.some((r, i) => 
                         i !== index && r.studentId === studentId
                     );
@@ -3698,6 +3699,7 @@
 
                     const oldData = { ...records[index] };
                     
+                    // Update record - Club ID stays the same (permanent)
                     records[index].fullName = fullName;
                     records[index].studentId = studentId;
                     records[index].email = email;
@@ -3706,11 +3708,12 @@
                     records[index].gender = gender;
                     records[index].interest = interest;
 
+                    // Permanently save with fixed Club ID
                     saveRegistrations(records);
                     renderAdminTable();
 
                     if (sendEmail) {
-                        const emailSent = await sendUpdateEmail(records[index], oldData);
+                        const emailSent = await sendUpdateEmailWrapper(records[index], oldData);
                         if (emailSent) {
                             records[index].emailSent = true;
                             saveRegistrations(records);
@@ -3762,6 +3765,7 @@
                         return;
                     }
                     
+                    // Remove certificate if exists
                     const certs = getCertificates();
                     if (certs[clubId]) {
                         delete certs[clubId];
@@ -3769,11 +3773,14 @@
                         console.log(`🗑️ Certificate removed for ${clubId}`);
                     }
                     
+                    // Remove the member permanently
                     records.splice(index, 1);
                     saveRegistrations(records);
                     
+                    // Update the UI
                     renderAdminTable();
                     
+                    // Close certificate modal if open
                     if (window._currentCertRecord && window._currentCertRecord.clubId === clubId) {
                         document.getElementById('certModal').classList.remove('open');
                         window._currentCertRecord = null;
@@ -4027,14 +4034,12 @@
             console.log('📌 TRXID Formats:');
             console.log('   💚 bKash: Must start with "DG" and be exactly 10 characters (e.g., DGH5GB82G7)');
             console.log('   💙 Nagad: Must start with "75" and be exactly 8 characters (e.g., 75OPUQ5X)');
-            console.log('📧 Email Services:');
-            console.log('   📧 Primary: Brevo (https://www.brevo.com/)');
-            console.log('   📧 Fallback: EmailJS');
-            console.log('   📧 Verified Template ID: ' + BREVO_TEMPLATE_VERIFIED);
-            console.log('   📧 Unverified Template ID: ' + BREVO_TEMPLATE_UNVERIFIED);
-            console.log('☁️ Cloud Sync: JSONBin.io');
-            console.log('   📦 Bin ID: ' + JSONBIN_BIN_ID);
-            console.log('   🔗 URL: ' + JSONBIN_URL);
+            console.log('📧 Brevo SMTP Configuration:');
+            console.log('   ✅ Confirmation/Verified emails use Brevo SMTP');
+            console.log('   ✅ Unverified emails use Brevo SMTP');
+            console.log('   ✅ Update notification emails use Brevo SMTP');
+            console.log('   📌 SMTP Host: smtp-relay.brevo.com');
+            console.log('   📌 Port: 587');
             console.log('📌 Data Management:');
             console.log('   💾 Data saved permanently with unique Club ID');
             console.log('   🔒 Club ID is fixed and cannot be changed');
@@ -4042,7 +4047,6 @@
             console.log('   🗑️ Delete permanently removes all data');
             console.log('   ☁️ Cloud sync with JSONBin.io');
             console.log('✅ System ready!');
-            console.log('🛠️ Click "Test Brevo" to test your Brevo configuration!');
         })();
     </script>
 </body>
