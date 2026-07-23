@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         /* ============================================
-           ALL STYLES (same as before, with cloud-error added)
+           ALL STYLES
            ============================================ */
         * {
             margin: 0;
@@ -68,7 +68,6 @@
             margin-top: 2px;
         }
 
-        /* Login Overlay */
         .login-overlay {
             position: fixed;
             top: 0;
@@ -150,7 +149,6 @@
             display: block;
         }
 
-        /* Tabs */
         .tabs {
             display: flex;
             gap: 0.5rem;
@@ -190,7 +188,6 @@
             display: block;
         }
 
-        /* Form Styles */
         .form-card {
             display: flex;
             flex-direction: column;
@@ -309,7 +306,6 @@
             box-shadow: none;
         }
 
-        /* Payment Section */
         .payment-section {
             background: #f3f9fc;
             border-radius: 28px;
@@ -459,7 +455,6 @@
             color: #1b754b;
         }
 
-        /* Past Student */
         .past-student-toggle {
             display: flex;
             align-items: center;
@@ -514,7 +509,6 @@
             font-weight: 600;
         }
 
-        /* Success Box */
         .success-box {
             background: #e5f2e9;
             border-radius: 28px;
@@ -570,7 +564,6 @@
             color: white;
         }
 
-        /* QR Section */
         .qr-section {
             background: #f8faff;
             border-radius: 20px;
@@ -643,7 +636,6 @@
             background: #1f8a5a;
         }
 
-        /* Admin */
         .admin-actions {
             display: flex;
             gap: 1rem;
@@ -712,7 +704,6 @@
             background: #d48a1a;
         }
 
-        /* Table */
         .admin-table-wrap {
             overflow-x: auto;
             margin-top: 1rem;
@@ -750,7 +741,6 @@
             padding: 1.5rem;
         }
 
-        /* Badges */
         .badge-paid {
             background: #1b754b;
             color: white;
@@ -816,7 +806,6 @@
             font-weight: 600;
         }
 
-        /* Payment Info */
         .payment-info {
             font-size: 0.75rem;
             line-height: 1.4;
@@ -837,7 +826,6 @@
             color: #3c6e9c;
         }
 
-        /* Buttons */
         .cert-btn {
             padding: 0.2rem 0.8rem;
             border: none;
@@ -917,7 +905,6 @@
             background: #1d5b9e;
         }
 
-        /* Toast */
         .notification-toast {
             position: fixed;
             bottom: 20px;
@@ -940,7 +927,6 @@
             transition: opacity 0.5s;
         }
 
-        /* Certificate Modal */
         .cert-modal {
             position: fixed;
             top: 0;
@@ -986,7 +972,6 @@
             background: #c62828;
         }
 
-        /* Sync Status */
         .sync-status {
             display: flex;
             align-items: center;
@@ -1032,7 +1017,39 @@
             }
         }
 
-        /* Edit Modal */
+        .cloud-error-banner {
+            background: #fff5f5;
+            border: 1px solid #f5c6c6;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: #b22234;
+        }
+        .cloud-error-banner.show {
+            display: flex;
+        }
+        .cloud-error-banner i {
+            font-size: 1.2rem;
+        }
+        .cloud-error-banner .retry-btn {
+            background: #b22234;
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+        .cloud-error-banner .retry-btn:hover {
+            background: #c62828;
+        }
+
         .edit-modal {
             position: fixed;
             top: 0;
@@ -1138,7 +1155,6 @@
             margin-right: 6px;
         }
 
-        /* Unverify Modal */
         .unverify-modal {
             position: fixed;
             top: 0;
@@ -1562,7 +1578,6 @@
             }
         }
 
-        /* Slip styling */
         .slip-container {
             background: white;
             padding: 2rem;
@@ -1600,40 +1615,6 @@
             margin-top: 1rem;
             font-size: 0.8rem;
             color: #6b8aaa;
-        }
-
-        /* Cloud Error Banner */
-        .cloud-error-banner {
-            background: #fff5f5;
-            border: 1px solid #f5c6c6;
-            border-radius: 10px;
-            padding: 10px 15px;
-            margin-bottom: 10px;
-            display: none;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.85rem;
-            color: #b22234;
-        }
-        .cloud-error-banner.show {
-            display: flex;
-        }
-        .cloud-error-banner i {
-            font-size: 1.2rem;
-        }
-        .cloud-error-banner .retry-btn {
-            background: #b22234;
-            color: white;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-left: auto;
-        }
-        .cloud-error-banner .retry-btn:hover {
-            background: #c62828;
         }
     </style>
 </head>
@@ -2029,10 +2010,12 @@
             const FROM_NAME = 'WUB EEE Club';
 
             // ============================================
-            // 🔗 JSONBin.io CONFIGURATION (YOUR CREDENTIALS)
+            // 🔗 JSONBin.io CONFIGURATION
+            // ⚠️ REPLACE WITH YOUR NEW CREDENTIALS FROM JSONBIN.IO
             // ============================================
-            const JSONBIN_BIN_ID = '6a3a40f6f5f4af5e2921c0d2';
-            const JSONBIN_API_KEY = '$2a$10$OAJm5/YRl9n2rl7OMrn4cO344FQVbRX/P3ZLlkdY68JlIAaifXVkS';
+            // TODO: Replace these with your new Bin ID and API Key
+            const JSONBIN_BIN_ID = '6a3a40f6f5f4af5e2921c0d2'; // e.g., '67abcd1234ef5678ghij9012'
+            const JSONBIN_API_KEY = '$2a$10$OAJm5/YRl9n2rl7OMrn4cO344FQVbRX/P3ZLlkdY68JlIAaifXVkS'; // Your JSONBin.io API Key
             const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 
             const STORAGE_KEY = 'wub_eee_registrations';
@@ -2047,24 +2030,15 @@
             let paymentCompleted = false;
             let verifiedTrxID = '';
             let selectedMethod = 'bKash';
-            let cloudErrorCount = 0;
 
             // ============================================
             // 📧 EMAIL SENDING FUNCTION
             // ============================================
             async function sendEmail(to, subject, htmlContent) {
-                console.log(`📧 Attempting to send email to: ${to}`);
-
                 try {
                     const payload = {
-                        sender: {
-                            name: FROM_NAME,
-                            email: FROM_EMAIL
-                        },
-                        to: [{
-                            email: to,
-                            name: to.split('@')[0] || 'Student'
-                        }],
+                        sender: { name: FROM_NAME, email: FROM_EMAIL },
+                        to: [{ email: to, name: to.split('@')[0] || 'Student' }],
                         subject: subject,
                         htmlContent: htmlContent
                     };
@@ -2079,7 +2053,6 @@
                     });
 
                     const data = await response.json();
-
                     if (response.ok) {
                         console.log('✅ Brevo API: Email sent successfully!');
                         return { success: true };
@@ -2087,16 +2060,12 @@
                         console.error('❌ Brevo API Error:', data);
                         return { success: false, error: data.message || 'Brevo API error' };
                     }
-
                 } catch (error) {
                     console.error('❌ Brevo API request failed:', error);
                     return { success: false, error: error.message || 'Network error' };
                 }
             }
 
-            // ============================================
-            // 📧 ESCAPE HTML
-            // ============================================
             function escapeHtml(text) {
                 if (!text) return '';
                 const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
@@ -2330,7 +2299,7 @@
             document.getElementById('testEmailBtn').addEventListener('click', testEmail);
 
             // ============================================
-            // ☁️ CLOUD SYNC FUNCTIONS (WITH BETTER ERROR HANDLING)
+            // ☁️ CLOUD SYNC FUNCTIONS
             // ============================================
             function updateSyncStatus(status, message) {
                 const dot = document.getElementById('syncDot');
@@ -2343,13 +2312,11 @@
                     dot.classList.add('online');
                     text.textContent = message || '✅ Cloud connected - Data synced across all devices';
                     banner.classList.remove('show');
-                    cloudErrorCount = 0;
-                } else if (status === 'offline' || status === 'cloud-error') {
+                } else if (status === 'cloud-error') {
                     dot.classList.add('cloud-error');
                     text.textContent = message || '⚠️ Cloud unavailable - Using local data only';
                     banner.classList.add('show');
-                    errorMsg.textContent = '⚠️ Cloud sync failed. Data is saved locally. Click Retry to try again.';
-                    cloudErrorCount++;
+                    errorMsg.textContent = message || '⚠️ Cloud sync failed. Data is saved locally. Click Retry to try again.';
                 } else if (status === 'syncing') {
                     dot.classList.add('syncing');
                     text.textContent = message || '⏳ Syncing with cloud...';
@@ -2357,10 +2324,15 @@
             }
 
             async function syncDataToCloud(records, lastId) {
+                if (!JSONBIN_BIN_ID || JSONBIN_BIN_ID === 'YOUR_NEW_BIN_ID') {
+                    console.warn('⚠️ JSONBin.io not configured. Please update your credentials.');
+                    updateSyncStatus('cloud-error', '⚠️ Cloud not configured - Please update credentials');
+                    return false;
+                }
+
                 try {
                     updateSyncStatus('syncing', '⏳ Saving to cloud...');
                     
-                    // Create a clean copy of data
                     const data = { 
                         records: records || [], 
                         lastId: lastId || getLastSerial(),
@@ -2395,6 +2367,11 @@
             }
 
             async function fetchDataFromCloud() {
+                if (!JSONBIN_BIN_ID || JSONBIN_BIN_ID === 'YOUR_NEW_BIN_ID') {
+                    console.warn('⚠️ JSONBin.io not configured.');
+                    return null;
+                }
+
                 try {
                     updateSyncStatus('syncing', '⏳ Fetching from cloud...');
                     
@@ -2428,7 +2405,6 @@
                     if (cloudData && cloudData.records) {
                         const localRecords = getRegistrations();
                         const cloudRecords = cloudData.records || [];
-                        // Merge: cloud wins if newer
                         const mergedRecords = mergeRecords(localRecords, cloudRecords);
                         saveRegistrations(mergedRecords);
                         if (cloudData.lastId && cloudData.lastId > getLastSerial()) {
@@ -2438,8 +2414,6 @@
                         showToast('✅ Data synced from cloud successfully!');
                     } else if (cloudData && cloudData.records && cloudData.records.length === 0) {
                         updateSyncStatus('online', '✅ Cloud connected - No data yet');
-                    } else {
-                        updateSyncStatus('cloud-error', '⚠️ Cloud unavailable - Using local data');
                     }
                 } catch (error) {
                     console.error('Sync error:', error);
@@ -2449,15 +2423,8 @@
             }
 
             function mergeRecords(local, cloud) {
-                // Create map by studentId (unique identifier)
                 const recordMap = {};
-                
-                // First add cloud records
-                cloud.forEach(r => { 
-                    if (r.studentId) recordMap[r.studentId] = { ...r, source: 'cloud' }; 
-                });
-                
-                // Then add local records (overwrite cloud if newer)
+                cloud.forEach(r => { if (r.studentId) recordMap[r.studentId] = { ...r, source: 'cloud' }; });
                 local.forEach(r => { 
                     if (r.studentId) {
                         if (!recordMap[r.studentId] || new Date(r.timestamp || 0) > new Date(recordMap[r.studentId].timestamp || 0)) {
@@ -2465,13 +2432,9 @@
                         }
                     }
                 });
-                
-                const merged = Object.values(recordMap);
-                console.log(`🔄 Merged ${merged.length} records (${Object.keys(recordMap).length} unique)`);
-                return merged;
+                return Object.values(recordMap);
             }
 
-            // Retry function for the banner
             window.retryCloudSync = function() {
                 showToast('🔄 Retrying cloud sync...');
                 syncFromCloud();
@@ -2507,15 +2470,7 @@
                 try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
                     const lastId = getLastSerial();
-                    // Async cloud sync with retry
-                    setTimeout(() => {
-                        syncDataToCloud(records, lastId).then(success => {
-                            if (!success && cloudErrorCount < 3) {
-                                // Auto retry after 5 seconds if failed
-                                setTimeout(() => syncDataToCloud(records, lastId), 5000);
-                            }
-                        });
-                    }, 500);
+                    setTimeout(() => syncDataToCloud(records, lastId), 500);
                     renderAdminTable();
                     return true;
                 } catch (e) {
@@ -2742,7 +2697,7 @@
             }
 
             // ============================================
-            // ✅ ADMIN FUNCTIONS (with auto-refresh)
+            // ✅ ADMIN FUNCTIONS
             // ============================================
             window.verifyMember = async function(clubId) {
                 const records = getRegistrations();
@@ -3564,7 +3519,8 @@
             console.log('📧 Brevo API configured with v3 key');
             console.log('🔑 Admin: eee-club@eee.wub.edu.bd / Eee123@580Eee');
             console.log('🔄 Admin panel auto-refresh enabled!');
-            console.log('☁️ Cloud sync: ' + JSONBIN_BIN_ID);
+            console.log('☁️ Cloud sync: ' + (JSONBIN_BIN_ID !== 'YOUR_NEW_BIN_ID' ? 'Configured ✅' : '⚠️ Not configured'));
+            console.log('📌 To enable cloud sync, update JSONBIN_BIN_ID and JSONBIN_API_KEY');
         })();
     </script>
 </body>
