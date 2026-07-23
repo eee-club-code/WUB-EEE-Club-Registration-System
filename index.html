@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         /* ============================================
-           ALL STYLES (same as before)
+           ALL STYLES (same as before, with cloud-error added)
            ============================================ */
         * {
             margin: 0;
@@ -1018,6 +1018,10 @@
             background: #f5a623;
             animation: pulse 1s infinite;
         }
+        .sync-status .sync-dot.cloud-error {
+            background: #b22234;
+            animation: pulse 0.5s infinite;
+        }
         @keyframes pulse {
             0%,
             100% {
@@ -1597,6 +1601,40 @@
             font-size: 0.8rem;
             color: #6b8aaa;
         }
+
+        /* Cloud Error Banner */
+        .cloud-error-banner {
+            background: #fff5f5;
+            border: 1px solid #f5c6c6;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: #b22234;
+        }
+        .cloud-error-banner.show {
+            display: flex;
+        }
+        .cloud-error-banner i {
+            font-size: 1.2rem;
+        }
+        .cloud-error-banner .retry-btn {
+            background: #b22234;
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+        .cloud-error-banner .retry-btn:hover {
+            background: #c62828;
+        }
     </style>
 </head>
 <body>
@@ -1626,6 +1664,13 @@
                 <h1>WUB EEE Club</h1>
                 <span><i class="fas fa-university"></i> World University of Bangladesh · Electrical &amp; Electronic Engineering</span>
             </div>
+        </div>
+
+        <!-- Cloud Error Banner -->
+        <div class="cloud-error-banner" id="cloudErrorBanner">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="cloudErrorMessage">⚠️ Cloud sync failed. Data is saved locally.</span>
+            <button class="retry-btn" onclick="retryCloudSync()"><i class="fas fa-sync"></i> Retry</button>
         </div>
 
         <div class="sync-status" id="syncStatus">
@@ -1984,11 +2029,31 @@
             const FROM_NAME = 'WUB EEE Club';
 
             // ============================================
+            // 🔗 JSONBin.io CONFIGURATION (YOUR CREDENTIALS)
+            // ============================================
+            const JSONBIN_BIN_ID = '6a3a40f6f5f4af5e2921c0d2';
+            const JSONBIN_API_KEY = '$2a$10$uxxlv8nJapUJj6YbaVCY4u1EBDwX6.jOssFoyi0I7e8CyDKeTIc5W';
+            const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+
+            const STORAGE_KEY = 'wub_eee_registrations';
+            const ID_KEY = 'wub_eee_last_id';
+            const CERT_KEY = 'wub_eee_certificates';
+            const ADMIN_EMAIL = 'eee-club@eee.wub.edu.bd';
+            const ADMIN_PASSWORD = 'Eee123@580Eee';
+            const year = new Date().getFullYear();
+
+            let isLoggedIn = false;
+            let isSyncing = false;
+            let paymentCompleted = false;
+            let verifiedTrxID = '';
+            let selectedMethod = 'bKash';
+            let cloudErrorCount = 0;
+
+            // ============================================
             // 📧 EMAIL SENDING FUNCTION
             // ============================================
             async function sendEmail(to, subject, htmlContent) {
                 console.log(`📧 Attempting to send email to: ${to}`);
-                console.log(`📧 Subject: ${subject}`);
 
                 try {
                     const payload = {
@@ -2016,24 +2081,16 @@
                     const data = await response.json();
 
                     if (response.ok) {
-                        console.log('✅ Brevo API: Email sent successfully!', data);
-                        return { success: true, provider: 'Brevo API', response: data };
+                        console.log('✅ Brevo API: Email sent successfully!');
+                        return { success: true };
                     } else {
                         console.error('❌ Brevo API Error:', data);
-                        return {
-                            success: false,
-                            error: data.message || 'Brevo API error',
-                            details: data
-                        };
+                        return { success: false, error: data.message || 'Brevo API error' };
                     }
 
                 } catch (error) {
                     console.error('❌ Brevo API request failed:', error);
-                    return {
-                        success: false,
-                        error: error.message || 'Network error',
-                        details: error
-                    };
+                    return { success: false, error: error.message || 'Network error' };
                 }
             }
 
@@ -2221,13 +2278,6 @@
                 return result.success;
             }
 
-            async function sendUpdateEmail(record, changes) {
-                const subject = `🔄 WUB EEE Club - Profile Updated (${record.clubId})`;
-                const htmlContent = buildUpdateEmailHTML(record, changes);
-                const result = await sendEmail(record.email, subject, htmlContent);
-                return result.success;
-            }
-
             // ============================================
             // 🧪 TEST EMAIL
             // ============================================
@@ -2280,190 +2330,26 @@
             document.getElementById('testEmailBtn').addEventListener('click', testEmail);
 
             // ============================================
-            // 🔗 JSONBin.io CONFIGURATION
-            // ============================================
-            const JSONBIN_BIN_ID = '6a3a40f6f5f4af5e2921c0d2';
-            const JSONBIN_API_KEY = '$2a$10$uxxlv8nJapUJj6YbaVCY4u1EBDwX6.jOssFoyi0I7e8CyDKeTIc5W';
-            const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
-
-            const STORAGE_KEY = 'wub_eee_registrations';
-            const ID_KEY = 'wub_eee_last_id';
-            const CERT_KEY = 'wub_eee_certificates';
-            const ADMIN_EMAIL = 'eee-club@eee.wub.edu.bd';
-            const ADMIN_PASSWORD = 'Eee123@580Eee';
-            const year = new Date().getFullYear();
-
-            let isLoggedIn = false;
-            let isSyncing = false;
-            let paymentCompleted = false;
-            let verifiedTrxID = '';
-            let selectedMethod = 'bKash';
-
-            // ============================================
-            // 🎯 DOM REFS
-            // ============================================
-            const trxidInput = document.getElementById('trxidInput');
-            const trxidHint = document.getElementById('trxidHint');
-            const verifyBtn = document.getElementById('verifyTrxidBtn');
-            const paymentStatus = document.getElementById('paymentStatus');
-            const submitBtn = document.getElementById('submitBtn');
-            const resetPaymentBtn = document.getElementById('resetPaymentBtn');
-            const bkashInfo = document.getElementById('bkashInfo');
-            const nagadInfo = document.getElementById('nagadInfo');
-            const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
-
-            // ============================================
-            // ✅ TRXID VALIDATION
-            // ============================================
-            function isValidBkashTrxid(trxid) {
-                return /^DG[A-Z0-9]{8}$/.test(trxid);
-            }
-
-            function isValidNagadTrxid(trxid) {
-                return /^75[A-Z0-9]{6}$/.test(trxid);
-            }
-
-            function validateTrxid(trxid, method) {
-                trxid = trxid.trim().toUpperCase();
-                if (!trxid) return { valid: false, message: 'Please enter a Transaction ID.' };
-                if (method === 'bKash') {
-                    if (!isValidBkashTrxid(trxid)) {
-                        return { valid: false, message: 'Invalid bKash TrxID. Must start with "DG" and be exactly 10 characters (e.g., DGH5GB82G7)' };
-                    }
-                    return { valid: true, message: '✅ Valid bKash TrxID format.' };
-                } else if (method === 'Nagad') {
-                    if (!isValidNagadTrxid(trxid)) {
-                        return { valid: false, message: 'Invalid Nagad TrxID. Must start with "75" and be exactly 8 characters (e.g., 75OPUQ5X)' };
-                    }
-                    return { valid: true, message: '✅ Valid Nagad TrxID format.' };
-                }
-                return { valid: false, message: 'Unknown payment method.' };
-            }
-
-            trxidInput.addEventListener('input', function() {
-                const value = this.value.trim().toUpperCase();
-                this.value = value;
-                this.classList.remove('valid', 'invalid');
-                if (value.length === 0) {
-                    trxidHint.textContent = 'Enter your transaction ID';
-                    trxidHint.className = 'trxid-hint';
-                    return;
-                }
-                const validation = validateTrxid(value, selectedMethod);
-                if (validation.valid) {
-                    this.classList.add('valid');
-                    trxidHint.textContent = validation.message;
-                    trxidHint.className = 'trxid-hint success';
-                } else {
-                    this.classList.add('invalid');
-                    trxidHint.textContent = validation.message;
-                    trxidHint.className = 'trxid-hint error';
-                }
-            });
-
-            paymentMethodRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    selectedMethod = this.value;
-                    if (selectedMethod === 'bKash') {
-                        bkashInfo.style.display = 'inline-flex';
-                        nagadInfo.style.display = 'none';
-                        trxidInput.placeholder = 'Enter bKash TrxID (DGXXXXXXXX)';
-                        trxidInput.maxLength = 10;
-                        trxidHint.textContent = 'Must start with "DG" and be 10 characters';
-                        trxidHint.className = 'trxid-hint';
-                    } else {
-                        bkashInfo.style.display = 'none';
-                        nagadInfo.style.display = 'inline-flex';
-                        trxidInput.placeholder = 'Enter Nagad TrxID (75XXXXXX)';
-                        trxidInput.maxLength = 8;
-                        trxidHint.textContent = 'Must start with "75" and be 8 characters';
-                        trxidHint.className = 'trxid-hint';
-                    }
-                    trxidInput.value = '';
-                    trxidInput.classList.remove('valid', 'invalid');
-                    paymentCompleted = false;
-                    verifiedTrxID = '';
-                    trxidInput.disabled = false;
-                    verifyBtn.disabled = false;
-                    verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify';
-                    verifyBtn.style.background = '#1b754b';
-                    submitBtn.disabled = true;
-                    updatePaymentUI();
-                });
-            });
-
-            function updatePaymentUI() {
-                if (paymentCompleted && verifiedTrxID) {
-                    paymentStatus.innerHTML =
-                        `<i class="fas fa-check-circle" style="color:#1b754b;"></i> Paid (${selectedMethod}: ${verifiedTrxID})`;
-                    paymentStatus.className = 'payment-status done';
-                    trxidInput.disabled = true;
-                    verifyBtn.disabled = true;
-                    verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verified';
-                    verifyBtn.style.background = '#1b754b';
-                    submitBtn.disabled = false;
-                } else {
-                    paymentStatus.innerHTML = '<i class="fas fa-clock"></i> Pending';
-                    paymentStatus.className = 'payment-status';
-                    trxidInput.disabled = false;
-                    verifyBtn.disabled = false;
-                    verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify';
-                    verifyBtn.style.background = '#1b754b';
-                    submitBtn.disabled = true;
-                }
-            }
-
-            verifyBtn.addEventListener('click', function() {
-                const trxid = trxidInput.value.trim().toUpperCase();
-                if (!trxid) {
-                    alert('⚠️ Please enter a Transaction ID (TrxID).');
-                    return;
-                }
-                const validation = validateTrxid(trxid, selectedMethod);
-                if (!validation.valid) {
-                    alert(`⚠️ ${validation.message}`);
-                    return;
-                }
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
-                this.disabled = true;
-                setTimeout(() => {
-                    verifiedTrxID = trxid;
-                    paymentCompleted = true;
-                    updatePaymentUI();
-                    alert(`✅ ${selectedMethod} payment verified!\nTrxID: ${verifiedTrxID}\nAmount: 200 TK`);
-                    this.innerHTML = '<i class="fas fa-check"></i> Verified';
-                    this.style.background = '#1b754b';
-                }, 800);
-            });
-
-            resetPaymentBtn.addEventListener('click', function() {
-                paymentCompleted = false;
-                verifiedTrxID = '';
-                trxidInput.value = '';
-                trxidInput.classList.remove('valid', 'invalid');
-                trxidInput.disabled = false;
-                verifyBtn.disabled = false;
-                verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify';
-                verifyBtn.style.background = '#1b754b';
-                submitBtn.disabled = true;
-                updatePaymentUI();
-                trxidHint.textContent = 'Enter your transaction ID';
-                trxidHint.className = 'trxid-hint';
-            });
-
-            // ============================================
-            // ☁️ CLOUD SYNC FUNCTIONS
+            // ☁️ CLOUD SYNC FUNCTIONS (WITH BETTER ERROR HANDLING)
             // ============================================
             function updateSyncStatus(status, message) {
                 const dot = document.getElementById('syncDot');
                 const text = document.getElementById('syncText');
+                const banner = document.getElementById('cloudErrorBanner');
+                const errorMsg = document.getElementById('cloudErrorMessage');
+                
                 dot.className = 'sync-dot';
                 if (status === 'online') {
                     dot.classList.add('online');
                     text.textContent = message || '✅ Cloud connected - Data synced across all devices';
-                } else if (status === 'offline') {
-                    dot.classList.add('offline');
+                    banner.classList.remove('show');
+                    cloudErrorCount = 0;
+                } else if (status === 'offline' || status === 'cloud-error') {
+                    dot.classList.add('cloud-error');
                     text.textContent = message || '⚠️ Cloud unavailable - Using local data only';
+                    banner.classList.add('show');
+                    errorMsg.textContent = '⚠️ Cloud sync failed. Data is saved locally. Click Retry to try again.';
+                    cloudErrorCount++;
                 } else if (status === 'syncing') {
                     dot.classList.add('syncing');
                     text.textContent = message || '⏳ Syncing with cloud...';
@@ -2473,21 +2359,37 @@
             async function syncDataToCloud(records, lastId) {
                 try {
                     updateSyncStatus('syncing', '⏳ Saving to cloud...');
-                    const data = { records: records, lastId: lastId || getLastSerial() };
+                    
+                    // Create a clean copy of data
+                    const data = { 
+                        records: records || [], 
+                        lastId: lastId || getLastSerial(),
+                        timestamp: new Date().toISOString()
+                    };
+                    
                     const response = await fetch(JSONBIN_URL, {
                         method: 'PUT',
-                        headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY },
+                        headers: { 
+                            'Content-Type': 'application/json', 
+                            'X-Master-Key': JSONBIN_API_KEY 
+                        },
                         body: JSON.stringify(data)
                     });
+                    
                     if (response.ok) {
+                        const result = await response.json();
+                        console.log('✅ Cloud save successful:', result);
                         updateSyncStatus('online', '✅ Data saved to cloud');
                         return true;
                     } else {
-                        updateSyncStatus('offline', '⚠️ Cloud save failed');
+                        const errorText = await response.text();
+                        console.error('❌ Cloud save failed:', response.status, errorText);
+                        updateSyncStatus('cloud-error', `⚠️ Cloud save failed (${response.status})`);
                         return false;
                     }
                 } catch (error) {
-                    updateSyncStatus('offline', '⚠️ Cloud error - Using local data');
+                    console.error('❌ Cloud sync error:', error);
+                    updateSyncStatus('cloud-error', '⚠️ Cloud error - Using local data');
                     return false;
                 }
             }
@@ -2495,20 +2397,25 @@
             async function fetchDataFromCloud() {
                 try {
                     updateSyncStatus('syncing', '⏳ Fetching from cloud...');
+                    
                     const response = await fetch(JSONBIN_URL, {
                         method: 'GET',
                         headers: { 'X-Master-Key': JSONBIN_API_KEY }
                     });
+                    
                     if (response.ok) {
                         const data = await response.json();
+                        console.log('✅ Cloud fetch successful:', data);
                         updateSyncStatus('online', '✅ Data fetched from cloud');
                         return data.record || data;
                     } else {
-                        updateSyncStatus('offline', '⚠️ Cloud fetch failed');
+                        console.error('❌ Cloud fetch failed:', response.status);
+                        updateSyncStatus('cloud-error', `⚠️ Cloud fetch failed (${response.status})`);
                         return null;
                     }
                 } catch (error) {
-                    updateSyncStatus('offline', '⚠️ Cloud error - Using local data');
+                    console.error('❌ Cloud fetch error:', error);
+                    updateSyncStatus('cloud-error', '⚠️ Cloud error - Using local data');
                     return null;
                 }
             }
@@ -2521,29 +2428,54 @@
                     if (cloudData && cloudData.records) {
                         const localRecords = getRegistrations();
                         const cloudRecords = cloudData.records || [];
+                        // Merge: cloud wins if newer
                         const mergedRecords = mergeRecords(localRecords, cloudRecords);
                         saveRegistrations(mergedRecords);
                         if (cloudData.lastId && cloudData.lastId > getLastSerial()) {
                             setLastSerial(cloudData.lastId);
                         }
-                        // ✅ FORCE REFRESH ADMIN TABLE AFTER SYNC
                         renderAdminTable();
                         showToast('✅ Data synced from cloud successfully!');
+                    } else if (cloudData && cloudData.records && cloudData.records.length === 0) {
+                        updateSyncStatus('online', '✅ Cloud connected - No data yet');
                     } else {
-                        updateSyncStatus('offline', '⚠️ Cloud unavailable - Using local data');
+                        updateSyncStatus('cloud-error', '⚠️ Cloud unavailable - Using local data');
                     }
                 } catch (error) {
-                    updateSyncStatus('offline', '⚠️ Cloud error - Using local data');
+                    console.error('Sync error:', error);
+                    updateSyncStatus('cloud-error', '⚠️ Cloud error - Using local data');
                 }
                 isSyncing = false;
             }
 
             function mergeRecords(local, cloud) {
+                // Create map by studentId (unique identifier)
                 const recordMap = {};
-                local.forEach(r => { if (r.studentId) recordMap[r.studentId] = r; });
-                cloud.forEach(r => { if (r.studentId) recordMap[r.studentId] = r; });
-                return Object.values(recordMap);
+                
+                // First add cloud records
+                cloud.forEach(r => { 
+                    if (r.studentId) recordMap[r.studentId] = { ...r, source: 'cloud' }; 
+                });
+                
+                // Then add local records (overwrite cloud if newer)
+                local.forEach(r => { 
+                    if (r.studentId) {
+                        if (!recordMap[r.studentId] || new Date(r.timestamp || 0) > new Date(recordMap[r.studentId].timestamp || 0)) {
+                            recordMap[r.studentId] = { ...r, source: 'local' };
+                        }
+                    }
+                });
+                
+                const merged = Object.values(recordMap);
+                console.log(`🔄 Merged ${merged.length} records (${Object.keys(recordMap).length} unique)`);
+                return merged;
             }
+
+            // Retry function for the banner
+            window.retryCloudSync = function() {
+                showToast('🔄 Retrying cloud sync...');
+                syncFromCloud();
+            };
 
             // ============================================
             // 💾 DATA MANAGEMENT
@@ -2562,25 +2494,53 @@
             }
 
             function getRegistrations() {
-                const data = localStorage.getItem(STORAGE_KEY);
-                return data ? JSON.parse(data) : [];
+                try {
+                    const data = localStorage.getItem(STORAGE_KEY);
+                    return data ? JSON.parse(data) : [];
+                } catch (e) {
+                    console.error('Error reading registrations:', e);
+                    return [];
+                }
             }
 
             function saveRegistrations(records) {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
-                const lastId = getLastSerial();
-                setTimeout(() => syncDataToCloud(records, lastId), 100);
-                // ✅ FORCE REFRESH ADMIN TABLE AFTER SAVE
-                setTimeout(() => renderAdminTable(), 200);
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+                    const lastId = getLastSerial();
+                    // Async cloud sync with retry
+                    setTimeout(() => {
+                        syncDataToCloud(records, lastId).then(success => {
+                            if (!success && cloudErrorCount < 3) {
+                                // Auto retry after 5 seconds if failed
+                                setTimeout(() => syncDataToCloud(records, lastId), 5000);
+                            }
+                        });
+                    }, 500);
+                    renderAdminTable();
+                    return true;
+                } catch (e) {
+                    console.error('Error saving registrations:', e);
+                    showToast('⚠️ Error saving data locally', true);
+                    return false;
+                }
             }
 
             function getCertificates() {
-                const data = localStorage.getItem(CERT_KEY);
-                return data ? JSON.parse(data) : {};
+                try {
+                    const data = localStorage.getItem(CERT_KEY);
+                    return data ? JSON.parse(data) : {};
+                } catch (e) {
+                    console.error('Error reading certificates:', e);
+                    return {};
+                }
             }
 
             function saveCertificates(certs) {
-                localStorage.setItem(CERT_KEY, JSON.stringify(certs));
+                try {
+                    localStorage.setItem(CERT_KEY, JSON.stringify(certs));
+                } catch (e) {
+                    console.error('Error saving certificates:', e);
+                }
             }
 
             // ============================================
@@ -2782,7 +2742,7 @@
             }
 
             // ============================================
-            // ✅ ADMIN FUNCTIONS
+            // ✅ ADMIN FUNCTIONS (with auto-refresh)
             // ============================================
             window.verifyMember = async function(clubId) {
                 const records = getRegistrations();
@@ -2799,7 +2759,6 @@
                 const emailSent = await sendConfirmationEmail(records[index]);
                 records[index].emailSent = emailSent;
                 saveRegistrations(records);
-                // ✅ FORCE REFRESH
                 renderAdminTable();
                 showToast(emailSent ? `✅ Verified & email sent` : `⚠️ Verified but email failed`, !emailSent);
             };
@@ -2887,7 +2846,6 @@
                     }
                     
                     document.getElementById('unverifyModal').classList.remove('open');
-                    // ✅ FORCE REFRESH
                     renderAdminTable();
                     showToast(emailSent ? `✅ Unverified & email sent` : `✅ Unverified (email ${sendEmail ? 'failed' : 'skipped'})`, !emailSent && sendEmail);
                 } catch (error) { 
@@ -2977,7 +2935,6 @@
                     records[index].interest = interest;
                     
                     saveRegistrations(records);
-                    // ✅ FORCE REFRESH
                     renderAdminTable();
                     
                     if (sendEmail) {
@@ -3037,7 +2994,6 @@
                     
                     records.splice(index, 1);
                     saveRegistrations(records);
-                    // ✅ FORCE REFRESH
                     renderAdminTable();
                     showToast(`🗑️ ${record.fullName} has been permanently deleted.`);
                 } catch (error) {
@@ -3234,7 +3190,6 @@
                     document.getElementById('loginOverlay').classList.add('open');
                     document.getElementById('loginError').classList.remove('show');
                 } else {
-                    // ✅ Refresh admin table when tab is clicked
                     renderAdminTable();
                 }
             });
@@ -3256,7 +3211,6 @@
                     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
                     document.getElementById('tab-admin').classList.add('active');
                     
-                    // ✅ FORCE REFRESH
                     renderAdminTable();
                     showToast('✅ Welcome Admin!');
                     setTimeout(syncFromCloud, 500);
@@ -3357,7 +3311,6 @@
                 document.getElementById('qrJoinDate').textContent = new Date(record.joinDate).toLocaleDateString();
                 document.getElementById('qrSection').style.display = 'block';
                 
-                // ✅ FORCE REFRESH AFTER REGISTRATION
                 renderAdminTable();
                 submitBtn.disabled = true;
                 showToast('🎉 Registration saved with Club ID: ' + clubId);
@@ -3593,7 +3546,6 @@
                     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
                     document.getElementById('tab-' + this.dataset.tab).classList.add('active');
                     if (this.dataset.tab === 'admin' && isLoggedIn) {
-                        // ✅ Force refresh when switching to admin tab
                         renderAdminTable();
                         setTimeout(syncFromCloud, 300);
                     }
@@ -3612,6 +3564,7 @@
             console.log('📧 Brevo API configured with v3 key');
             console.log('🔑 Admin: eee-club@eee.wub.edu.bd / Eee123@580Eee');
             console.log('🔄 Admin panel auto-refresh enabled!');
+            console.log('☁️ Cloud sync: ' + JSONBIN_BIN_ID);
         })();
     </script>
 </body>
