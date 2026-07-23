@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         /* ============================================
-           ALL STYLES
+           ALL STYLES (Full working styles)
            ============================================ */
         * {
             margin: 0;
@@ -2002,21 +2002,19 @@
     <script>
         (function() {
             // ============================================
+            // 🔥 YOUR WORKING CREDENTIALS
+            // ============================================
+            const JSONBIN_BIN_ID = '6a61d0b7f5f4af5e29b4be88';
+            const JSONBIN_API_KEY = '$2a$10$OAJm5/YRl9n2rl7OMrn4cO344FQVbRX/P3ZLlkdY68JlIAaifXVkS';
+            const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+
+            // ============================================
             // 🔥 BREVO API CONFIGURATION
             // ============================================
             const BREVO_API_KEY = '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';
             const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
             const FROM_EMAIL = 'eee-club@eee.wub.edu.bd';
             const FROM_NAME = 'WUB EEE Club';
-
-            // ============================================
-            // 🔗 JSONBin.io CONFIGURATION
-            // ⚠️ REPLACE WITH YOUR NEW CREDENTIALS FROM JSONBIN.IO
-            // ============================================
-            // TODO: Replace these with your new Bin ID and API Key
-            const JSONBIN_BIN_ID = '6a3a40f6f5f4af5e2921c0d2'; // e.g., '67abcd1234ef5678ghij9012'
-            const JSONBIN_API_KEY = '$2a$10$OAJm5/YRl9n2rl7OMrn4cO344FQVbRX/P3ZLlkdY68JlIAaifXVkS'; // Your JSONBin.io API Key
-            const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 
             const STORAGE_KEY = 'wub_eee_registrations';
             const ID_KEY = 'wub_eee_last_id';
@@ -2030,6 +2028,7 @@
             let paymentCompleted = false;
             let verifiedTrxID = '';
             let selectedMethod = 'bKash';
+            let cloudErrorCount = 0;
 
             // ============================================
             // 📧 EMAIL SENDING FUNCTION
@@ -2066,6 +2065,9 @@
                 }
             }
 
+            // ============================================
+            // 📧 ESCAPE HTML
+            // ============================================
             function escapeHtml(text) {
                 if (!text) return '';
                 const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
@@ -2312,11 +2314,13 @@
                     dot.classList.add('online');
                     text.textContent = message || '✅ Cloud connected - Data synced across all devices';
                     banner.classList.remove('show');
+                    cloudErrorCount = 0;
                 } else if (status === 'cloud-error') {
                     dot.classList.add('cloud-error');
                     text.textContent = message || '⚠️ Cloud unavailable - Using local data only';
                     banner.classList.add('show');
                     errorMsg.textContent = message || '⚠️ Cloud sync failed. Data is saved locally. Click Retry to try again.';
+                    cloudErrorCount++;
                 } else if (status === 'syncing') {
                     dot.classList.add('syncing');
                     text.textContent = message || '⏳ Syncing with cloud...';
@@ -2324,9 +2328,8 @@
             }
 
             async function syncDataToCloud(records, lastId) {
-                if (!JSONBIN_BIN_ID || JSONBIN_BIN_ID === 'YOUR_NEW_BIN_ID') {
-                    console.warn('⚠️ JSONBin.io not configured. Please update your credentials.');
-                    updateSyncStatus('cloud-error', '⚠️ Cloud not configured - Please update credentials');
+                if (!JSONBIN_BIN_ID) {
+                    console.warn('⚠️ JSONBin.io not configured.');
                     return false;
                 }
 
@@ -2367,7 +2370,7 @@
             }
 
             async function fetchDataFromCloud() {
-                if (!JSONBIN_BIN_ID || JSONBIN_BIN_ID === 'YOUR_NEW_BIN_ID') {
+                if (!JSONBIN_BIN_ID) {
                     console.warn('⚠️ JSONBin.io not configured.');
                     return null;
                 }
@@ -2414,6 +2417,8 @@
                         showToast('✅ Data synced from cloud successfully!');
                     } else if (cloudData && cloudData.records && cloudData.records.length === 0) {
                         updateSyncStatus('online', '✅ Cloud connected - No data yet');
+                    } else {
+                        updateSyncStatus('cloud-error', '⚠️ Cloud unavailable - Using local data');
                     }
                 } catch (error) {
                     console.error('Sync error:', error);
@@ -3515,12 +3520,8 @@
             setTimeout(syncFromCloud, 1000);
 
             console.log('🏫 WUB EEE Club System loaded!');
-            console.log('✅ All admin functions are working!');
-            console.log('📧 Brevo API configured with v3 key');
+            console.log('✅ Cloud sync configured with Bin ID:', JSONBIN_BIN_ID);
             console.log('🔑 Admin: eee-club@eee.wub.edu.bd / Eee123@580Eee');
-            console.log('🔄 Admin panel auto-refresh enabled!');
-            console.log('☁️ Cloud sync: ' + (JSONBIN_BIN_ID !== 'YOUR_NEW_BIN_ID' ? 'Configured ✅' : '⚠️ Not configured'));
-            console.log('📌 To enable cloud sync, update JSONBIN_BIN_ID and JSONBIN_API_KEY');
         })();
     </script>
 </body>
